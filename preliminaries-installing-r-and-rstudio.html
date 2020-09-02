@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 1 Preliminaries: Installing R and RStudio | An Introduction to Discrete Choice Analysis</title>
+  <meta name="description" content="These notes were created by Antonio Paez as a resource for teaching a graduate discrete choice analysis course (GEOG 738) at McMaster University." />
+  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 1 Preliminaries: Installing R and RStudio | An Introduction to Discrete Choice Analysis" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="These notes were created by Antonio Paez as a resource for teaching a graduate discrete choice analysis course (GEOG 738) at McMaster University." />
+  <meta name="github-repo" content="paezha/Discrete-Choice-Analysis-with-R" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 1 Preliminaries: Installing R and RStudio | An Introduction to Discrete Choice Analysis" />
+  
+  <meta name="twitter:description" content="These notes were created by Antonio Paez as a resource for teaching a graduate discrete choice analysis course (GEOG 738) at McMaster University." />
+  
+
+<meta name="author" content="Antonio Paez" />
+
+
+<meta name="date" content="2020-09-02" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+<link rel="next" href="chapter-1.html"/>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">A Minimal Book Example</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a><ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#choices-choices-choices"><i class="fa fa-check"></i>Choices, choices, choices</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#price-mechanisms"><i class="fa fa-check"></i>Price Mechanisms</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#plan"><i class="fa fa-check"></i>Plan</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#audience"><i class="fa fa-check"></i>Audience</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#requisites"><i class="fa fa-check"></i>Requisites</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html"><i class="fa fa-check"></i><b>1</b> Preliminaries: Installing R and RStudio</a><ul>
+<li class="chapter" data-level="1.1" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a></li>
+<li class="chapter" data-level="1.2" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#learning-objectives"><i class="fa fa-check"></i><b>1.2</b> Learning Objectives</a></li>
+<li class="chapter" data-level="1.3" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#r-the-open-statistical-computing-project"><i class="fa fa-check"></i><b>1.3</b> R: The Open Statistical Computing Project</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#what-is-r"><i class="fa fa-check"></i><b>1.3.1</b> What is R?</a></li>
+<li class="chapter" data-level="1.3.2" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#the-rstudio-ide"><i class="fa fa-check"></i><b>1.3.2</b> The RStudio IDE</a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#packages-in-r"><i class="fa fa-check"></i><b>1.4</b> Packages in R</a></li>
+<li class="chapter" data-level="1.5" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#encoding-in-r"><i class="fa fa-check"></i><b>1.5</b> Encoding in R</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="chapter-1.html"><a href="chapter-1.html"><i class="fa fa-check"></i><b>2</b> Data and stuff</a><ul>
+<li class="chapter" data-level="2.1" data-path="chapter-1.html"><a href="chapter-1.html#what-are-models"><i class="fa fa-check"></i><b>2.1</b> What are models?</a></li>
+<li class="chapter" data-level="2.2" data-path="chapter-1.html"><a href="chapter-1.html#how-to-use-this-note"><i class="fa fa-check"></i><b>2.2</b> How to use this note</a></li>
+<li class="chapter" data-level="2.3" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#learning-objectives"><i class="fa fa-check"></i><b>2.3</b> Learning objectives</a></li>
+<li class="chapter" data-level="2.4" data-path="chapter-1.html"><a href="chapter-1.html#suggested-readings"><i class="fa fa-check"></i><b>2.4</b> Suggested readings</a></li>
+<li class="chapter" data-level="2.5" data-path="chapter-1.html"><a href="chapter-1.html#ways-of-measuring-stuff"><i class="fa fa-check"></i><b>2.5</b> Ways of measuring stuff</a><ul>
+<li class="chapter" data-level="2.5.1" data-path="chapter-1.html"><a href="chapter-1.html#categorical"><i class="fa fa-check"></i><b>2.5.1</b> Categorical</a></li>
+<li class="chapter" data-level="2.5.2" data-path="chapter-1.html"><a href="chapter-1.html#quantitative"><i class="fa fa-check"></i><b>2.5.2</b> Quantitative</a></li>
+</ul></li>
+<li class="chapter" data-level="2.6" data-path="chapter-1.html"><a href="chapter-1.html#importing-data"><i class="fa fa-check"></i><b>2.6</b> Importing data</a></li>
+<li class="chapter" data-level="2.7" data-path="chapter-1.html"><a href="chapter-1.html#data-classes-in-r"><i class="fa fa-check"></i><b>2.7</b> Data Classes in <code>R</code></a></li>
+<li class="chapter" data-level="2.8" data-path="chapter-1.html"><a href="chapter-1.html#more-on-indexing-and-data-manipulation"><i class="fa fa-check"></i><b>2.8</b> More on indexing and data manipulation</a></li>
+<li class="chapter" data-level="2.9" data-path="chapter-1.html"><a href="chapter-1.html#visualization"><i class="fa fa-check"></i><b>2.9</b> Visualization</a></li>
+<li class="chapter" data-level="2.10" data-path="chapter-1.html"><a href="chapter-1.html#exercise"><i class="fa fa-check"></i><b>2.10</b> Exercise</a><ul>
+<li class="chapter" data-level="2.10.1" data-path="chapter-1.html"><a href="chapter-1.html#questions"><i class="fa fa-check"></i><b>2.10.1</b> Questions</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="chapter-2.html"><a href="chapter-2.html"><i class="fa fa-check"></i><b>3</b> Fundamental concepts</a><ul>
+<li class="chapter" data-level="3.1" data-path="chapter-2.html"><a href="chapter-2.html#why-modelling-choices"><i class="fa fa-check"></i><b>3.1</b> Why modelling choices?</a></li>
+<li class="chapter" data-level="3.2" data-path="chapter-1.html"><a href="chapter-1.html#how-to-use-this-note"><i class="fa fa-check"></i><b>3.2</b> How to use this note</a></li>
+<li class="chapter" data-level="3.3" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#learning-objectives"><i class="fa fa-check"></i><b>3.3</b> Learning objectives</a></li>
+<li class="chapter" data-level="3.4" data-path="chapter-1.html"><a href="chapter-1.html#suggested-readings"><i class="fa fa-check"></i><b>3.4</b> Suggested readings</a></li>
+<li class="chapter" data-level="3.5" data-path="chapter-2.html"><a href="chapter-2.html#preliminaries"><i class="fa fa-check"></i><b>3.5</b> Preliminaries</a></li>
+<li class="chapter" data-level="3.6" data-path="chapter-2.html"><a href="chapter-2.html#utility-maximization"><i class="fa fa-check"></i><b>3.6</b> Utility maximization</a><ul>
+<li class="chapter" data-level="3.6.1" data-path="chapter-2.html"><a href="chapter-2.html#what-is-utility"><i class="fa fa-check"></i><b>3.6.1</b> What is utility?</a></li>
+</ul></li>
+<li class="chapter" data-level="3.7" data-path="chapter-2.html"><a href="chapter-2.html#what-about-those-random-terms"><i class="fa fa-check"></i><b>3.7</b> What about those random terms?</a></li>
+<li class="chapter" data-level="3.8" data-path="chapter-2.html"><a href="chapter-2.html#probability-distribution-functions-pdfs"><i class="fa fa-check"></i><b>3.8</b> Probability distribution functions (PDFs)</a></li>
+<li class="chapter" data-level="3.9" data-path="chapter-2.html"><a href="chapter-2.html#a-simple-random-utility-discrete-choice-model"><i class="fa fa-check"></i><b>3.9</b> A simple random utility discrete choice model</a></li>
+<li class="chapter" data-level="3.10" data-path="chapter-2.html"><a href="chapter-2.html#other-choice-mechanisms"><i class="fa fa-check"></i><b>3.10</b> Other choice mechanisms</a></li>
+<li class="chapter" data-level="3.11" data-path="chapter-1.html"><a href="chapter-1.html#exercise"><i class="fa fa-check"></i><b>3.11</b> Exercise</a><ul>
+<li class="chapter" data-level="3.11.1" data-path="chapter-1.html"><a href="chapter-1.html#questions"><i class="fa fa-check"></i><b>3.11.1</b> Questions</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="chapter-3.html"><a href="chapter-3.html"><i class="fa fa-check"></i><b>4</b> Logit</a><ul>
+<li class="chapter" data-level="4.1" data-path="chapter-3.html"><a href="chapter-3.html#modelling-choices"><i class="fa fa-check"></i><b>4.1</b> Modelling choices</a></li>
+<li class="chapter" data-level="4.2" data-path="chapter-1.html"><a href="chapter-1.html#how-to-use-this-note"><i class="fa fa-check"></i><b>4.2</b> How to use this note</a></li>
+<li class="chapter" data-level="4.3" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#learning-objectives"><i class="fa fa-check"></i><b>4.3</b> Learning objectives</a></li>
+<li class="chapter" data-level="4.4" data-path="chapter-1.html"><a href="chapter-1.html#suggested-readings"><i class="fa fa-check"></i><b>4.4</b> Suggested readings</a></li>
+<li class="chapter" data-level="4.5" data-path="chapter-2.html"><a href="chapter-2.html#preliminaries"><i class="fa fa-check"></i><b>4.5</b> Preliminaries</a></li>
+<li class="chapter" data-level="4.6" data-path="chapter-3.html"><a href="chapter-3.html#once-again-those-random-terms"><i class="fa fa-check"></i><b>4.6</b> Once again those random terms</a></li>
+<li class="chapter" data-level="4.7" data-path="chapter-3.html"><a href="chapter-3.html#now-about-those-parameters-mu-and-sigma..."><i class="fa fa-check"></i><b>4.7</b> Now, about those parameters <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span>...</a></li>
+<li class="chapter" data-level="4.8" data-path="chapter-3.html"><a href="chapter-3.html#multinomial-logit"><i class="fa fa-check"></i><b>4.8</b> Multinomial logit</a></li>
+<li class="chapter" data-level="4.9" data-path="chapter-3.html"><a href="chapter-3.html#properties-of-the-logit-model"><i class="fa fa-check"></i><b>4.9</b> Properties of the logit model</a></li>
+<li class="chapter" data-level="4.10" data-path="chapter-3.html"><a href="chapter-3.html#revisiting-the-systematic-utilities"><i class="fa fa-check"></i><b>4.10</b> Revisiting the systematic utilities</a></li>
+<li class="chapter" data-level="4.11" data-path="chapter-1.html"><a href="chapter-1.html#exercise"><i class="fa fa-check"></i><b>4.11</b> Exercise</a><ul>
+<li class="chapter" data-level="4.11.1" data-path="chapter-1.html"><a href="chapter-1.html#questions"><i class="fa fa-check"></i><b>4.11.1</b> Questions</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="chapter-4.html"><a href="chapter-4.html"><i class="fa fa-check"></i><b>5</b> Practical issues in specification and estimation</a><ul>
+<li class="chapter" data-level="5.1" data-path="chapter-4.html"><a href="chapter-4.html#theory-and-practice"><i class="fa fa-check"></i><b>5.1</b> Theory and practice</a></li>
+<li class="chapter" data-level="5.2" data-path="chapter-1.html"><a href="chapter-1.html#how-to-use-this-note"><i class="fa fa-check"></i><b>5.2</b> How to use this note</a></li>
+<li class="chapter" data-level="5.3" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#learning-objectives"><i class="fa fa-check"></i><b>5.3</b> Learning objectives</a></li>
+<li class="chapter" data-level="5.4" data-path="chapter-1.html"><a href="chapter-1.html#suggested-readings"><i class="fa fa-check"></i><b>5.4</b> Suggested readings</a></li>
+<li class="chapter" data-level="5.5" data-path="chapter-2.html"><a href="chapter-2.html#preliminaries"><i class="fa fa-check"></i><b>5.5</b> Preliminaries</a></li>
+<li class="chapter" data-level="5.6" data-path="chapter-4.html"><a href="chapter-4.html#the-anatomy-of-utility-functions"><i class="fa fa-check"></i><b>5.6</b> The anatomy of utility functions</a></li>
+<li class="chapter" data-level="5.7" data-path="chapter-4.html"><a href="chapter-4.html#example-specifying-the-utility-functions"><i class="fa fa-check"></i><b>5.7</b> Example: Specifying the utility functions</a></li>
+<li class="chapter" data-level="5.8" data-path="chapter-4.html"><a href="chapter-4.html#estimation"><i class="fa fa-check"></i><b>5.8</b> Estimation</a></li>
+<li class="chapter" data-level="5.9" data-path="chapter-4.html"><a href="chapter-4.html#example-a-logit-model-of-mode-choice"><i class="fa fa-check"></i><b>5.9</b> Example: A logit model of mode choice</a></li>
+<li class="chapter" data-level="5.10" data-path="chapter-4.html"><a href="chapter-4.html#comparing-models-mcfaddens-rho2"><i class="fa fa-check"></i><b>5.10</b> Comparing models: McFadden's <span class="math inline">\(\rho^2\)</span></a></li>
+<li class="chapter" data-level="5.11" data-path="chapter-4.html"><a href="chapter-4.html#comparing-models-the-likelihood-ratio-test"><i class="fa fa-check"></i><b>5.11</b> Comparing models: the likelihood ratio test</a></li>
+<li class="chapter" data-level="5.12" data-path="chapter-1.html"><a href="chapter-1.html#exercise"><i class="fa fa-check"></i><b>5.12</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="chapter-5.html"><a href="chapter-5.html"><i class="fa fa-check"></i><b>6</b> Behavioral insights from choice models</a><ul>
+<li class="chapter" data-level="6.1" data-path="chapter-5.html"><a href="chapter-5.html#inferring-and-forecasting-behavior"><i class="fa fa-check"></i><b>6.1</b> Inferring and forecasting behavior</a></li>
+<li class="chapter" data-level="6.2" data-path="chapter-1.html"><a href="chapter-1.html#how-to-use-this-note"><i class="fa fa-check"></i><b>6.2</b> How to use this note</a></li>
+<li class="chapter" data-level="6.3" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#learning-objectives"><i class="fa fa-check"></i><b>6.3</b> Learning objectives</a></li>
+<li class="chapter" data-level="6.4" data-path="chapter-1.html"><a href="chapter-1.html#suggested-readings"><i class="fa fa-check"></i><b>6.4</b> Suggested readings</a></li>
+<li class="chapter" data-level="6.5" data-path="chapter-2.html"><a href="chapter-2.html#preliminaries"><i class="fa fa-check"></i><b>6.5</b> Preliminaries</a></li>
+<li class="chapter" data-level="6.6" data-path="chapter-5.html"><a href="chapter-5.html#the-meaning-of-the-coefficients"><i class="fa fa-check"></i><b>6.6</b> The meaning of the coefficients</a></li>
+<li class="chapter" data-level="6.7" data-path="chapter-5.html"><a href="chapter-5.html#marginal-effects"><i class="fa fa-check"></i><b>6.7</b> Marginal effects</a><ul>
+<li class="chapter" data-level="6.7.1" data-path="chapter-5.html"><a href="chapter-5.html#direct-marginal-effects"><i class="fa fa-check"></i><b>6.7.1</b> Direct marginal effects</a></li>
+<li class="chapter" data-level="6.7.2" data-path="chapter-5.html"><a href="chapter-5.html#cross-marginal-effects"><i class="fa fa-check"></i><b>6.7.2</b> Cross-marginal effects</a></li>
+</ul></li>
+<li class="chapter" data-level="6.8" data-path="chapter-5.html"><a href="chapter-5.html#elasticity"><i class="fa fa-check"></i><b>6.8</b> Elasticity</a><ul>
+<li class="chapter" data-level="6.8.1" data-path="chapter-5.html"><a href="chapter-5.html#direct-point-elasticity"><i class="fa fa-check"></i><b>6.8.1</b> Direct-point elasticity</a></li>
+<li class="chapter" data-level="6.8.2" data-path="chapter-5.html"><a href="chapter-5.html#cross-point-elasticity"><i class="fa fa-check"></i><b>6.8.2</b> Cross-point elasticity</a></li>
+</ul></li>
+<li class="chapter" data-level="6.9" data-path="chapter-5.html"><a href="chapter-5.html#calculating-elasticities-based-on-an-mlogit-model"><i class="fa fa-check"></i><b>6.9</b> Calculating elasticities based on an <code>mlogit</code> model</a><ul>
+<li class="chapter" data-level="6.9.1" data-path="chapter-5.html"><a href="chapter-5.html#computing-the-marginal-effects"><i class="fa fa-check"></i><b>6.9.1</b> Computing the marginal effects</a></li>
+<li class="chapter" data-level="6.9.2" data-path="chapter-5.html"><a href="chapter-5.html#computing-the-elasticities"><i class="fa fa-check"></i><b>6.9.2</b> Computing the elasticities</a></li>
+</ul></li>
+<li class="chapter" data-level="6.10" data-path="chapter-5.html"><a href="chapter-5.html#a-note-about-attributes-in-dummy-format"><i class="fa fa-check"></i><b>6.10</b> A note about attributes in dummy format</a></li>
+<li class="chapter" data-level="6.11" data-path="chapter-5.html"><a href="chapter-5.html#willingness-to-pay-and-discount-rate"><i class="fa fa-check"></i><b>6.11</b> Willingness to pay and discount rate</a></li>
+<li class="chapter" data-level="6.12" data-path="chapter-5.html"><a href="chapter-5.html#simulating-market-changes"><i class="fa fa-check"></i><b>6.12</b> Simulating market changes</a><ul>
+<li class="chapter" data-level="6.12.1" data-path="chapter-5.html"><a href="chapter-5.html#incentives"><i class="fa fa-check"></i><b>6.12.1</b> Incentives</a></li>
+<li class="chapter" data-level="6.12.2" data-path="chapter-5.html"><a href="chapter-5.html#introduction-of-a-new-system"><i class="fa fa-check"></i><b>6.12.2</b> Introduction of a new system</a></li>
+</ul></li>
+<li class="chapter" data-level="6.13" data-path="chapter-1.html"><a href="chapter-1.html#exercise"><i class="fa fa-check"></i><b>6.13</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="chapter-6.html"><a href="chapter-6.html"><i class="fa fa-check"></i><b>7</b> Non-Proportional Substitution Patterns I: Generalized Extreme Value Models</a><ul>
+<li class="chapter" data-level="7.1" data-path="chapter-2.html"><a href="chapter-2.html#preliminaries"><i class="fa fa-check"></i><b>7.1</b> Preliminaries</a></li>
+<li class="chapter" data-level="7.2" data-path="chapter-6.html"><a href="chapter-6.html#the-limits-of-perfection"><i class="fa fa-check"></i><b>7.2</b> The limits of perfection</a></li>
+<li class="chapter" data-level="7.3" data-path="chapter-1.html"><a href="chapter-1.html#how-to-use-this-note"><i class="fa fa-check"></i><b>7.3</b> How to use this note</a></li>
+<li class="chapter" data-level="7.4" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#learning-objectives"><i class="fa fa-check"></i><b>7.4</b> Learning objectives</a></li>
+<li class="chapter" data-level="7.5" data-path="chapter-1.html"><a href="chapter-1.html#suggested-readings"><i class="fa fa-check"></i><b>7.5</b> Suggested readings</a></li>
+<li class="chapter" data-level="7.6" data-path="chapter-6.html"><a href="chapter-6.html#generalized-extreme-value-models-a-recipe-for-deriving-discrete-choice-models"><i class="fa fa-check"></i><b>7.6</b> Generalized Extreme Value models: a recipe for deriving discrete choice models</a></li>
+<li class="chapter" data-level="7.7" data-path="chapter-6.html"><a href="chapter-6.html#nested-logit-model"><i class="fa fa-check"></i><b>7.7</b> Nested Logit model</a></li>
+<li class="chapter" data-level="7.8" data-path="chapter-6.html"><a href="chapter-6.html#properties-of-the-nested-logit-model"><i class="fa fa-check"></i><b>7.8</b> Properties of the nested logit model</a></li>
+<li class="chapter" data-level="7.9" data-path="chapter-6.html"><a href="chapter-6.html#estimation-of-the-nested-logit-model"><i class="fa fa-check"></i><b>7.9</b> Estimation of the nested logit model</a></li>
+<li class="chapter" data-level="7.10" data-path="chapter-6.html"><a href="chapter-6.html#substitution-patterns-with-the-nested-logit-model"><i class="fa fa-check"></i><b>7.10</b> Substitution patterns with the nested logit model</a></li>
+<li class="chapter" data-level="7.11" data-path="chapter-6.html"><a href="chapter-6.html#elasticities-of-the-nested-logit-model"><i class="fa fa-check"></i><b>7.11</b> Elasticities of the nested logit model</a></li>
+<li class="chapter" data-level="7.12" data-path="chapter-1.html"><a href="chapter-1.html#exercise"><i class="fa fa-check"></i><b>7.12</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="chapter-7.html"><a href="chapter-7.html"><i class="fa fa-check"></i><b>8</b> Non-Proportional Substitution Patterns I: The Probit Model</a><ul>
+<li class="chapter" data-level="8.1" data-path="chapter-2.html"><a href="chapter-2.html#preliminaries"><i class="fa fa-check"></i><b>8.1</b> Preliminaries</a></li>
+<li class="chapter" data-level="8.2" data-path="chapter-7.html"><a href="chapter-7.html#more-flexible-substitution-patterns"><i class="fa fa-check"></i><b>8.2</b> More flexible substitution patterns</a></li>
+<li class="chapter" data-level="8.3" data-path="chapter-1.html"><a href="chapter-1.html#how-to-use-this-note"><i class="fa fa-check"></i><b>8.3</b> How to use this note</a></li>
+<li class="chapter" data-level="8.4" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#learning-objectives"><i class="fa fa-check"></i><b>8.4</b> Learning objectives</a></li>
+<li class="chapter" data-level="8.5" data-path="chapter-1.html"><a href="chapter-1.html#suggested-readings"><i class="fa fa-check"></i><b>8.5</b> Suggested readings</a></li>
+<li class="chapter" data-level="8.6" data-path="chapter-7.html"><a href="chapter-7.html#probit-model"><i class="fa fa-check"></i><b>8.6</b> Probit model</a></li>
+<li class="chapter" data-level="8.7" data-path="chapter-1.html"><a href="chapter-1.html#exercise"><i class="fa fa-check"></i><b>8.7</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="chapter-8.html"><a href="chapter-8.html"><i class="fa fa-check"></i><b>9</b> Dealing with Heterogeneity I: The Latent Class Logit Model</a><ul>
+<li class="chapter" data-level="9.1" data-path="chapter-2.html"><a href="chapter-2.html#preliminaries"><i class="fa fa-check"></i><b>9.1</b> Preliminaries</a></li>
+<li class="chapter" data-level="9.2" data-path="chapter-8.html"><a href="chapter-8.html#taste-variations-in-the-population"><i class="fa fa-check"></i><b>9.2</b> Taste variations in the population</a></li>
+<li class="chapter" data-level="9.3" data-path="chapter-1.html"><a href="chapter-1.html#how-to-use-this-note"><i class="fa fa-check"></i><b>9.3</b> How to use this note</a></li>
+<li class="chapter" data-level="9.4" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#learning-objectives"><i class="fa fa-check"></i><b>9.4</b> Learning objectives</a></li>
+<li class="chapter" data-level="9.5" data-path="chapter-1.html"><a href="chapter-1.html#suggested-readings"><i class="fa fa-check"></i><b>9.5</b> Suggested readings</a></li>
+<li class="chapter" data-level="9.6" data-path="chapter-8.html"><a href="chapter-8.html#latent-class-logit"><i class="fa fa-check"></i><b>9.6</b> Latent class logit</a></li>
+<li class="chapter" data-level="9.7" data-path="chapter-4.html"><a href="chapter-4.html#estimation"><i class="fa fa-check"></i><b>9.7</b> Estimation</a></li>
+<li class="chapter" data-level="9.8" data-path="chapter-8.html"><a href="chapter-8.html#properties-of-the-latent-class-logit-model"><i class="fa fa-check"></i><b>9.8</b> Properties of the latent class logit model</a></li>
+<li class="chapter" data-level="9.9" data-path="chapter-8.html"><a href="chapter-8.html#empirical-example"><i class="fa fa-check"></i><b>9.9</b> Empirical example</a></li>
+<li class="chapter" data-level="9.10" data-path="chapter-8.html"><a href="chapter-8.html#adding-individual-level-attributes"><i class="fa fa-check"></i><b>9.10</b> Adding individual-level attributes</a></li>
+<li class="chapter" data-level="9.11" data-path="chapter-8.html"><a href="chapter-8.html#adding-variables-to-the-latent-class-selection-model"><i class="fa fa-check"></i><b>9.11</b> Adding variables to the latent class selection model</a></li>
+<li class="chapter" data-level="9.12" data-path="chapter-1.html"><a href="chapter-1.html#exercise"><i class="fa fa-check"></i><b>9.12</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="chapter-9.html"><a href="chapter-9.html"><i class="fa fa-check"></i><b>10</b> Dealing with Heterogeneity II: The Mixed Logit Model</a><ul>
+<li class="chapter" data-level="10.1" data-path="chapter-2.html"><a href="chapter-2.html#preliminaries"><i class="fa fa-check"></i><b>10.1</b> Preliminaries</a></li>
+<li class="chapter" data-level="10.2" data-path="chapter-9.html"><a href="chapter-9.html#more-on-taste-variation"><i class="fa fa-check"></i><b>10.2</b> More on taste variation</a></li>
+<li class="chapter" data-level="10.3" data-path="chapter-1.html"><a href="chapter-1.html#how-to-use-this-note"><i class="fa fa-check"></i><b>10.3</b> How to use this note</a></li>
+<li class="chapter" data-level="10.4" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#learning-objectives"><i class="fa fa-check"></i><b>10.4</b> Learning objectives</a></li>
+<li class="chapter" data-level="10.5" data-path="chapter-1.html"><a href="chapter-1.html#suggested-readings"><i class="fa fa-check"></i><b>10.5</b> Suggested readings</a></li>
+<li class="chapter" data-level="10.6" data-path="chapter-9.html"><a href="chapter-9.html#mixed-logit"><i class="fa fa-check"></i><b>10.6</b> Mixed logit</a></li>
+<li class="chapter" data-level="10.7" data-path="chapter-4.html"><a href="chapter-4.html#estimation"><i class="fa fa-check"></i><b>10.7</b> Estimation</a></li>
+<li class="chapter" data-level="10.8" data-path="chapter-9.html"><a href="chapter-9.html#practical-example"><i class="fa fa-check"></i><b>10.8</b> Practical example</a></li>
+<li class="chapter" data-level="10.9" data-path="chapter-9.html"><a href="chapter-9.html#behavioral-insights-from-the-mixed-logit-model"><i class="fa fa-check"></i><b>10.9</b> Behavioral insights from the mixed logit model</a><ul>
+<li class="chapter" data-level="10.9.1" data-path="chapter-9.html"><a href="chapter-9.html#unconditional-distribution-of-a-random-parameter"><i class="fa fa-check"></i><b>10.9.1</b> Unconditional distribution of a random parameter</a></li>
+<li class="chapter" data-level="10.9.2" data-path="chapter-9.html"><a href="chapter-9.html#conditional-distribution-of-the-random-coefficients"><i class="fa fa-check"></i><b>10.9.2</b> Conditional distribution of the random coefficients</a></li>
+</ul></li>
+<li class="chapter" data-level="10.10" data-path="chapter-9.html"><a href="chapter-9.html#using-covariates-to-capture-variations-in-taste"><i class="fa fa-check"></i><b>10.10</b> Using covariates to capture variations in taste</a></li>
+<li class="chapter" data-level="10.11" data-path="chapter-9.html"><a href="chapter-9.html#revisiting-the-example"><i class="fa fa-check"></i><b>10.11</b> Revisiting the example</a></li>
+<li class="chapter" data-level="10.12" data-path="chapter-9.html"><a href="chapter-9.html#full-covariance-matrix-for-random-components"><i class="fa fa-check"></i><b>10.12</b> Full covariance matrix for random components</a></li>
+<li class="chapter" data-level="10.13" data-path="chapter-9.html"><a href="chapter-9.html#final-remarks"><i class="fa fa-check"></i><b>10.13</b> Final remarks</a></li>
+<li class="chapter" data-level="10.14" data-path="chapter-1.html"><a href="chapter-1.html#exercise"><i class="fa fa-check"></i><b>10.14</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="chapter-10.html"><a href="chapter-10.html"><i class="fa fa-check"></i><b>11</b> Ordinal and Ranked Responses</a><ul>
+<li class="chapter" data-level="11.1" data-path="chapter-2.html"><a href="chapter-2.html#preliminaries"><i class="fa fa-check"></i><b>11.1</b> Preliminaries</a></li>
+<li class="chapter" data-level="11.2" data-path="chapter-9.html"><a href="chapter-9.html#more-on-taste-variation"><i class="fa fa-check"></i><b>11.2</b> More on taste variation</a></li>
+<li class="chapter" data-level="11.3" data-path="chapter-1.html"><a href="chapter-1.html#how-to-use-this-note"><i class="fa fa-check"></i><b>11.3</b> How to use this note</a></li>
+<li class="chapter" data-level="11.4" data-path="preliminaries-installing-r-and-rstudio.html"><a href="preliminaries-installing-r-and-rstudio.html#learning-objectives"><i class="fa fa-check"></i><b>11.4</b> Learning objectives</a></li>
+<li class="chapter" data-level="11.5" data-path="chapter-1.html"><a href="chapter-1.html#suggested-readings"><i class="fa fa-check"></i><b>11.5</b> Suggested readings</a></li>
+<li class="chapter" data-level="11.6" data-path="chapter-8.html"><a href="chapter-8.html#latent-class-logit"><i class="fa fa-check"></i><b>11.6</b> Latent class logit</a></li>
+<li class="chapter" data-level="11.7" data-path="chapter-4.html"><a href="chapter-4.html#estimation"><i class="fa fa-check"></i><b>11.7</b> Estimation</a></li>
+<li class="chapter" data-level="11.8" data-path="chapter-8.html"><a href="chapter-8.html#properties-of-the-latent-class-logit-model"><i class="fa fa-check"></i><b>11.8</b> Properties of the latent class logit model</a></li>
+<li class="chapter" data-level="11.9" data-path="chapter-8.html"><a href="chapter-8.html#empirical-example"><i class="fa fa-check"></i><b>11.9</b> Empirical example</a></li>
+<li class="chapter" data-level="11.10" data-path="chapter-8.html"><a href="chapter-8.html#adding-individual-level-attributes"><i class="fa fa-check"></i><b>11.10</b> Adding individual-level attributes</a></li>
+<li class="chapter" data-level="11.11" data-path="chapter-8.html"><a href="chapter-8.html#adding-variables-to-the-latent-class-selection-model"><i class="fa fa-check"></i><b>11.11</b> Adding variables to the latent class selection model</a></li>
+<li class="chapter" data-level="11.12" data-path="chapter-1.html"><a href="chapter-1.html#exercise"><i class="fa fa-check"></i><b>11.12</b> Exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">An Introduction to Discrete Choice Analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="preliminaries-installing-r-and-rstudio" class="section level1">
+<h1><span class="header-section-number">Chapter 1</span> Preliminaries: Installing R and RStudio</h1>
+<div id="introduction" class="section level2">
+<h2><span class="header-section-number">1.1</span> Introduction</h2>
+<p>The course makes extensive use of R and RStudio. Here are the instructions to install these two tools.</p>
+</div>
+<div id="learning-objectives" class="section level2">
+<h2><span class="header-section-number">1.2</span> Learning Objectives</h2>
+<p>In this reading, you will learn:</p>
+<ol style="list-style-type: decimal">
+<li>How to install (or update) R.</li>
+<li>About the RStudio Interactive Development Environment.</li>
+<li>About packages in R.</li>
+</ol>
+</div>
+<div id="r-the-open-statistical-computing-project" class="section level2">
+<h2><span class="header-section-number">1.3</span> R: The Open Statistical Computing Project</h2>
+<div id="what-is-r" class="section level3">
+<h3><span class="header-section-number">1.3.1</span> What is R?</h3>
+<p>R is an open-source language for statistical computing. It was created by Ross Ihaka and Robert Gentleman at the University of Auckland, in New Zealand, as a way to offer their students an accessible, no-cost tool for their courses. R is now maintained by the R Development Core Team, and developed by hundreds of contributors around the globe. R is an attractive alternative to other software applications for data analysis (e.g., Microsoft Excel, STATA) due to its open-source character (i.e., it is free), its flexibility, and large and dedicated user community, which means if there’s something you want to do (for instance, linear regression), it is very likely that someone has already developed functionality for it in R.</p>
+<p>A good way to think about R is as a core package, to which a library, consisting of additional packages, can be attached to increase its functionality. R can be downloaded for free at:</p>
+<pre><code>https://cran.rstudio.com/</code></pre>
+<p>R comes with a built-in console (a user graphical interface), but better alternatives to the basic interface exist, including RStudio, an Integrated Development Environment, or IDE for short. RStudio can also be downloaded for free, by visiting the website:</p>
+<pre><code>https://www.rstudio.com/products/rstudio/download/</code></pre>
+<p>R requires you to work using the command line, which is going to be unfamiliar to many of you accustomed to user-friendly graphical interfaces. Do not fear. People worked for a long time using the command line, or even more cumbersome, punched cards in early computers. Graphical user interfaces are convenient, but they have a major drawback, namely their inflexibility. A program that functions based on graphical user interfaces allows you to do only what is hard-coded in the user interface. Command line, as we will see, is somewhat more involved, but provides much more flexibility in operation.</p>
+<p>Go ahead. Install R and RStudio in your computer.</p>
+<p>IMPORTANT NOTE: If you want to install a new version of R, you need to follow the instructions to update your current version, rather than installing a new one.</p>
+<p>Before introducing some basic functionality in R, lets quickly take a tour R Studio.</p>
+</div>
+<div id="the-rstudio-ide" class="section level3">
+<h3><span class="header-section-number">1.3.2</span> The RStudio IDE</h3>
+<p>The RStudio IDE provides a complete interface to interact with the language R. It consists of a window with several panes. Some panes include in addition several tabs. There are the usual drop-down menus for common operations, such as creating new files, saving, common commands for editing, etc. See Figure <a href="preliminaries-installing-r-and-rstudio.html#fig:RStudio-IDE">1.1</a> below.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(knitr)</code></pre></div>
+<div class="figure"><span id="fig:RStudio-IDE"></span>
+<img src="00-Figure-1.png" alt="\label{fig:RStudio-IDE}The RStudio IDE" width="3898" />
+<p class="caption">
+Figure 1.1: The RStudio IDE
+</p>
+</div>
+<p>The editor pane allows you to open and work with text and other files, where you can write instructions that can be passed on to the program. Writing something in the editor does not execute any instructions, it merely records them for possible future use. In fact, much of what is written in the editor will not be instructions, but rather comments, discussion, and other text that is useful to understand code.</p>
+<p>The console pane is where instructions are passed on to the program. When an instruction is typed (or copied and pasted) there, R will understand that it needs to do something. The instructions must be written in a way that R understands, otherwise errors will occur. If you have typed instructions in the editor, you can use &quot;ctrl-Enter&quot; (in Windows) or &quot;cmd-Enter&quot; (in Mac) to send to the console and execute.</p>
+<p>The environment is where all data that is currently in memory is reported. The History tab acts like a log: it keeps track of the instructions that have been executed in the console.</p>
+<p>The last pane includes a number of useful tabs. The File tab allows you to navigate your computer, change the working directory, see what files are where, and so on. The Plot tab is where plots are rendered, when instructions require R to do so. The Packages tab allows you to manage packages, which as mentioned above, are pieces of code that can augment the functionality of R. The Help tab is where you can consult the documentation for functions/packages/see examples, and so on. The Viewer tab is for displaying local web content, for instance, to preview a Notebook (more on Notebooks soon).</p>
+<p>This brief introduction should have allowed you to install both R and RStudio. The next thing that you will need is <em>packages</em>.</p>
+</div>
+</div>
+<div id="packages-in-r" class="section level2">
+<h2><span class="header-section-number">1.4</span> Packages in R</h2>
+<p>Packages are the basic units of reproducible code in the R multiverse. Packages allow a developer to create a self-contained unit of code that often is meant to achieve some task. For instance, there are packages in R that specialize in statistical techniques, such as <a href="https://cran.r-project.org/web/packages/cluster/index.html">cluster analysis</a>, <a href="https://cran.r-project.org/web/packages/ggplot2/index.html">visualization</a>, or <a href="https://cran.r-project.org/web/packages/dplyr/">data manipulation</a>. Some packages can be miscellaneous tools, or contain mostly datasets. Packages are a very convenient way of maintaining code, data, and documentation, and also of sharing all these resources.</p>
+<p>Packages can be obtained from different sources (including making them!). One of the reasons why R has become so successful is the relative facility with which packages can be distributed. A package that I use frequently is called <code>tidyverse</code>. The <code>tidyverse</code> is a collection of functions for data manipulation, analysis, and visualization. This package can be downloaded and installed in your personal library of R packages by using the function <code>install.packages</code>, as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;tidyverse&quot;</span>)</code></pre></div>
+<p>The function <code>install.packages</code> retrieves packages from the <a href="https://cran.r-project.org/">Comprehensive R Archive Network</a>, or CRAN for short. CRAN is a collection of sites (accessible via the internet) that carry identical materials for distribution for R.</p>
+</div>
+<div id="encoding-in-r" class="section level2">
+<h2><span class="header-section-number">1.5</span> Encoding in R</h2>
+<p>Depending on your default enconding parameters, the text in the .Rmd file may present strange characters. If that is the case, reopen the file using the UTF-8 encoding style (File-&gt;Reopen with Encoding).</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="chapter-1.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/00-Installation.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["bookdown-demo.pdf", "bookdown-demo.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
