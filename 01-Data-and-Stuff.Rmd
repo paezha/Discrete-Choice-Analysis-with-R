@@ -27,13 +27,13 @@ This is true whether the model is physical (for instance a sculpture), conceptua
 
 In the case of a sculpture, the raw materials can be marble, wood, or clay; the tools chisels, mallet, and spatula; and the technique the mastery of the sculptor when working with the tools and the materials. Anyone can try sculpture, and most people can create sculptures. These kind of models are evaluated by their aesthetic value, not necessarily their usefulness. But if the scultpure is poorly balanced and falls and breaks, then its value is limited by its structural integrity - the skill of the sculptor matters even if only in this sense.
 
-In the case of a mental map, the raw materials are ideas, the tools are a drawing surface and tools for writing, or maybe an app, and the technical expertise is the ability of the modeler to organize ideas in a useful way. There are useful conceptual models, and conceptual models that are anything but. Figure \@ref(fig:fig-conceptual-models) shows two example of conceptual models.
+In the case of a mental map, the raw materials are ideas, the tools are a drawing surface and tools for writing, or maybe an app, and the technical expertise is the ability of the modeler to organize ideas in a useful way. There are useful conceptual models, and conceptual models that are less useful. Figure \@ref(fig:fig-conceptual-models) shows two example of conceptual models.
 
 ```{r fig-conceptual-models, fig.cap= "\\label{fig:fig-conceptual-models}Two Examples of Conceptual Models", echo=FALSE}
 knitr::include_graphics(rep("01-Figure-1.jpg"))
 ```
 
-In the case of mathematical/statistical models, the raw materials are data; the tools are descriptive statistics and statistical plots, and various forms of regression analysis; and the technical expertise is the ability of the modeler to select tools that are appropriate to the data, and to convince the data to "speak": in other words, to extract information from the data. As Moran said in the aphorism quoted at the top of this section: you can have data without information, but no information without data. Technical mastery is the degree to which a modeller can obtain information from data that is useful, accurate, and precise, to the extent that the raw materials permit.
+In the case of mathematical/statistical models, the raw materials are data; the tools are descriptive statistics and statistical plots, and various forms of regression analysis; and the technical expertise is the ability of the modeler to select tools that are appropriate to the data, and to convince the data to "speak": in other words, to extract information from the data. As Moran said in the aphorism quoted at the top of this section, you can have data without information, but no information without data. Technical mastery is the degree to which a modeller can obtain information from data that is useful, accurate, and precise, to the extent that the raw materials permit.
 
 Before moving on to the technical skills required for modeling, it is important to understand the raw materials and the tools. The objective of this note is to introduce some important concepts concerning data and data manipulation, and some useful tools.
 
@@ -360,6 +360,7 @@ There are many different geoms that can be used in `ggplot2`. You can always con
 You can also check the `ggplot2` [Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf) for more information on how to use this package.
 
 A last note. Many other visualization alternatives (for instance, Excel) provide point-and-click functions for creating plots. In contrast, ggplot2 in R requires that the plot be created by meticulously instructing the package what to do. While this is more laborious, it also means that you have complete control over the creation of plots, which in turn allows you to create more flexible and creative visuals.
+
 
 ## Exercise
 
