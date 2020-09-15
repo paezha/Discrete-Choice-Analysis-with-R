@@ -130,7 +130,7 @@ install.packages("tidyverse")
 
 The function `install.packages` retrieves packages from the [Comprehensive R Archive Network](https://cran.r-project.org/), or CRAN for short. CRAN is a collection of sites (accessible via the internet) that carry identical materials for distribution for R.
 
-Installing a package is similar to acquiring a book for your library. The book is there, but if you want to use it, you need to bring it to your workspace, so to speak. The function for retrieving a package from the library is naturally enough `library()`. For the moment, we need the following packages. If you have not done so, take a moment to install them, as illustrated in the previous chunk.
+Installing a package is similar to acquiring a book for your library. The book is there, but if you want to use it, you need to bring it to your workspace, so to speak. The function for retrieving a package from the library is natural enough `library()`. For the moment, we need the following packages. If you have not done so, take a moment to install them, as illustrated in the previous chunk.
 ```{r message=FALSE}
 library(tidyverse)
 library(readr)
@@ -210,6 +210,8 @@ Next we will see a way to address this. One last thing before doing so: you can 
 class(mc_mode_choice$choice)
 class(mc_mode_choice$timecycle)
 ```
+
+The Rstudio also allows you to quickly see the variables and their format in the environment panel.
 
 ## More on indexing and data manipulation
 
@@ -354,7 +356,7 @@ What do we learn from this plot? Could we have derived a similar insight from th
 
 There are many different geoms that can be used in `ggplot2`. You can always consult the help/tutorial files by typing `??ggplot2` in the console. See:
 ```{r eval=FALSE}
-??ggplot2
+?ggplot2
 ```
 
 You can also check the `ggplot2` [Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf) for more information on how to use this package.
@@ -371,9 +373,6 @@ A last note. Many other visualization alternatives (for instance, Excel) provide
 2. Why are models on a 1-to-1 scale undesirable?
 
 3. Invoke dataset `Mode` from package `mlogit`. To do this you need to first load the package. Once you have done so, usage of datasets is as follows:
-```{r eval=FALSE}
-data("Mode")
-```
 
 This is a dataset with choices about mode of transportation.
 
