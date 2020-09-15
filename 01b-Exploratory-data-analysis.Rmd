@@ -83,6 +83,7 @@ ggplot(data = mc_mode_choice, aes(x = choice, y = side_den)) + geom_boxplot()
 ```
 
 What can you learn from this figure? What are the variables? How is side_den measured?
+
 ```{r}
 ggplot(data = mc_mode_choice, aes(x = choice, y = side_den)) + 
   geom_boxplot() + 
@@ -176,3 +177,9 @@ To be completed.
 ### Questions
 
 1. Explore the relationships between the different variables in the dataset. Derive and discuss at least two interesting hypotheses using bivariate EDA?
+
+```{r}
+mc_mode_choice$parking = factor(mc_mode_choice$parking, labels=c('no','yes'))
+
+mosaic(parking ~ choice, mc_mode_choice, main="Mode choice as a function of parking")
+```
