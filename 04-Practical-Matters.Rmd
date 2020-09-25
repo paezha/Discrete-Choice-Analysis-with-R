@@ -285,23 +285,23 @@ We can see that the formula includes by default the alternative specific coeffic
 
 $$
 \begin{array}{l}
-                V_{i\text{Cycle}} =\\
+                V_{i\text{Car}} =\\
                 V_{i\text{Walk}} =\\
                 V_{i\text{HSR}} =\\
-                V_{i\text{HSR}} =\\
+                V_{i\text{Cycle}} =\\
               \end{array}  
   \overbrace{ \begin{array}{lll}
                 0 & +0 & +0\\
                 \mu_{\text{Walk}} & +0 & +0\\
                 0 & +\mu_{\text{HSR}} & +0 \\
-                0 & +0 & +\mu_{\text{Car}}\\
+                0 & +0 & +\mu_{\text{Cycle}}\\
               \end{array}
               }^\text{alternative specific constants} 
   \underbrace{\begin{array}{lll}
-                +\beta_1\text{time}_{i\text{Cycle}}\\
+                +\beta_1\text{time}_{i\text{Car}}\\
                 +\beta_1\text{time}_{i\text{Walk}}\\
                 +\beta_1\text{time}_{i\text{HSR}}\\
-                +\beta_1\text{time}_{i\text{Car}}\\
+                +\beta_1\text{time}_{i\text{Cycle}}\\
               \end{array}
               }_{\text{alternative vars. with generic coefficients}}
 $$
@@ -320,23 +320,23 @@ And the utility functions are therefore:
 
 $$
 \begin{array}{l}
-                V_{i\text{Cycle}} =\\
+                V_{i\text{Car}} =\\
                 V_{i\text{Walk}} =\\
                 V_{i\text{HSR}} =\\
-                V_{i\text{HSR}} =\\
+                V_{i\text{Cycle}} =\\
               \end{array}  
   \overbrace{ \begin{array}{lll}
                 0 & +0 & +0\\
                 \mu_{\text{Walk}} & +0 & +0\\
                 0 & +\mu_{\text{HSR}} & +0 \\
-                0 & +0 & +\mu_{\text{Car}}\\
+                0 & +0 & +\mu_{\text{Cycle}}\\
               \end{array}
               }^\text{alternative specific constants} 
   \underbrace{\begin{array}{lll}
-                +\beta_1\text{time}_{i\text{Cycle}}\\
+                +\beta_1\text{time}_{i\text{Car}}\\
                 +\beta_1\text{time}_{i\text{Walk}}\\
                 +\beta_1\text{time}_{i\text{HSR}}\\
-                +\beta_1\text{time}_{i\text{Car}}\\
+                +\beta_1\text{time}_{i\text{Cycle}}\\
               \end{array}
               }_{\text{alternative vars. with generic coefficients}}
   \overbrace{ \begin{array}{lll}
@@ -364,16 +364,16 @@ The utility functions for this are:
 
 $$
 \begin{array}{l}
-                V_{i\text{Cycle}} =\\
+                V_{i\text{Car}} =\\
                 V_{i\text{Walk}} =\\
                 V_{i\text{HSR}} =\\
-                V_{i\text{HSR}} =\\
+                V_{i\text{Cycle}} =\\
               \end{array}  
   \overbrace{ \begin{array}{lll}
                 0 & +0 & +0\\
                 \mu_{\text{Walk}} & +0 & +0\\
                 0 & +\mu_{\text{HSR}} & +0 \\
-                0 & +0 & +\mu_{\text{Car}}\\
+                0 & +0 & +\mu_{\text{Cycle}}\\
               \end{array}
               }^\text{alternative specific constants} 
   \underbrace{ \begin{array}{lll}
@@ -384,10 +384,10 @@ $$
               \end{array}
               }_\text{individual vars with specific coefficients} 
   \overbrace{\begin{array}{lll}
-                +\delta_1\text{time}_{i\text{Cycle}} & +0 & +0 & +0\\
+                +\delta_1\text{time}_{i\text{Car}} & +0 & +0 & +0\\
                 +0 & +\delta_2\text{time}_{i\text{Walk}} & +0 & +0\\
                 +0 & +0 &  +\delta_3\text{time}_{i\text{HSR}}\\
-                +0 & +0 & +0 & +\delta_4\text{time}_{i\text{Car}}\\
+                +0 & +0 & +0 & +\delta_4\text{time}_{i\text{Cycle}}\\
               \end{array}
               }^{\text{alternative vars. with specific coefficients}}
 
@@ -420,7 +420,7 @@ L = \prod_{i=n}^N\prod_{j=1}^J P_{ij}^{y_{ij}}
 $$
 where $P_{ij}$ is the probability of decision-maker $i$ selecting alternative $j$ and $y_{ij}$ is an indicator variable that takes the value of $1$ if individual $i$ chose alternative $j$ and $0$ otherwise. The effect of the indicator variable is to turn the probabilities on and off, since $P^0 = 1$ and $P^1 = P$. Notice that the likelihood function is bounded between 0 and 1, but in the case of the logit model it is never exactly zero nor one, since the logit probabilities never take any of those exact values.
 
-We can explore the behavior of the likelihood function by means of a simple example. Consider a binomial logit mode, that is, a model with only two alternatives in the choice set. The likelihood function of this model is as follows:
+We can explore the behavior of the likelihood function by means of a simple example. Consider a binomial logit model, that is, a model with only two alternatives in the choice set. The likelihood function of this model is as follows:
 
 $$
 L = \prod_{i=n}^N P_{iA}^{y_{iA}}P_{iB}^{y_{iB}} = \prod_{i=n}^N 
@@ -490,7 +490,7 @@ kable(df, "html", digits = 4, align = "c") %>%
   footnote(general = paste("The value of the likelihood function is ", round(L, digits = 4)))
 ```
 
-As you can see, that the logit probabilities when all coefficients are zero is $0.5$. By setting the coefficients to zero we have defined what is called a _null model_. Since the variables are set to zero, this model has no useful information to estimate the probability, and therefore it assigns equal probabilities to all alternatives. The value of the likelihood function is a relatively small (positive) number (remember, the function is bounded between zero and one).
+As you can see, the logit probabilities when all coefficients are zero is $0.5$. By setting the coefficients to zero we have defined what is called a _null model_. Since the variables are set to zero, this model has no useful information to estimate the probability, and therefore it assigns equal probabilities to all alternatives. The value of the likelihood function is a relatively small (positive) number (remember, the function is bounded between zero and one).
 
 Now, we can experiment with the coefficients, by giving them different values as follows (call this "Experiment 2"):
 ```{r}
@@ -757,20 +757,20 @@ Another way to compare models is by means of the likelihood ratio test. This tes
 For example, consider the utility functions of `model2`:
 $$
 \begin{array}{l}
-  V_{i\text{Cycle}} = 0 &+& \beta_1\text{time}_{i\text{Cycle}} &+& 0\\
+  V_{i\text{Car}} = 0 &+& \beta_1\text{time}_{i\text{Car}} &+& 0\\
   V_{i\text{Walk}} = \mu_{\text{Walk}} &+& \beta_1\text{time}_{i\text{Walk}} &+& \gamma_{1}\text{swd}_{i}\\
   V_{i\text{HSR}} = \mu_{\text{HSR}} &+& \beta_1\text{time}_{i\text{HSR}} &+& \gamma_{2}\text{swd}_{i}\\
-  V_{i\text{HSR}} = \mu_{\text{Car}} &+& \beta_1\text{time}_{i\text{Car}} &+& \gamma_{3}\text{swd}_{i}\\
+  V_{i\text{HSR}} = \mu_{\text{Cycle}} &+& \beta_1\text{time}_{i\text{Cycle}} &+& \gamma_{3}\text{swd}_{i}\\
 \end{array}  
 $$
 
 We can reduce this model to `model1` by setting $\gamma_{1}=\gamma_{2}=\gamma_{3}=0$:
 $$
 \begin{array}{l}
-  V_{i\text{Cycle}} = 0 &+& \beta_1\text{time}_{i\text{Cycle}}\\
+  V_{i\text{Car}} = 0 &+& \beta_1\text{time}_{i\text{Car}}\\
   V_{i\text{Walk}} = \mu_{\text{Walk}} &+& \beta_1\text{time}_{i\text{Walk}}\\
   V_{i\text{HSR}} = \mu_{\text{HSR}} &+& \beta_1\text{time}_{i\text{HSR}}\\
-  V_{i\text{HSR}} = \mu_{\text{Car}} &+& \beta_1\text{time}_{i\text{Car}}\\
+  V_{i\text{HSR}} = \mu_{\text{Cycle}} &+& \beta_1\text{time}_{i\text{Cycle}}\\
 \end{array}  
 $$
 
