@@ -224,9 +224,9 @@ And so the differences in utilities are:
 
 $$
 \begin{array}{lll}
-    V_{i2}-V_{i1}=&(\mu_2 - 0) & + &\beta_{11}(x_{i2} - x_{i1}) & + &\beta_{11}(z_ix_{i2} - z_ix_{i1}) & + &(\delta_2w_{i2} - \delta_1w_{i1})\\
-    V_{i3}-V_{i1}=&(\mu_3 - 0) & + &\beta_{11}(x_{i2} - x_{i1}) & + &\beta_{11}(z_ix_{i3} - z_ix_{i1}) & + &(\delta_3w_{i3} -  \delta_1w_{i1})\\
-    V_{i3}-V_{i2}=&(\mu_3- \mu_2) & + &\beta_{11}(x_{i2} - x_{i1}) & + &\beta_{11}(z_ix_{i3} - z_ix_{i2}) & + &(\delta_3w_{i3} - \delta_2w_{i2})\\
+    V_{i2}-V_{i1}=&(\mu_2 - 0) & + &\beta_{11}(x_{i2} - x_{i1}) & + &\beta_{12}(z_ix_{i2} - z_ix_{i1}) & + &(\delta_2w_{i2} - \delta_1w_{i1})\\
+    V_{i3}-V_{i1}=&(\mu_3 - 0) & + &\beta_{11}(x_{i2} - x_{i1}) & + &\beta_{12}(z_ix_{i3} - z_ix_{i1}) & + &(\delta_3w_{i3} -  \delta_1w_{i1})\\
+    V_{i3}-V_{i2}=&(\mu_3- \mu_2) & + &\beta_{11}(x_{i2} - x_{i1}) & + &\beta_{12}(z_ix_{i3} - z_ix_{i2}) & + &(\delta_3w_{i3} - \delta_2w_{i2})\\
 \end{array}
 $$
 
@@ -533,6 +533,7 @@ Notice how changing the coefficients has two effects, as you would expect: the p
 If you are working with the R Notebook, at this point you can try changing the coefficients. Can you improve the value of the likelihood function, or maybe even make it worse?
 
 The likelihood function can be plotted as shown below. If you hover over the plot, you can see how the value of the likelihood changes as a function of $\mu$ and $\beta$:
+
 ```{r fig-likelihood-function, echo=FALSE, fig.cap= "\\label{fig:fig-likelihood-function}Likelihood function for toy dataset"}
 # Create a grid to plot the likelihood function
 mu = seq(from = -1, to = 1, by = 0.05)
@@ -573,7 +574,8 @@ lkh <- function(mu = 0, beta = 0){
 L <- lkh(mu = coeffs$Var1, beta = coeffs$Var2)
 
 L <- data.frame(mu = coeffs$Var1, beta = coeffs$Var2, L)
-L <- xtabs(L ~ beta + mu, L)
+L <- xtabs(L ~ beta + mu, L) %>% # Convert to cross-tabulation matrix
+  unclass() # Drop the xtabs class (plotly does not like it)
 
 plot_ly(z = ~L, x = ~mu, y = ~beta) %>% 
   add_surface() %>%
@@ -584,6 +586,8 @@ plot_ly(z = ~L, x = ~mu, y = ~beta) %>%
     ))
 
 ```
+
+
 
 From Figure \@ref(fig:fig-evi-distribution) we can see that the approximate values of the coefficients that maximize the likelihood function are $\mu=0.10$ and $\beta=-0.65$. If we use these coefficients to calculate the logit probabilities, we can compare to the probabilities of Experiments 1 and 2:
 ```{r}
@@ -687,12 +691,12 @@ We can visually explore how the probability of choosing different modes varies w
 summary(mc_commute_long$sidewalk_density)
 ```
 
-Copy the dataframe used to estimate the model, but only enough columns to explore sidewalk densities in the range between 0 and 60 , in intervals of 5. Therefore we need to copy 60 rows from the long table (thirteen levels of sidewalk density times four alternatives):
+Copy the dataframe used to estimate the model, but only enough columns to explore sidewalk densities in the range between 0 and 60 , in intervals of 5. Therefore we need to copy 52 rows from the long table (thirteen levels of sidewalk density times four alternatives):
 ```{r}
 mc_commute_predict <- mc_commute_long[1:52,]
 ```
 
-Replace the time variable using values for times 1 to 20. Since each alternative is a row, we need to create a sequence of replicated values as follows:
+Replace the sidewalk density variable using values from 0 to 60, with an interval of 5. Since each alternative is a row, we need to create a sequence of replicated values as follows:
 ```{r}
 mc_commute_predict$sidewalk_density <- rep(seq(0, 60, 5), each = 4)
 ```
@@ -704,7 +708,7 @@ select(mc_commute_predict, sidewalk_density) %>% head(8)
 
 The prediction dataframe now includes the range of sidewalk densities that we are interested in.
 
-The setup for the simulation essentially amounts to: what is the probability of choosing each mode for a trip that would take 1 min? For the simulation, we also need to set the values of other variables of interest. Since the model has the variable `time` we need to also set it to a desired value, for instance, the median trip duration (paying attention to remove the missing values):
+The setup for the simulation essentially amounts to: what is the probability of choosing each mode for a trip that originates in an area with a sidewalk density of 5? Of 10? For the simulation, we also need to set the values of other variables of interest. Since the model has the variable `time` we need to also set it to a desired value, for instance, the median trip duration (paying attention to remove the missing values):
 ```{r}
 median(mc_commute_long$time, na.rm = TRUE)
 ```
@@ -724,7 +728,7 @@ Next, predict the probabilities using the `predict()` function and `model2`:
 probs <- predict(model2, newdata = mc_commute_predict)
 ```
 
-The value (output) of `predict` is a 20-by-4 matrix that contains the probability for twenty travel time values (i.e., $1, 2, 3,\cdots, 20$), and four modes (Walk, Cycle, HSR, Car). To facilitate plotting, we add the time values and then reshape that 10-by-4 matrix as follows:
+The value (output) of `predict` is a 20-by-4 matrix that contains the probability for thirteen levels of sidewalk density (i.e., $0, 5, 10,\cdots, 60$), and four modes (Walk, Cycle, HSR, Car). To facilitate plotting, we add the sidewalk density values and then reshape that 13 times 4 matrix as follows:
 ```{r}
 probs <- data.frame(sidewalk_density = seq(0, 60, 5), probs) %>% 
   gather(key = "Mode", value = "Probability", -sidewalk_density)
@@ -790,7 +794,7 @@ lrtest(model1, model2)
 
 Notice that the number of degrees of freedom (Df) is $3$: this is because there are three individual-specific parameters in `model2` that are not present in `model1`. The null hypothesis of the test is that the log-likelihood of the two models is not different, in other words, that the alternate model is not an improvement over the base model.
 
-In the present case, the very small $p$-value leads us to reject the null hypothesis, and the conclusion is that `model2`, which includes age, is a significant improvement over `model1`, which does not.
+In the present case, the very small $p$-value leads us to reject the null hypothesis, and the conclusion is that `model2`, which includes sidewalk density, is a significant improvement over `model1`, which does not.
 
 ## Exercise
 
