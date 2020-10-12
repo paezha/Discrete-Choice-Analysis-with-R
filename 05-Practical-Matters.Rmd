@@ -1,0 +1,804 @@
+---
+title: "05 Practical Matters"
+output: html_notebook
+---
+
+# Practical issues in specification and estimation {#chapter-4}
+
+>  "In theory, there is no difference between theory and practice. But in practice, there is."
+>
+> --- Benjamin Brewster
+
+
+> "An ounce of practice is generally worth more than a ton of theory.
+>
+> --- E.F. Schumacher
+
+## Theory and practice
+
+Chapters \@ref(chapter-2) and \@ref(chapter-3) presented a conceptual framework (a theory of behavior) and the necessary apparatus (based on probability theory) to implement the conceptual framework. This theoretical introduction was necessary to begin work from a solid foundation, and it provides an intuitive and elegant framework to study decision-making, and a powerful one too; Daniel McFadden was awarded the Sveriges Riksbank Prize in Economic Sciences ([Nobel Prize](https://www.nobelprize.org/prizes/economic-sciences/2000/mcfadden/diploma/)) for his contributions to random utility modelling.
+
+Although not described in detail in previous chapters, it is worthwhile to dwell for a moment on the history of the development of the logit model as a random utility model.
+
+In his Nobel Lecture, [McFadden](https://en.wikipedia.org/wiki/Daniel_McFadden) [-@McFadden2001economic] recounts the path that led to the development of random utility models for discrete choices. Like most important discoveries, it is a meandering path. It began early in the 20th century with a theory for economic behavior (i.e., utility) that considered heterogeneous preferences that in practice were difficult to verify empirically because of data limitations. Indeed, studies before the 1960s mostly considered aggregated demand with representative agents (i.e., archetypical consumers) to accommodate this limitation in data availability. It was only when individual-level data became more widely collected and within reach of researchers that it became possible to pay attention to the behavior of individual agents. 
+
+While economists were busy with models of aggregated demand, researchers in psychometrics and mathematical psychology, chiefly [L.L Thurstone](https://en.wikipedia.org/wiki/Louis_Leon_Thurstone) and [R.D. Luce](https://en.wikipedia.org/wiki/R._Duncan_Luce), were busy providing the technical basis for modelling what Thurstone termed _Comparative Judgement_ (in the sense of making a decision or forming an opinion). In particular, Luce introduced the axiom of Independence of Irrelevant Alternatives (discussed in Chapter \@ref(chapter-3)). According to McFadden (2001, p. 353), this axiom "simplified experimental collection of choice data by allowing multinomial choice probabilities to be inferred from binomial choice experiments." [J. Marschak](https://en.wikipedia.org/wiki/Jacob_Marschak) was the first to introduce the work of Thurstone to econometrics in 1960, and also coined the term _Random Utility Maximizing_ (RUM) that eventually prevailed over the comparative judgement terminology of Thurstone. McFadden's early contributions to this body of research was developing an econometric version of Luce's model, with strict (i.e., systematic) utilities specified as functions of the attributes of the alternatives. This allowed a research to link unobserved preference heterogeneity to a fully consistent description of the distribution of demand. Since the 1970s, discrete choice analysis has been a burgeoning area of research with a plethora of applications in economics, marketing, and travel behavior, among many other disciplines.
+
+This brief story neatly illustrates the complex interplay between theory and practice.
+
+Early attempts to study demand were limited due to practical considerations (i.e., the absence of data at the individual level). Once appropriate data became available, new studies continued to push the theoretical envelope. Indeed, theoretical questions have continued to inspire newer way to collect data and novel methods, and these in turn have helped us to refine our understanding of behavior. See as an example the work on decision-making in social situations [@Akerlof1997social; @Axhausen2005social; @Paez2007social] which inspired the use of new data sources [e.g., @Carrasco2007social @Axhausen2008social; @Scott2012social; @Chen2016social] as well as novel modelling approaches [e.g., @Dugundji2005discrete; @Dugundji2013social; @Kamargianni2014social] and empirical work [e.g., @vandenBerg2009social; @Goetzke2011bicycle; @Matous2017social].
+
+Now that the preceding chapters have armed us with the theory and basic concepts to implement random utility models, it is proper that we turn our attention to the practical aspects of modelling. The best way to ensure that the concepts take hold, in my view, is to get your hands on a dataset and struggle with the practicalities of cleaning and organizing data, specifying the utility functions (a task that is more art than science), and estimating models. These skills are mostly transferable to other modelling techniques, so we will begin by applying them to the most fundamental of discrete choice models, namely the multinomial logit.  
+
+## How to use this note
+
+Remember that the source for the document you are reading is an R Notebook. Throughout the notes, you will find examples of code in segments of text called _chunks_. This is an example of a chunk:
+```{r}
+print("Hats off to you, Prof. McFadden")
+```
+
+If you are working with the Notebook version of the document, you can run the code by clicking the 'play' icon on the top right corner of the chunk. If you are reading the web-book version of the document, you will often see that the code has already been executed. You can still try it by copying and pasting into your R or RStudio console.
+
+## Learning objectives
+
+In this practice, you will learn about:
+
+1. Specification of utility functions.
+2. Maximum likelihood estimation.
+3. Estimation of multinomial logit models.
+4. McFadden's $\rho^2$
+5. The likelihood ratio test.
+
+## Suggested readings
+
+- Ben-Akiva, M. Lerman, [-@Benakiva1985discrete] Discrete Choice Analysis: Theory and Applications to Travel Demand, **Chapters 4 and 5**, MIT Press.
+- Hensher, D.A., Rose, J.M., Greene, W.H [-@hensher2005applied] Applied Choice Analysis: A Primer, **Chapter 10**, Cambridge University Press.
+- Ortuzar JD, Willumsen LG [-@Ortuzar2011modelling] Modelling Transport, Fourth Edition, **Chapter 8**, John Wiley and Sons.
+- Train [-@Train2009discrete] Discrete Choice Methods with Simulation, Second Edition, **Chapter 3**, Cambridge University Press.
+
+## Preliminaries
+
+Load the packages used in this section:
+```{r message=FALSE}
+library(kableExtra)
+library(mlogit)
+library(plotly)
+library(tidyverse)
+```
+
+Load the dataset used in this section:
+```{r}
+load("Commute Mac Wide.RData")
+```
+
+## The anatomy of utility functions
+
+At the end Chapter \@ref(chapter-3) we took, for the first time, a closer look at the systematic utilities of discrete choice models. It is useful to think about the anatomy of a typical systematic utility function. Previously, we said that some variables vary across utility functions; these are typically the attributes that describe the various alternatives (e.g., their level of service and cost). The variables that describe the decision-maker do _not_ vary by alternative. This has implications, as seen before, for how the variables are entered into the functions. Since the model works on the basis of _differences_ between utilities, the attributes must actually measure different levels of something or vanish.
+
+We will describe the utilities in terms of the way different variables are introduced in the utility functions. As before, we will assume that the location parameters of the distribution are absorbed by $J-1$ utility functions (where $J$ is the number of alternatives) in the form of alternative specific constants. 
+
+Consider first variables that vary across alternatives. These variables can have a generic coefficient or they can have alternative-specific coefficients, as seen here:
+
+$$
+\begin{array}{l}
+                V_{i1} =\\
+                V_{i2} =\\
+                V_{i3} =\\
+              \end{array}  
+  \overbrace{ \begin{array}{lll}
+                0 & +0 & +0\\
+                0 & +\mu_2 & +0 \\
+                0 & +0 & +\mu_3\\
+              \end{array}
+              }^\text{alternative specific constants} 
+  \underbrace{\begin{array}{lll}
+                +\beta_1x_{i1}\\
+                +\beta_1x_{i2}\\
+                +\beta_1x_{i3}\\
+              \end{array}
+              }_{\text{alternative vars. with generic coefficients}}
+  \overbrace{\begin{array}{lll}
+                 +\delta_1w_{i1} & +0 & +0\\
+                +0 & +\delta_2w_{i2} & +0\\
+                +0 & +0 & +\delta_3w_{i3}\\
+              \end{array}
+              }^{\text{alternative vars. with specific coefficients}}
+$$
+
+In many cases it is sensible to have generic coefficients. For instance, if the variable is cost, we might assume that one dollar is valued equally irrespective of the which alternative it is spent on. In other cases, the use of alternative-specific coefficients might be informative. For instance, a consistent finding in the literature is that time waiting for a bus is perceived as being more expensive than time actually on-board and traveling in the bus. Occasionally, as well, an attribute might be specific to an alternative: for instance, waiting time is often implicitly zero for travel by car and active modes of transportation (i.e., walking and cycling).
+
+The differences of the utilities are as follows:
+
+$$
+\begin{array}{lll}
+    V_{i2}-V_{i1}=&(\mu_2 - 0) & + &\beta_1(x_{i2} - x_{i1}) & + &(\delta_2w_{i2} - \delta_1w_{i1})\\
+    V_{i3}-V_{i1}=&(\mu_3 - 0) & + &\beta_1(x_{i2} - x_{i1}) & + &(\delta_3w_{i3} -  \delta_1w_{i1})\\
+    V_{i3}-V_{i2}=&(\mu_3- \mu_2) & + &\beta_1(x_{i2} - x_{i1}) & + &(\delta_3w_{i3} - \delta_2w_{i2})\\
+\end{array}
+$$
+
+Variables that vary across individuals but not by alternative can be introduced with alternative-specific coefficients:
+
+$$
+\begin{array}{l}
+                V_{i1} =\\
+                V_{i2} =\\
+                V_{i3} =\\
+              \end{array}  
+  \overbrace{ \begin{array}{lll}
+                0 & +0 & +0\\
+                0 & +\mu_2 & +0 \\
+                0 & +0 & +\mu_3\\
+              \end{array}
+              }^\text{alternative specific constants} 
+  \underbrace{\begin{array}{lll}
+                +\beta_1x_{i1}\\
+                +\beta_1x_{i2}\\
+                +\beta_1x_{i3}\\
+              \end{array}
+              }_{\text{alternative vars. with generic coefficients}}
+
+  \overbrace{\begin{array}{lll}
+                 +\delta_1w_{i1} & +0 & +0\\
+                +0 & +\delta_2w_{i2} & +0\\
+                +0 & +0 & +\delta_3w_{i3}\\
+              \end{array}
+              }^{\text{alternative vars. with specific coefficients}}
+  \underbrace{\begin{array}{lll}
+                +0 & +0 &\\
+                +\gamma_2z_{i} & +0\\
+                +0 & +\gamma_3z_{i}\\
+              \end{array}
+              }_\text{individual vars with specific coefficients}
+$$
+
+Following the example above, the differences of utilities are:
+
+$$
+\begin{array}{lll}
+    V_{i2}-V_{i1}=&(\mu_2 - 0) & + &\beta_1(x_{i2} - x_{i1}) & + &(\delta_2w_{i2} - \delta_1w_{i1}) & + &(\gamma_2 - 0)z_i\\
+    V_{i3}-V_{i1}=&(\mu_3 - 0) & + &\beta_1(x_{i2} - x_{i1}) & + &(\delta_3w_{i3} -  \delta_1w_{i1}) & + &(\gamma_3 - 0)z_i\\
+    V_{i3}-V_{i2}=&(\mu_3- \mu_2) & + &\beta_1(x_{i2} - x_{i1}) & + &(\delta_3w_{i3} - \delta_2w_{i2}) & + &(\gamma_3 - \gamma_2)z_i\\
+\end{array}
+$$
+
+A different way of introducing individual-level variables is as part of an expansion of some coefficients, for example:
+
+$$
+
+\begin{array}{l}
+                V_{i1} =\\
+                V_{i2} =\\
+                V_{i3} =\\
+              \end{array}  
+  \overbrace{ \begin{array}{lll}
+                0 & +0 & +0\\
+                0 & +\mu_2 & +0 \\
+                0 & +0 & +\mu_3\\
+              \end{array}
+              }^\text{alternative specific constants} 
+  \underbrace{\begin{array}{lll}
+                +(\beta_{11} + \beta_{12}z_i)x_{i1}\\
+                +(\beta_{11} + \beta_{12}z_i)x_{i2}\\
+                +(\beta_{11} + \beta_{12}z_i)x_{i3}\\
+              \end{array}
+              }_{\text{alternative vars. with generic coefficients}}
+  \overbrace{\begin{array}{lll}
+                 +\delta_1w_{i1} & +0 & +0\\
+                +0 & +\delta_2w_{i2} & +0\\
+                +0 & +0 & +\delta_3w_{i3}\\
+              \end{array}
+              }^{\text{alternative vars. with specific coefficients}}
+$$
+
+The above expands to:
+
+$$
+
+\begin{array}{l}
+                V_{i1} =\\
+                V_{i2} =\\
+                V_{i3} =\\
+              \end{array}  
+  \overbrace{ \begin{array}{lll}
+                0 & +0 & +0\\
+                0 & +\mu_2 & +0 \\
+                0 & +0 & +\mu_3\\
+              \end{array}
+              }^\text{alternative specific constants} 
+  \underbrace{\begin{array}{lll}
+                +\beta_{11}x_{i1} & +\beta_{12}z_ix_{i1}\\
+                +\beta_{11}x_{i2} & + \beta_{12}z_ix_{i2}\\
+                +\beta_{11}x_{i3} & + \beta_{12}z_ix_{i3}\\
+              \end{array}
+              }_{\text{alternative vars. with generic coefficients}}
+  \overbrace{\begin{array}{lll}
+                +\delta_1w_{i1} & +0 & +0\\
+                +0 & +\delta_2w_{i2} & +0\\
+                +0 & +0 & +\delta_3w_{i3}\\
+              \end{array}
+              }^{\text{alternative vars. with specific coefficients}}
+$$
+
+And so the differences in utilities are:
+
+$$
+\begin{array}{lll}
+    V_{i2}-V_{i1}=&(\mu_2 - 0) & + &\beta_{11}(x_{i2} - x_{i1}) & + &\beta_{11}(z_ix_{i2} - z_ix_{i1}) & + &(\delta_2w_{i2} - \delta_1w_{i1})\\
+    V_{i3}-V_{i1}=&(\mu_3 - 0) & + &\beta_{11}(x_{i2} - x_{i1}) & + &\beta_{11}(z_ix_{i3} - z_ix_{i1}) & + &(\delta_3w_{i3} -  \delta_1w_{i1})\\
+    V_{i3}-V_{i2}=&(\mu_3- \mu_2) & + &\beta_{11}(x_{i2} - x_{i1}) & + &\beta_{11}(z_ix_{i3} - z_ix_{i2}) & + &(\delta_3w_{i3} - \delta_2w_{i2})\\
+\end{array}
+$$
+
+Understanding the anatomy of utility functions is essential to properly specify and estimate models.
+
+## Example: Specifying the utility functions
+
+We will now proceed to work with a practical example, using the dataset that you encountered before in Chapter \@ref(chapter-1). This dataset contains information on various modes of transportation used by people commuting to McMaster University in Canada [@Whalen2013]. The dataset was loaded above as part of the preliminaries of this chapter. We can begin by exploring the data. Please note that this is the same dataset that you used in Chapter \@ref(chapter-1), but not the same file. For convenience, the dataset was pre-processed. The contents of the dataframe can be quickly seen by means of the function `head()`. This function will display the first few top rows of the dataframe:
+```{r}
+head(mc_commute, 8)
+```
+
+As you can see, the dataframe is in wide format, meaning that each row represents one decision-maker and the information about the choice situations is spread: for instance, there is one variable for travel time, but it appears in four columns, one for each of the alternatives ("Cycle", "Walk", "HSR", and "Car"). The package `mlogit` works with _long_ tables, where each row is a choice situation. Since wide tables are more common, the package includes a utility function to reshape the table. This is used below to convert our wide table into a long table. Notice that we need to indicate which variables are _varying_, meaning that they vary by alternative. In our wide table, there are four variables that vary by alternative: travel time (`time`), access time (`access`: the time needed to reach an HSR bus stop), waiting time (`wait`: time spent waiting for an HSR bus), and number of transfers when using HSR (`transfer`). The latter three variables are specific to HSR and therefore are set to zero for the modes "Car", Cycle", and "Walk".
+```{r}
+mc_commute_long <- mlogit.data(mc_commute, shape = "wide", choice = "choice", varying = 7:22)
+```
+
+If we examine the long table, we see that instead of each row being an individual, each row is a choice situation:
+```{r}
+head(mc_commute_long, 8)
+```
+
+Since there are four alternatives in this case, each row corresponds to the choice situation for an alternative for an individual. We notice that the row names now have the format `#.Alt`, where `#` is the number of the decision-maker and `Alt` is the name of the alternative. In this way the first four rows of the table correspond to the first decision-maker who, faced with four alternatives, chose HSR (public transportation) - as recorded in the column `choice`. The next four rows correspond to the second decision-maker in the sample (who also chose HSR), and so on, four rows per decision-maker. More generally, there will be $J$ rows per decision-maker. When an attribute is missing, this means that the alternative was not available to the decision-maker. For example:
+```{r}
+head(mc_commute_long[,c(1, 59:60)], 8)
+```
+
+Here we see that the modes "Car" and "Cycle" were not available to decision-maker 1 (id: 566872636), and "Cycle" was not available to decision-maker 2 (id: 566873140).
+
+The first step towards developing a choice model is to specify the utility functions for the desired model. The package `mlogit` uses the package `mFormula` to create the functions. This package creates objects that build upon the [`Formula` package](https://CRAN.R-project.org/package=Formula ) for multi-component formulas. As seen above, utility functions can potentially have multiple components, so the functionality to build formulas in `mFormula` and `Formula` is quite useful.
+
+Formulas for the `mlogit` package are defined using three parts:
+
+$$
+\text{choice} \sim \text{alternative specific vars with generic coefficients }|\text{ individual specific vars }|\text{ alternative specific vars with specific coefficients}  
+$$
+
+If we list all columns in the dataframe, we can see what variables are available for this analysis:
+```{r}
+colnames(mc_commute_long)
+```
+
+Besides identifier variables `id` and `chid`, and the variable for `choice`, we see that several variables are specific to the individual decision-makers. These are `parking` (availability of a parking pass), `vehind` (whether the decision-maker had individual access to a private vehicle), `gender`, `age`, `shared` (living in shared accommodations away from the family home), `family` (living at the family home), and `child` (respondent was responsible for at least one minors in the household). Furthermore, some variables relate to the physical environment of the place of residence (`street_density` and `sidewalk_density`), in addition to the coordinates of the place of residence (geocoded to the nearest major intersection or postal code centroid). One variable is alternative specific, namely `time` (travel time in minutes). And, as noted before, three variables are specific to public transportation, namely `access` (access time to public transportation in minutes), `wait` (waiting time in minutes), and `transfer` (number of transfers when traveling by public transportation).
+
+We can begin by defining a very simple formula that considers only travel time. We will save this object as `f1`:
+```{r}
+f1 <- mFormula(choice ~ time)
+```
+
+The function `model.matrix` allows us to see how the formula is applied to the data (we use `head()` to display only the top rows of the model matrix):
+```{r}
+head(model.matrix(f1, mc_commute_long), 8)
+```
+
+We can see that the formula includes by default the alternative specific coefficients, in this case using car as the reference alternative. The corresponding utility functions are as follows:
+
+$$
+\begin{array}{l}
+                V_{i\text{Cycle}} =\\
+                V_{i\text{Walk}} =\\
+                V_{i\text{HSR}} =\\
+                V_{i\text{HSR}} =\\
+              \end{array}  
+  \overbrace{ \begin{array}{lll}
+                0 & +0 & +0\\
+                \mu_{\text{Walk}} & +0 & +0\\
+                0 & +\mu_{\text{HSR}} & +0 \\
+                0 & +0 & +\mu_{\text{Car}}\\
+              \end{array}
+              }^\text{alternative specific constants} 
+  \underbrace{\begin{array}{lll}
+                +\beta_1\text{time}_{i\text{Cycle}}\\
+                +\beta_1\text{time}_{i\text{Walk}}\\
+                +\beta_1\text{time}_{i\text{HSR}}\\
+                +\beta_1\text{time}_{i\text{Car}}\\
+              \end{array}
+              }_{\text{alternative vars. with generic coefficients}}
+$$
+
+Define now a formula with an individual-specific variable, say sidewalk density at the place of residence, and call it `f2`:
+```{r}
+f2 <- mFormula(choice ~ time | sidewalk_density)
+```
+
+The model matrix is now:
+```{r}
+head(model.matrix(f2, mc_commute_long))
+```
+
+And the utility functions are therefore:
+
+$$
+\begin{array}{l}
+                V_{i\text{Cycle}} =\\
+                V_{i\text{Walk}} =\\
+                V_{i\text{HSR}} =\\
+                V_{i\text{HSR}} =\\
+              \end{array}  
+  \overbrace{ \begin{array}{lll}
+                0 & +0 & +0\\
+                \mu_{\text{Walk}} & +0 & +0\\
+                0 & +\mu_{\text{HSR}} & +0 \\
+                0 & +0 & +\mu_{\text{Car}}\\
+              \end{array}
+              }^\text{alternative specific constants} 
+  \underbrace{\begin{array}{lll}
+                +\beta_1\text{time}_{i\text{Cycle}}\\
+                +\beta_1\text{time}_{i\text{Walk}}\\
+                +\beta_1\text{time}_{i\text{HSR}}\\
+                +\beta_1\text{time}_{i\text{Car}}\\
+              \end{array}
+              }_{\text{alternative vars. with generic coefficients}}
+  \overbrace{ \begin{array}{lll}
+                0 & +0 & +0\\
+                \gamma_{1}\text{swd}_{i} & +0 & +0\\
+                0 & + \gamma_{2}\text{swd}_{i} & +0 \\
+                0 & +0 & +\gamma_{3}\text{swd}_{i}\\
+              \end{array}
+              }^\text{individual vars with specific coefficients} 
+$$
+
+Here, we try a different formula, where time has alternative-specific instead of generic coefficients, and call it `f3`:
+```{r}
+f3 <- mFormula(choice ~ 0 | sidewalk_density | time)
+```
+
+Note that, since we do not define other alternative-specific variables with generic coefficients, we have to explicitly state that there are `0` such variables!
+
+This formula leads to the following model matrix:
+```{r}
+head(model.matrix(f3, mc_commute_long))
+```
+
+The utility functions for this are:
+
+$$
+\begin{array}{l}
+                V_{i\text{Cycle}} =\\
+                V_{i\text{Walk}} =\\
+                V_{i\text{HSR}} =\\
+                V_{i\text{HSR}} =\\
+              \end{array}  
+  \overbrace{ \begin{array}{lll}
+                0 & +0 & +0\\
+                \mu_{\text{Walk}} & +0 & +0\\
+                0 & +\mu_{\text{HSR}} & +0 \\
+                0 & +0 & +\mu_{\text{Car}}\\
+              \end{array}
+              }^\text{alternative specific constants} 
+  \underbrace{ \begin{array}{lll}
+                0 & +0 & +0\\
+                \gamma_{1}\text{swd}_{i} & +0 & +0\\
+                0 & + \gamma_{2}\text{swd}_{i} & +0 \\
+                0 & +0 & +\gamma_{3}\text{swd}_{i}\\
+              \end{array}
+              }_\text{individual vars with specific coefficients} 
+  \overbrace{\begin{array}{lll}
+                +\delta_1\text{time}_{i\text{Cycle}} & +0 & +0 & +0\\
+                +0 & +\delta_2\text{time}_{i\text{Walk}} & +0 & +0\\
+                +0 & +0 &  +\delta_3\text{time}_{i\text{HSR}}\\
+                +0 & +0 & +0 & +\delta_4\text{time}_{i\text{Car}}\\
+              \end{array}
+              }^{\text{alternative vars. with specific coefficients}}
+
+$$
+
+Given the utility functions, the logit probabilities for each alternative are:
+
+$$
+\begin{array}{l}
+    P(\text{Cycle}) = \frac{e^{V_{\text{Cycle}}}}{e^{V_{\text{Cycle}}}+e^{V_{\text{Walk}}}+e^{V_{\text{HSR}}}+e^{V_{\text{Car}}}}\\
+    P(\text{Walk}) = \frac{e^{V_{\text{Walk}}}}{e^{V_{\text{Cycle}}}+e^{V_{\text{Walk}}}+e^{V_{\text{HSR}}}+e^{V_{\text{Car}}}}\\
+    P(\text{HSR}) = \frac{e^{V_{\text{Cycle}}}}{e^{V_{\text{Cycle}}}+e^{V_{\text{Walk}}}+e^{V_{\text{HSR}}}+e^{V_{\text{Car}}}}\\
+    P(\text{Car}) =1 - P(\text{Cycle}) - P(\text{Walk}) - P(\text{HSR})\\
+\end{array}
+$$
+
+The utility functions depend on the data but also on the coefficients, which we do not know _a priori_. Rather, these must be retrieved from the sample, as discussed next.
+
+## Estimation
+
+Before we can calculate the choice probabilities, we need to somehow obtain coefficients for the utility functions. The process to do so is called _estimation_, and it involves the use of a statistical sample. 
+
+To estimate the coefficients of a model we need to define a criterion that we wish to satisfy with our choice of coefficients. Estimates can take an infinite number of values, after all, so our criterion must be optimal in some sense - in this way, once that we estimate the coefficients we can be satisfied that they are the best that we can obtain for the model under considerations, given then inputs.
+
+A common criterion used to estimate discrete choice models is the _likelihood_. So what is this likelihood? Previously we encountered probability distribution functions. These functions were defined by parameters (such as the location parameter and the dispersion parameter). Given the parameters, it is possible to calculate the probability of values for a variable $x$. A likelihood function is a similar concept, except that whereas in the probability functions the parameters were given, in a likelihood function the data are given and the parameters need to be obtained from the function.
+
+The relevant likelihood function for the multinomial logit model is as follows:
+$$
+L = \prod_{i=n}^N\prod_{j=1}^J P_{ij}^{y_{ij}}
+$$
+where $P_{ij}$ is the probability of decision-maker $i$ selecting alternative $j$ and $y_{ij}$ is an indicator variable that takes the value of $1$ if individual $i$ chose alternative $j$ and $0$ otherwise. The effect of the indicator variable is to turn the probabilities on and off, since $P^0 = 1$ and $P^1 = P$. Notice that the likelihood function is bounded between 0 and 1, but in the case of the logit model it is never exactly zero nor one, since the logit probabilities never take any of those exact values.
+
+We can explore the behavior of the likelihood function by means of a simple example. Consider a binomial logit mode, that is, a model with only two alternatives in the choice set. The likelihood function of this model is as follows:
+
+$$
+L = \prod_{i=n}^N P_{iA}^{y_{iA}}P_{iB}^{y_{iB}} = \prod_{i=n}^N 
+    \Bigg(\frac{e^{V_{iA}}}{e^{V_{iA}} + e^{V_{iB}}}\Bigg)^{y_{iA}}
+    \Bigg(\frac{e^{V_{iB}}}{e^{V_{iA}} + e^{V_{iB}}}\Bigg)^{y_{iB}}
+$$
+
+The utility functions $V_{iA}$ and $V_{iB}$ depend on the data, which we know (since we have a statistical sample), and the coefficients, which we do not know. 
+
+For the example, we have the following toy sample with six individuals:
+```{r echo=FALSE}
+ts <- data.frame(Individual = c(1, 2, 3, 4, 5, 6),
+                 Choice = c("A", "A", "B", "A", "B", "B"), 
+                 yiA = c(1, 1, 0, 1, 0, 0),
+                 yiB = c(0, 0, 1, 0, 1, 1),
+                 xiA = c(5, 2, 5, 1, 4, 3),
+                 xiB = c(4, 5, 2, 6, 1, 4))
+  
+kable(ts, "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+Based on this sample, we can specify the utility functions in this fashion:
+
+$$
+\begin{array}{l}
+                V_{iA} = 0 &+& \beta x_{iA}\\
+                V_{iB} = \mu &+& \beta x_{iB}\\
+              \end{array}  
+$$
+
+These utility functions are very similar to the first set of utility functions that we defined in the preceding section for the case of mode choice.
+
+Next, the likelihood function for this toy sample can be writen as a function of $\mu$ and $\beta$. In this way, it is possible to calculate an initial value of the likelihood function bu setting $\mu$ and $\beta$ to zero. We will call this "Experiment 1":
+```{r}
+mu <- 0
+beta <- 0
+
+P1A_1 <- (exp(beta * ts$xiA[1])/(exp(beta * ts$xiA[1]) + exp(mu + beta * ts$xiB[1])))
+P1B_1 <- (exp(mu + beta * ts$xiB[1])/(exp(beta * ts$xiA[1]) + exp(mu + beta * ts$xiB[1])))
+P2A_1 <- (exp(beta * ts$xiA[2])/(exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
+P2B_1 <- (exp(mu + beta * ts$xiB[2])/(exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
+P3A_1 <- (exp(beta * ts$xiA[3])/(exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
+P3B_1 <- (exp(mu + beta * ts$xiB[3])/(exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
+P4A_1 <- (exp(beta * ts$xiA[4])/(exp(beta * ts$xiA[4]) + exp(mu + beta * ts$xiB[4])))
+P4B_1 <- (exp(mu + beta * ts$xiB[4])/(exp(beta * ts$xiA[4]) + exp(mu + beta * ts$xiB[4])))
+P5A_1 <- (exp(beta * ts$xiA[5])/(exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
+P5B_1 <- (exp(mu + beta * ts$xiB[5])/(exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
+P6A_1 <- (exp(beta * ts$xiA[6])/(exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
+P6B_1 <- (exp(mu + beta * ts$xiB[6])/(exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
+  
+L <-  P1A_1^ts$yiA[1] * P1B_1^ts$yiB[1] * 
+  P2A_1^ts$yiA[2] * P2B_1^ts$yiB[2] * 
+  P3A_1^ts$yiA[3] * P3B_1^ts$yiB[3] * 
+  P4A_1^ts$yiA[4] * P4B_1^ts$yiB[4] * 
+  P5A_1^ts$yiA[5] * P5B_1^ts$yiB[5] * 
+  P6A_1^ts$yiA[6] * P6B_1^ts$yiB[6] 
+
+# Create data frame to tabulate results:
+df <- data.frame(Individual = c(1, 2, 3, 4, 5, 6),
+                 Choice = c("A", "A", "B", "A", "B", "B"),
+                 PA = c(P1A_1, P2A_1, P3A_1, P4A_1, P5A_1, P6A_1),
+                 PB = c(P1B_1, P2B_1, P3B_1, P4B_1, P5B_1, P6B_1))
+
+kable(df, "html", digits = 4, align = "c") %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  footnote(general = paste("The value of the likelihood function is ", round(L, digits = 4)))
+```
+
+As you can see, that the logit probabilities when all coefficients are zero is $0.5$. By setting the coefficients to zero we have defined what is called a _null model_. Since the variables are set to zero, this model has no useful information to estimate the probability, and therefore it assigns equal probabilities to all alternatives. The value of the likelihood function is a relatively small (positive) number (remember, the function is bounded between zero and one).
+
+Now, we can experiment with the coefficients, by giving them different values as follows (call this "Experiment 2"):
+```{r}
+mu <- 0.5 # -0.5
+beta <- -0.5 # -0.5
+
+P1A_2 <- (exp(beta * ts$xiA[1])/(exp(beta * ts$xiA[1]) + exp(mu + beta * ts$xiB[1])))
+P1B_2 <- (exp(mu + beta * ts$xiB[1])/(exp(beta * ts$xiA[1]) + exp(mu + beta * ts$xiB[1])))
+P2A_2 <- (exp(beta * ts$xiA[2])/(exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
+P2B_2 <- (exp(mu + beta * ts$xiB[2])/(exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
+P3A_2 <- (exp(beta * ts$xiA[3])/(exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
+P3B_2 <- (exp(mu + beta * ts$xiB[3])/(exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
+P4A_2 <- (exp(beta * ts$xiA[4])/(exp(beta * ts$xiA[4]) + exp(mu + beta * ts$xiB[4])))
+P4B_2 <- (exp(mu + beta * ts$xiB[4])/(exp(beta * ts$xiA[4]) + exp(mu + beta * ts$xiB[4])))
+P5A_2 <- (exp(beta * ts$xiA[5])/(exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
+P5B_2 <- (exp(mu + beta * ts$xiB[5])/(exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
+P6A_2 <- (exp(beta * ts$xiA[6])/(exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
+P6B_2 <- (exp(mu + beta * ts$xiB[6])/(exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
+  
+L <-  P1A_2^ts$yiA[1] * P1B_2^ts$yiB[1] * 
+  P2A_2^ts$yiA[2] * P2B_2^ts$yiB[2] * 
+  P3A_2^ts$yiA[3] * P3B_2^ts$yiB[3] * 
+  P4A_2^ts$yiA[4] * P4B_2^ts$yiB[4] * 
+  P5A_2^ts$yiA[5] * P5B_2^ts$yiB[5] * 
+  P6A_2^ts$yiA[6] * P6B_2^ts$yiB[6] 
+
+# Create data frame to tabulate results:
+df <- data.frame(Individual = c(1, 2, 3, 4, 5, 6),
+                 Choice = c("A", "A", "B", "A", "B", "B"),
+                 PA = c(P1A_2, P2A_2, P3A_2, P4A_2, P5A_2, P6A_2),
+                 PB = c(P1B_2, P2B_2, P3B_2, P4B_2, P5B_2, P6B_2))
+
+kable(df, "html", digits = 4, align = "c") %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  footnote(general = paste("The value of the likelihood function is ", round(L, digits = 4)))
+```
+
+Notice how changing the coefficients has two effects, as you would expect: the probabilities change and the value of the likelihood function changes too. Inspect the probabilities and the value of the likelihood function with the new coefficients. What do you notice?
+
+If you are working with the R Notebook, at this point you can try changing the coefficients. Can you improve the value of the likelihood function, or maybe even make it worse?
+
+The likelihood function can be plotted as shown below. If you hover over the plot, you can see how the value of the likelihood changes as a function of $\mu$ and $\beta$:
+```{r fig-likelihood-function, echo=FALSE, fig.cap= "\\label{fig:fig-likelihood-function}Likelihood function for toy dataset"}
+# Create a grid to plot the likelihood function
+mu = seq(from = -1, to = 1, by = 0.05)
+beta = seq(from = -2, to = 0, by = 0.05)
+coeffs <- expand.grid(mu, beta)
+
+# Define the likelihood function
+lkh <- function(mu = 0, beta = 0){
+  ts <- data.frame(Individual = c(1, 2, 3, 4, 5, 6),
+                         Choice = c("A", "A", "B", "A", "B", "B"), 
+                         yiA = c(1, 1, 0, 1, 0, 0),
+                         yiB = c(0, 0, 1, 0, 1, 1),
+                         xiA = c(5, 2, 5, 1, 4, 3),
+                         xiB = c(4, 5, 2, 6, 1, 4))
+  
+  P1A <- (exp(beta * ts$xiA[1])/(exp(beta * ts$xiA[1]) + exp(mu + beta * ts$xiB[1])))
+  P1B <- (exp(mu + beta * ts$xiB[1])/(exp(beta * ts$xiA[1]) + exp(mu + beta * ts$xiB[1])))
+  P2A <- (exp(beta * ts$xiA[2])/(exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
+  P2B <- (exp(mu + beta * ts$xiB[2])/(exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
+  P3A <- (exp(beta * ts$xiA[3])/(exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
+  P3B <- (exp(mu + beta * ts$xiB[3])/(exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
+  P4A <- (exp(beta * ts$xiA[4])/(exp(beta * ts$xiA[4]) + exp(mu + beta * ts$xiB[4])))
+  P4B <- (exp(mu + beta * ts$xiB[4])/(exp(beta * ts$xiA[4]) + exp(mu + beta * ts$xiB[4])))
+  P5A <- (exp(beta * ts$xiA[5])/(exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
+  P5B <- (exp(mu + beta * ts$xiB[5])/(exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
+  P6A <- (exp(beta * ts$xiA[6])/(exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
+  P6B <- (exp(mu + beta * ts$xiB[6])/(exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
+  
+  P1A^ts$yiA[1] * P1B^ts$yiB[1] * 
+  P2A^ts$yiA[2] * P2B^ts$yiB[2] * 
+  P3A^ts$yiA[3] * P3B^ts$yiB[3] * 
+  P4A^ts$yiA[4] * P4B^ts$yiB[4] * 
+  P5A^ts$yiA[5] * P5B^ts$yiB[5] * 
+  P6A^ts$yiA[6] * P6B^ts$yiB[6] 
+}
+
+# Evaluate the likelihood function on the grid
+L <- lkh(mu = coeffs$Var1, beta = coeffs$Var2)
+
+L <- data.frame(mu = coeffs$Var1, beta = coeffs$Var2, L)
+L <- xtabs(L ~ beta + mu, L) %>% # Convert to cross-tabulation matrix
+  unclass() # Drop the xtabs class (plotly does not like it)
+
+plot_ly(z = ~L, x = ~mu, y = ~beta) %>% 
+  add_surface() %>%
+  layout(scene = list(
+      xaxis = list(title = "x-axis (mu)"),
+      yaxis = list(title = "y-axis (beta)"),
+      zaxis = list(title = "$z$-axis (L)")
+    ))
+
+```
+
+From Figure \@ref(fig:fig-evi-distribution) we can see that the approximate values of the coefficients that maximize the likelihood function are $\mu=0.10$ and $\beta=-0.65$. If we use these coefficients to calculate the logit probabilities, we can compare to the probabilities of Experiments 1 and 2:
+```{r}
+# Approximate values that maximize the likelihood function.
+mu <- 0.10
+beta <- -0.65
+
+P1A_3 <- (exp(beta * ts$xiA[1])/(exp(beta * ts$xiA[1]) + exp(mu + beta * ts$xiB[1])))
+P1B_3 <- (exp(mu + beta * ts$xiB[1])/(exp(beta * ts$xiA[1]) + exp(mu + beta * ts$xiB[1])))
+P2A_3 <- (exp(beta * ts$xiA[2])/(exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
+P2B_3 <- (exp(mu + beta * ts$xiB[2])/(exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
+P3A_3 <- (exp(beta * ts$xiA[3])/(exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
+P3B_3 <- (exp(mu + beta * ts$xiB[3])/(exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
+P4A_3 <- (exp(beta * ts$xiA[4])/(exp(beta * ts$xiA[4]) + exp(mu + beta * ts$xiB[4])))
+P4B_3 <- (exp(mu + beta * ts$xiB[4])/(exp(beta * ts$xiA[4]) + exp(mu + beta * ts$xiB[4])))
+P5A_3 <- (exp(beta * ts$xiA[5])/(exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
+P5B_3 <- (exp(mu + beta * ts$xiB[5])/(exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
+P6A_3 <- (exp(beta * ts$xiA[6])/(exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
+P6B_3 <- (exp(mu + beta * ts$xiB[6])/(exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
+  
+L <-  P1A_3^ts$yiA[1] * P1B_3^ts$yiB[1] * 
+  P2A_3^ts$yiA[2] * P2B_3^ts$yiB[2] * 
+  P3A_3^ts$yiA[3] * P3B_3^ts$yiB[3] * 
+  P4A_3^ts$yiA[4] * P4B_3^ts$yiB[4] * 
+  P5A_3^ts$yiA[5] * P5B_3^ts$yiB[5] * 
+  P6A_3^ts$yiA[6] * P6B_3^ts$yiB[6] 
+
+# Create data frame to tabulate results:
+df <- data.frame(Individual = c(1, 2, 3, 4, 5, 6),
+                 Choice = c("A", "A", "B", "A", "B", "B"),
+                 PA_1 = c(P1A_1, P2A_1, P3A_1, P4A_1, P5A_1, P6A_1),
+                 PB_1 = c(P1B_1, P2B_1, P3B_1, P4B_1, P5B_1, P6B_1),
+                 PA_1 = c(P1A_2, P2A_2, P3A_2, P4A_2, P5A_2, P6A_2),
+                 PB_1 = c(P1B_2, P2B_2, P3B_2, P4B_2, P5B_2, P6B_2),
+                 PA_1 = c(P1A_3, P2A_3, P3A_3, P4A_3, P5A_3, P6A_3),
+                 PB_1 = c(P1B_3, P2B_3, P3B_3, P4B_3, P5B_3, P6B_3))
+
+kable(df, "html", digits = 4, 
+      col.names = c("Individual", "Choice", "PA", "PB", "PA", "PB", "PA", "PB"),
+      align = "c") %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  add_header_above(c(" " = 1, " " = 1, "Experiment 1" = 2, "Experiment 2" = 2, "Approx Max Likelihood" = 2))
+```
+
+Maximizing the likelihood is a useful criterion to estimate the coefficients of the models, since this criterion provides the optimal probabilities of the right alternative being chosen. Mind you, this does not necessarily mean that those probabilities will be high - however, we can be certain that they will be the best for the model under consideration for the sample given.
+
+In this toy example we "solved" the problem of maximizing the likelihood by hand. This is rather difficult, unfeasible even, in most applied situations with large samples and/or more than one variable. Fortunately, there are a number of numerical algorithms that can be used to maximize the likelihood. We will not discuss this in detail, but interested readers can consult Train [-@Train2009discrete; Section 3.7] for details. The `mlogit` package imports the package `maxLik` [@Henningsen2011maxlik], which implements canonical algorithms including [Newton-Raphson](https://en.wikipedia.org/wiki/Newton%27s_method), the Berndt–Hall–Hall–Hausman (or [BHHH](https://en.wikipedia.org/wiki/Berndt-Hall-Hall-Hausman_algorithm)), and the Broyden–Fletcher–Goldfarb–Shanno (or [BFGS](https://en.wikipedia.org/wiki/Broyden-Fletcher-Goldfarb-Shanno_algorithm)) algorithm.
+
+In practice, the algorithms above maximize not the likelihood function, but a transformation thereof, called the _log-likelihood_, which is obtained by taking the natural logarithm of the function, to give:
+
+$$
+l = \sum_{i=n}^N\sum_{j=1}^J y_{ij}log(P_{ij})
+$$
+Since the likelihood function is bound between zero and one, the log-likelihood is bound between minus infinity and zero. The value of the maximized log-likelihood function provides a useful diagnostic to compare models, since higher values are indicative of a better model. Several statistical tests (such as the likelihood ratio) can be used to test the hypothesis that a model is a significant improvement over other, and are thus useful for model selection purposes. However, before discussing model diagnostics, we will see how multinomial logit models are estimated using `mlogit`.
+
+## Example: A logit model of mode choice
+
+Coming back to the transportation mode choice dataset, we had already defined some formulas (i.e., utility functions) that we can use to estimate a model.
+
+The function to estimate a model is `mlogit()`. This function requires at least two arguments: an `mFormula` object and a dataset. We can verify that the formulas we created above are of this class:
+```{r}
+class(f1)
+class(f2)
+class(f3)
+```
+
+The value (output) of the function can be named and saved to an object for further analysis or for further processing, post-estimation. Begin by estimating a model using the simplest of our formulas:
+```{r}
+model1 <- mlogit(f1, mc_commute_long)
+summary(model1)
+```
+
+The output of the function includes the estimated frequencies of alternatives in addition to information about the optimization procedure. For instance, the message "successive function values within tolerance limits" indicates that the algorithm converged normally. 
+
+The output also reports the estimated values of the coefficients, along with standard errors, $z$-values, and $p$-vallues. The null hypothesis associated with the coefficients is that they are zero. An analyst can reject the null hypothesis in any case, but small $p$-vallues indicate a low probability that the coefficient is zero - and therefore increase the confidence that by rejecting the null the analyst is not mistakenly rejecting a true zero. In the present case, with $p$-vallues smaller than 0.0001, the null hypothesis can be comfortably rejected for every coefficient. The small $p$-vallues mean that it is highly unlikely that the coefficients are zero.
+
+This simple model includes three alternative-specific constants and one alternative-specific variable with a generic coefficient. The signs of the coefficients are informative. Since the reference mode is "Car", the positive values of the constants indicate that, other things being equal, car is the least preferred mode, followed by cycling, HSR, and then walk (which gives the highest utility at a constant value of time). This is verified from the estimated frequencies of the modes, where we see that "Walk" is the mode of choice of 51.7% of respondents in the sample.
+
+The negative coefficient for time indicates that time is a "cost", in other words, the utility of travelling tends to decline with increasing travel times. This indicates that slower modes will tend to have lower utilities.
+
+Finally, the maximized value of the log-likelihood function is reported, along with two diagnostics, McFadden R^2 (in reality $\rho^2$) and a likelihood ratio test. We will come back to these diagnostics below, but first, we will estimate a new model using the second formula.
+```{r}
+model2 <- mlogit(f2, mc_commute_long)
+summary(model2)
+```
+
+Now there is an individual-specific variable in the model (i.e., sidewalk density). Only one of those coefficients is significant at a conventional level of significance (i.e., $p<0.05$), and the values is positive. Since the reference is "Car", a positive value indicates that higher sidewalk density causes the utility of walking to increase with respect to the utility of using a car. The same is not true for HSR and "Cycle", whose coefficients for this attribute are not significantly different from "Car".
+
+Note that it is possible to select the reference level for the utilities when estimating the model. For example, below we re-estimate the preceding model, but now using the utility of Walk as the reference:
+```{r}
+model2 <- mlogit(f2, mc_commute_long, reflevel = "Walk")
+summary(model2)
+```
+
+Notice that now two sidewalk coefficient are significant! While sidewalk density does not significantly change the utility of cycling with respect to walking, living in a place with high sidewalk density reduces the utility of "Car" and "HSR" _with respect to walking_.
+
+The value of the maximized log-likelihood and other model diagnostics are identical irrespective of which mode is selected as a utility. In essence, the models are the same, but they provide a different perspective on how some coefficients relate to each other across alternatives.
+
+We can visually explore how the probability of choosing different modes varies with sidewalk density. To do this we will first summarize the sidewalk density variable:
+```{r}
+summary(mc_commute_long$sidewalk_density)
+```
+
+Copy the dataframe used to estimate the model, but only enough columns to explore sidewalk densities in the range between 0 and 60 , in intervals of 5. Therefore we need to copy 60 rows from the long table (thirteen levels of sidewalk density times four alternatives):
+```{r}
+mc_commute_predict <- mc_commute_long[1:52,]
+```
+
+Replace the time variable using values for times 1 to 20. Since each alternative is a row, we need to create a sequence of replicated values as follows:
+```{r}
+mc_commute_predict$sidewalk_density <- rep(seq(0, 60, 5), each = 4)
+```
+
+We can examine the results of simulating the sidewalk density:
+```{r}
+head(mc_commute_predict["sidewalk_density"], 8)
+```
+
+The prediction dataframe now includes the range of sidewalk densities that we are interested in.
+
+The setup for the simulation essentially amounts to: what is the probability of choosing each mode for a trip that would take 1 min? For the simulation, we also need to set the values of other variables of interest. Since the model has the variable `time` we need to also set it to a desired value, for instance, the median trip duration (paying attention to remove the missing values):
+```{r}
+median(mc_commute_long$time, na.rm = TRUE)
+```
+
+The median trip length is 10 minutes, so we replace the current values in the prediction dataframe:
+```{r}
+mc_commute_predict$time <- 10
+```
+
+Examine the relevant variables of the prediction dataframe:
+```{r}
+mc_commute_predict[c("time", "sidewalk_density")] %>% summary()
+```
+
+Next, predict the probabilities using the `predict()` function and `model2`:
+```{r}
+probs <- predict(model2, newdata = mc_commute_predict)
+```
+
+The value (output) of `predict` is a 20-by-4 matrix that contains the probability for twenty travel time values (i.e., $1, 2, 3,\cdots, 20$), and four modes (Walk, Cycle, HSR, Car). To facilitate plotting, we add the time values and then reshape that 10-by-4 matrix as follows:
+```{r}
+probs <- data.frame(sidewalk_density = seq(0, 60, 5), probs) %>% 
+  gather(key = "Mode", value = "Probability", -sidewalk_density)
+```
+
+By "gathering" the probabilities, now the data frame has one column with the mode and one column with the probability. We can then plot, using a different colors for each alternative:
+```{r}
+ggplot(data = probs, aes(x = sidewalk_density, y = Probability, color = Mode)) +
+  geom_line()
+```
+
+We can see that the probability of walking (for a trip that takes the median duration in the sample) tends to increase as the density of sidewalks increase. The probability of using the three other modes tends to decrease with sidewalk density, but more rapidly for HSR than for car or cycling.
+
+## Comparing models: McFadden's $\rho^2$
+
+The log-likelihood reported in the summary of the model is useful as a measure of goodness of fit. Recall that the likelihood of this model is bounded between $0$ and $1$, and therefore the log-likelihood is bounded at the upper end by $0$ (it is minus infinity at the lower end). We also know that higher values of the likelihood represent better fits. 
+
+One simple diagnostic to compare the fit of models is McFadden's $\rho^2$. This summary diagnostic is defined as follows:
+$$
+\rho^2 = 1 - \frac{l^*}{l_0}
+$$
+where $l^*$ is the value of the maximized log-likelihood and $l_0$ is the value of the log-likelihood of a null model (perhaps without constants, or a constants only model). If the model is uninformative, its log-likelihood will tend to the likelihood of the null model. In this case $l^*/l_0$ tends to one and therefore $\rho^2$ tends to zero. If the maximized log-likelihood of the model tends to 0 (the upper limit for the log-likelihood function), $\rho^2$ tends to one.
+
+Although $\rho^2$ is bounded between zero and one, just like the coefficient of determination $R^2$ in regression analysis, its interpretation is _not_ the same as for $R^2$. Whereas $R^2$ is interpreted as the proportion of variance explained by the model, $\rho^2$ lacks such an interpretation. Also, the values of $\rho^2$ tend to be lower, and values of $0.4$ are conventionally considered very good fits. The main utility of McFadden's $\rho^2$ is as a quick way of comparing the relative fit of different models, rather than assessing the fit against an absolute value of goodness of fit.
+
+## Comparing models: the likelihood ratio test
+
+Another way to compare models is by means of the likelihood ratio test. This test compares the log-likelihood of two models to assess whether they are significantly different. The test follows the $\chi^2$ distribution with degrees of freedom equal to the difference in the number of coefficients between the two models. The test requires a base model and a full model, and the base model must _nest_ within the full model. Nesting in this sense means that full model must be reducible to the base model by setting some coefficients to zero.
+
+For example, consider the utility functions of `model2`:
+$$
+\begin{array}{l}
+  V_{i\text{Cycle}} = 0 &+& \beta_1\text{time}_{i\text{Cycle}} &+& 0\\
+  V_{i\text{Walk}} = \mu_{\text{Walk}} &+& \beta_1\text{time}_{i\text{Walk}} &+& \gamma_{1}\text{swd}_{i}\\
+  V_{i\text{HSR}} = \mu_{\text{HSR}} &+& \beta_1\text{time}_{i\text{HSR}} &+& \gamma_{2}\text{swd}_{i}\\
+  V_{i\text{HSR}} = \mu_{\text{Car}} &+& \beta_1\text{time}_{i\text{Car}} &+& \gamma_{3}\text{swd}_{i}\\
+\end{array}  
+$$
+
+We can reduce this model to `model1` by setting $\gamma_{1}=\gamma_{2}=\gamma_{3}=0$:
+$$
+\begin{array}{l}
+  V_{i\text{Cycle}} = 0 &+& \beta_1\text{time}_{i\text{Cycle}}\\
+  V_{i\text{Walk}} = \mu_{\text{Walk}} &+& \beta_1\text{time}_{i\text{Walk}}\\
+  V_{i\text{HSR}} = \mu_{\text{HSR}} &+& \beta_1\text{time}_{i\text{HSR}}\\
+  V_{i\text{HSR}} = \mu_{\text{Car}} &+& \beta_1\text{time}_{i\text{Car}}\\
+\end{array}  
+$$
+
+In this way, `model1` "nests" in `model2`.
+
+In the summary of the models, the likelihood ratio test is reported. See:
+```{r}
+summary(model1)
+```
+
+The test reported in the output of the model is against the null model, that is, a model with no variables at all. This is the least informative of all models.
+
+When two non-null models need to be compared, the `lrtest` function implements the likelihood ratio test for two inputs, which are two `mlogit` models, as follows:
+```{r}
+lrtest(model1, model2)
+```
+
+Notice that the number of degrees of freedom (Df) is $3$: this is because there are three individual-specific parameters in `model2` that are not present in `model1`. The null hypothesis of the test is that the log-likelihood of the two models is not different, in other words, that the alternate model is not an improvement over the base model.
+
+In the present case, the very small $p$-value leads us to reject the null hypothesis, and the conclusion is that `model2`, which includes age, is a significant improvement over `model1`, which does not.
+
+## Exercise
+
+1. In the example in this chapter we estimated the probabilities of choosing different modes by sidewalk density setting travel time to the in-sample median. Use `model2` to calculate the probability of choosing each mode but now for travel times 20, 30, 40. Discuss the results.
+
+2. Estimate a model using formula `f3` (call it `model3`). Discuss the output of this model.
+
+3. Use the likelihood ratio test to compare `model3` to `model1`.
+
+4. Can you use the likelihood ratio test to compare `model3` to `model2`? Discuss.

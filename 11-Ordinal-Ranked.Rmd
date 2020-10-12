@@ -1,0 +1,13 @@
+---
+title: "10 Ordinal and Ranked Responses"
+output: html_notebook
+---
+
+# Ordinal and Ranked Responses {#chapter-10}
+
+> "I can't rank anything. I mean, how could anyone possibly say what their favourite piece of music is? I don't have the ability or the desire to categorise things of that nature."
+>
+> --- Charlie Brooker
+
+## Preliminaries
+

@@ -1,0 +1,532 @@
+---
+title: "08 Dealing with Heterogeneity I"
+output: html_notebook
+---
+
+# Dealing with Heterogeneity I: The Latent Class Logit Model {#chapter-8}
+
+> "Byrdes of on kynde and color flok and flye together."
+>
+> --- William Turner, The Rescuing of Romish Fox
+
+## Preliminaries
+
+Load the packages used in this section:
+```{r}
+library(tidyverse)
+library(mlogit)
+library(gmnl)
+library(kableExtra)
+library(gridExtra)
+```
+
+## Taste variations in the population
+
+The preceding chapters (Chapters \@ref(chapter-6) and \@ref(chapter-7)) were concerned with the IIA property of the logit model. As discussed there, when the specification of the model is incomplete, the presence of residual correlation can often lead to inappropriate - even nonsensical - substitution patterns. Accordingly, the GEV family of models (of which the nested logit is a member) and the multinomial probit model aimed at introducing more flexible substitution patterns. The nested logit model achieves this by inducing a hierarchical decision-making structure where alternatives within nests are correlated, whereas the multinomial probit model introduces a flexible, but technically demanding, covariance structure for multinomial choices.
+
+In this chapter, we introduce a second important issue in the analysis of discrete choices, namely taste variation or heterogeneity.
+
+To motivate the discussion, we will use a data set reported in research by Leon and Miguel [-@Leon2017risky] on the transportation choices of individuals travelling to and from the airport in Freetown, Sierra Leone. This dataset is available in the `mlogit` package:
+```{r}
+data("RiskyTransport", package = "mlogit")
+```
+
+The airport in Freetown is not on the mainland, and the alternatives for travel to and fro are ferry, hovercraft, helicopter, and water taxi. Information about the number of fatalities due to accidents by each of these modes was available and allowed the researchers to calculate the mortality risk by mode.
+
+The choice set is not balanced, meaning that not all alternatives were available to all individuals surveyed for this study. This is due to the seasonality or occasional unavailability of some modes. For the example in this chapter, we will extract a subset of observations for those individuals who had the four alternatives available as part of their choice set. To do this, we identify all respondents with four modes: 
+```{r}
+all_available <- RiskyTransport %>% 
+  group_by(chid) %>% 
+  summarise(no_rows = length(chid), .groups = 'drop') %>% 
+  filter(no_rows == 4) %>% select(chid)
+```
+
+Next, we do an inner join of those respondents with the full dataset. This joins will only preserve the rows in the table corresponding to the respondents in `all_available`:
+```{r}
+RT <- inner_join(RiskyTransport, all_available, by = "chid") %>% drop_na()
+```
+
+The two key variables (in addition to the mode chosen) are the generalized cost of the transport mode (`cost`) and the fatality rate in deaths per 100,000 trips (`risk`). The following table presents the descriptive statistics for the different modes of transportation:
+```{r}
+df <- RT %>% group_by(mode) %>% summarize(use = sum(choice),
+                                    min_cost = min(cost), mean_cost = mean(cost), max_cost = max(cost),
+                                    min_risk = min(risk), mean_risk = mean(risk), max_risk = max(risk),
+                                    .groups = 'drop')
+df$use <- df$use/sum(df$use)
+
+kable(df, 
+      "html",
+      digits = 4,
+      col.names = c("Mode",
+                    "Proportion",
+                    "Min",
+                    "Mean",
+                    "Max",
+                    "Min",
+                    "Mean",
+                    "Max")) %>%
+  kable_styling() %>%
+  add_header_above(c(" " = 2, "Cost" = 3, "Risk" = 3))
+```
+
+The two most popular modes are Water Taxi and Ferry, with Hovercraft as a distant third. Helicopter is the most expensive mode and the least popular, in addition to being the riskier. Notice that while the cost by mode varies (due to seasonal variations in fare), `risk` is in fact a constant for each mode. For this reason, and to avoid perfect multicollinearity, any models that use this variable cannot include a constant term.
+
+The dataset includes information on number of seats, noise, crowdness, convenience of location, and clientele by mode. Finally, it includes information about the decision-makers, including whether they are African, their declared life expectancy, their declared hourly wage, their imputed hourly wage, their level of education, a self-ranked response on their degree of fatalism, gender, age, whether they have children, and if they know how to swim.
+
+Although the survey includes sample weights, we will ignore those after subsetting the data.
+
+We add to the dataset some interactions and non-linear terms:
+```{r}
+RT <- RT %>% mutate(`cost:dwage` = cost * dwage,
+                    `risk:dwage` = risk * dwage,
+                    dwage2 = dwage^2)
+```
+
+The dataset is in "long" form, which means that there is one record per decision-making situation per decision-maker. Therefore, we must format the dataframe in preparation for use with `mlogit` and `gmnl`:
+```{r}
+junk <- dfidx(RiskyTransport, 
+              choice = "choice", 
+              idx = list(c("chid", "id"), "mode"),
+              idnames = c("chid", "alt"))
+```
+
+## How to use this note
+
+Remember that the source for the document you are reading is an R Notebook. Throughout the notes, you will find examples of code in segments of text called _chunks_. This is an example of a chunk:
+```{r}
+print("Ignorance is the foundation of absolute power")
+```
+
+If you are working with the Notebook version of the document, you can run the code by clicking the 'play' icon on the top right corner of the chunk. If you are reading the web-book version of the document, you will often see that the code has already been executed. You can still try it by copying and pasting into your R or RStudio console.
+
+## Learning objectives
+
+In this practice, you will learn about:
+
+1. A framework for modeling taste variations.
+2. The latent class logit model.
+3. Behavioral insights of the latent class logit model.
+
+## Suggested readings
+
+- Louviere, J.J., Hensher, D.A., Swait, J.D. [-@Louviere2000stated] Stated Choice Methods: Analysis and Application, **Chapter 6, pp. 205-206**, Cambridge University Press.
+- Train [-@Train2009discrete] Discrete Choice Methods with Simulation, Second Edition, **Chapter 6 pp. 135-136**, Cambridge University Press.
+
+## Latent class logit
+
+To motivate the discussion, we will begin by estimating a base model with two alternative-specific attributes, namely cost and risk. 
+
+The utility function for individual $n$ and mode $i$ is as follows:
+
+$$
+V_{ni} = \beta_{cost} cost_i + \beta_{risk} {risk}_i
+$$
+
+where `safe` is the probability of completing a trip safely.
+
+This model is estimated as follows, supressing the constants in the second term of the formula:
+```{r}
+mnl.rt0 <- mlogit(choice ~ cost + risk | 0, 
+                data = junk)
+summary(mnl.rt0)
+```
+
+The coefficients for `cost` and `safe` provide useful information. In this case, the typical willingness to pay is as follows:
+
+$$
+-\frac{\partial cost}{\partial risk} = \frac{\beta_{risk}}{\beta_{cost}}
+$$
+
+Since the probability is of not surviving a trip, the ratio of the coefficients is the willingness to pay to reduce the risk of accidental death:
+
+$$
+-\frac{\beta_{p_{safe}}}{\beta_{cost}} = \frac{-0.25309}{-0.01401} \simeq 18.06
+$$
+
+A question, however, is whether there are unobserved variations in the implicit behavior, that is, whether some individuals have more taste for life than other, and therefore their values for a statistical life vary.
+
+We will redefine the utility functions of the model in the following manner:
+
+$$
+V_{niq} = \beta_{q,cost} cost_i + \beta_{q,safe} {risk}_i
+$$
+
+where $q$ is a subindex to indicate that the coefficients are not fixed for individual $n$, but may vary. For instance, lets suppose that there are two classes, say cost-conscious individuals (class $1$) and risk-conscious individuals (say class $2$).
+
+Now the utility functions are:
+
+$$
+\begin{array}{c}
+V_{ni1} = \beta_{1,cost} cost_i + \beta_{1,risk} {risk}_i\\
+V_{ni2} = \beta_{2,cost} cost_i + \beta_{2,risk} {risk}_i
+\end{array}
+$$
+
+with:
+
+$$
+\begin{array}{c}
+\beta_{1,cost} \neq \beta_{2,cost}\\
+\text{and}\\
+\beta_{1,risk} \neq \beta_{2,risk}\\
+\end{array}
+$$
+
+Making the usual assumption about the random utility (i.e., Extreme Value Type I), the probability that an individual who is cost-conscious will choose alternative $i$ is:
+
+$$
+\frac{e^{V_{ni1}}}{\sum_k e^{V_{nk1}}}
+$$
+
+and the probability that an individual who is risk-conscious will choose alternative $i$ is:
+
+$$
+\frac{e^{V_{ni2}}}{\sum_k e^{V_{nk2}}}
+$$
+
+The issue, however, is that we do not know which decision-makers belong to which class, therefore the term _latent classes_. A way to proceed is to assume that decision-makers belong with certain probability to each class of decision makers, say $p_1$ and $p_2$. In this way, we can condition the probability of choosing $i$ on the probability of a decision-maker being in each class:
+
+$$
+\begin{array}{l}
+  P_{ni|1} = p_1\frac{e^{V_{ni1}}}{\sum_k e^{V_{nk1}}}\\
+\text{and}\\
+  P_{ni|2} = p_2\frac{e^{V_{ni2}}}{\sum_k e^{V_{nk2}}}\\
+\end{array}
+$$
+
+The probability of belonging to each latent class can be defined by means of a logit-like expression:
+
+$$
+\begin{array}{c}
+p_1 = \frac{e^{\gamma_1}}{e^{\gamma_1} + e^{\gamma_2}}\\
+\text{and}\\
+p_2 = \frac{e^{\gamma_2}}{e^{\gamma_1} + e^{\gamma_2}}\\
+\end{array}
+$$
+
+or, if we define $\gamma_1=0$:
+
+$$
+\begin{array}{c}
+p_1 = \frac{1}{1 + e^{\gamma_2}}\\
+\text{and}\\
+p_2 = \frac{e^{\gamma_2}}{1 + e^{\gamma_2}}\\
+\end{array}
+$$
+
+which implies that:
+
+$$
+p_1 + p_2 = \frac{1}{1 + e^{\gamma_2}} + \frac{e^{\gamma_2}}{1 + e^{\gamma_2}} = 1
+$$
+
+Accordingly, the unconditional probability of the decision-maker choosing alternative $i$ is:
+
+$$
+P_{ni} = p_1\frac{e^{V_{ni1}}}{\sum_k e^{V_{nk1}}} + p_2\frac{e^{V_{ni2}}}{\sum_k e^{V_{nk2}}}
+$$
+
+And since the sum of probabilities $p_1 + p_2=1$, the unconditional probability is essentially the weighted average of the probabilities for each latent class.
+
+More generally, we allow for an arbitrary number of groups $q=1,2,\cdots,Q$ each with their own distinctive set of coefficients, for $Q$ latent classes, and therefore, the unconditional probability of decision-maker $n$ choosing alternative $i$ is:
+
+$$
+P_{ni} = \sum_q^Q P_{ni|q} = \sum_q^Q p_q\frac{e^{V_{niq}}}{\sum_k e^{V_{nkq}}}
+$$
+
+and the probability of belonging to each group is:
+
+$$
+p_q = \frac{e^{\gamma_q}}{\sum_{z=1}^Qe^{\gamma_z}}
+$$
+
+with $\gamma_1=0$.
+
+## Estimation
+
+The log-likelihood function of the latent class logit model is this:
+$$
+l = \sum_nln\Big[\sum_q p_q(\prod_i P_{ni}^{y_{ni}})\Big]
+$$
+where $y_{ni}$ is an indicator variable that takes the value of one if decision maker $n$ chose alternative $i$, and zero otherwise.
+
+The log-likelihood function can be maximized using conventional optimization techniques, contingent on the selection of the number of latent classes $Q$.
+
+## Properties of the latent class logit model
+
+Among the properties of the latent class logit, two are of interest.
+
+The first one can be illustrated by means of the odds-ratio of two alternatives, say $i$ and $j$:
+$$
+\frac{P_{ni}}{P_{nj}} = \frac{\sum_q^Q p_q\frac{e^{V_{niq}}}{\sum_k e^{V_{nkq}}}}{\sum_q^Q p_q\frac{e^{V_{njq}}}{\sum_k e^{V_{nkq}}}}
+$$
+
+When $Q=1$ the model collapses to the multinomial logit model and proportional substitution patterns. When $Q\ge3$, on the other hand, the denominator of the logit probabilities is inside the summation for the classes, and does not vanish:
+$$
+\frac{P_{ni}}{P_{nj}} = \frac{p_1\frac{e^{V_{ni1}}}{\sum_k e^{V_{nk1}}} + p_2\frac{e^{V_{ni2}}}{\sum_k e^{V_{nk1}}} + p_3\frac{e^{V_{ni3}}}{\sum_k e^{V_{nk3}}}}{p_1\frac{e^{V_{nj1}}}{\sum_k e^{V_{nk1}}} + p_2\frac{e^{V_{nj2}}}{\sum_k e^{V_{nk1}}}+ p_3\frac{e^{V_{ni3}}}{\sum_k e^{V_{nk3}}}}
+$$
+
+Therefore, the latent class logit model does not display independence from irrelevant alterantives.
+
+Secondly, latent class logit models with higher number of classes do _not_ nest into each other. The reason for this is that the parameters that define the probability of belonging to a class are contingent on the number of classes. Therefore, reducing the number of classes, say from $Q=3$ to $Q=2$, is not equivalent to restricting some parameters to be zero. As a consequence, latent class models cannot be compared by means of the likelihood ratio test. Further, since the log-likelihood always improves with the addition of classes, it is not possible to compare the likelihood directly.
+
+Instead, criteria that account for the size of the models are used. Roeder et al. [-@Roeder1999modeling] suggest using the Bayesian Information Criterion:
+$$
+BIC = k\ln(n)-2\hat{l}
+$$
+where $k$ is the number of parameters in the model, $n$ is the sample size, and $\hat{l}$ is the maximized value of the likelihood of the model.
+
+Shen [-@Shen2009latent] suggests using Akaike's Information Criterion: 
+$$
+AIC = 2k-2\hat{l}
+$$
+or Consistent Akaike's Information Criterion:
+$$
+CAIC = k[ln(n)+1]-2\hat{l}
+$$
+The three criteria above use the likelihood of the model and apply a penalty based on the size of the model and possibly the size of the sample. Since the negative of the likelihood is used in the calculations, minimizing an information criteria is an indicator of goodness-of-fit. 
+
+In particular, when using $AIC$, the following decision rule could be followed. Suppose that there are candidate models with $q=1, 2, \cdots,Q$ latent classes. Calculate the $AIC$ for each model, such that there are $AIC_{q=1}, AIC_{q=2},\cdots, AIC_{q=Q}$. Denote the minimum $AIC$ as $AIC_{min}$. The _relative likelihood_ is defined as:
+$$
+RL = e^{\frac{AIC_{min}-AIC_q}{2}}
+$$
+The interpretation of the relative likelihood is as being proportional to the probability that the model with $q$ classes minimizes the estimated information loss.
+
+## Empirical example
+
+Here we revisit the empirical example. To estimate latent class models we use the package `gmnl`. This package uses a similar syntax for specifying multi-part formulas as `mlogit`. In particular, the parts of a formula are:
+$$
+\begin{array}{cr}
+choice & \sim& \text{alternative attributes with generic coefficients } |\\
+&&\text{individual attributes }|\\
+&&\text{alternative attributes with specific coefficients }|\\
+&&\text{variables for random coefficients }|\\
+&&\text{variables for latent class model }\\
+\end{array}
+$$
+
+We proceed to estimate latent class models as follows, with $Q=2$ and $Q=3$ (i.e., two and three latent classes):
+```{r}
+lc2 <- gmnl(choice ~ cost + risk | 0 | 0 | 0 | 1, 
+           data = junk,
+           model = 'lc', 
+           Q = 2,
+           panel = TRUE,
+           method = "bhhh")
+#summary(lc2)
+
+lc3 <- gmnl(choice ~ cost + risk | 0 | 0 | 0 | 1, 
+           data = RT,
+           model = 'lc', 
+           Q = 3,
+           panel = TRUE,
+           method = "bhhh")
+#summary(lc3)
+```
+
+The results of these models are summarized in the table below. 
+```{r}
+# Estimate a constants only model to calculate McFadden's _adjusted_ rho2
+
+names(mnl.rt0$coefficients) <- c("class.1.cost", "class.1.risk")
+
+mnl0.summary <- rownames_to_column(data.frame(summary(mnl.rt0)$CoefTable), "Variable") %>%
+  transmute(Variable, Estimate, pval = `Pr...z..`)
+
+lc2.summary <- rownames_to_column(data.frame(summary(lc2)$CoefTable), "Variable") %>%
+  transmute(Variable, Estimate, pval = `Pr...z..`)
+
+lc3.summary <- rownames_to_column(data.frame(summary(lc3)$CoefTable), "Variable") %>% 
+  transmute(Variable, Estimate, pval = `Pr...z..`)
+
+df <- full_join(mnl0.summary, lc2.summary, by = "Variable") %>% 
+  full_join(lc3.summary, by = "Variable")
+
+kable(df, 
+      "html",
+      digits = 4,
+      col.names = c("Variable",
+                    "Estimate",
+                    "p-value",
+                    "Estimate",
+                    "p-value",
+                    "Estimate",
+                    "p-value"),
+      caption = "Base models: multinomial logit (MNL), latent class Q = 2 (LC2), latent class Q = 3 (LC3)") %>%
+  kable_styling() %>%
+  add_header_above(c(" " = 1, "MNL" = 2, "LC2" = 2, "LC3" = 2)) %>%
+  footnote(general = c(paste0("Log-Likelihood: MNL = ", round(mnl.rt0$logLik[1], digits = 3),
+                            "; Latent Class (Q=2) = ", round(lc2$logLik$maximum, digits = 3),
+                            "; Latent Class (Q=2) = ", round(lc3$logLik$maximum, digits = 3))))
+```
+
+Notice that model LC3, despite improving the likelihood, returns non-significant parameters for the latent class model. For this reason, we compare only the multinomial logit model and LC2.
+
+The $AIC$ of the base multinomial logit model is:
+```{r}
+2 * length(coef(mnl.rt0)) - 2 * mnl.rt0$logLik
+```
+
+The $AIC$ of model LC2 is:
+```{r}
+2 * length(coef(lc2)) - 2 * lc2$logLik$maximum
+```
+
+The minimum $AIC$ is for the latent class model. If we calculate the relative likelihood:
+```{r}
+as.numeric(exp(((2 * length(coef(lc2)) - 2 * lc2$logLik$maximum) - (2 * length(coef(mnl.rt0)) - 2 * mnl.rt0$logLik))/2))
+```
+
+Therefore, the standard multinomial logit model is less than $0.001$ times probable as the latent class model with $Q=2$ to minimize the information loss.
+
+Notice that in the latent class model, the coefficient for risk in class 1 is not significant, whereas the coefficient for cost in class 2 is not significant. This suggests that class 1 is more cost-averse and class 2 more risk-averse.
+
+To calculate the shares of the latent classes in the population, we can write the latent class model as follows:
+$$
+p_2 = \frac{e^{0.4207}}{1 + e^{0.4207}}
+$$
+and:
+$$
+p_1 = 1 - p_2
+$$
+
+Therefore, the share for class 1 is:
+```{r}
+as.numeric(1 - exp(coef(lc2)["(class)2"])/(1 + exp(coef(lc2)["(class)2"])))
+```
+
+and the share for class 2 is:
+```{r}
+as.numeric(exp(coef(lc2)["(class)2"])/(1 + exp(coef(lc2)["(class)2"])))
+```
+
+## Adding individual-level attributes
+
+A question when doing this kind of analysis is, to what extent can the inclusion of individual-level attributes capture the variations in taste.
+
+Here, we revisit the models after adding covariates. There are two multinomial logit models. In one, we introduce the same covariate to all but one utility function (MNL-COV), and in a second model the covariate is used to expand the coefficients of the alternative-level attributes as follows:
+$$
+V_{ni} = (b_{cost} + b_{cost:dwage}dwage_n)cost_i + (b_{risk} + b_{risk:dwage}dwage_n)risk_i
+$$
+
+These models are estimated next:
+```{r}
+mnl.cov <- mlogit(choice ~ cost + risk | dwage + 0, 
+                data = RT)
+#summary(mnl.cov)
+
+mnl.exp <- mlogit(choice ~ cost + cost:dwage +
+                   risk + risk:dwage | 0, 
+                data = RT)
+#summary(mnl.exp)
+```
+
+The models are summarized next:
+```{r}
+mnl.cov.summary <- rownames_to_column(data.frame(summary(mnl.cov)$CoefTable), "Variable") %>%
+  transmute(Variable, Estimate, pval = `Pr...z..`)
+
+mnl.exp.summary <- rownames_to_column(data.frame(summary(mnl.exp)$CoefTable), "Variable") %>%
+  transmute(Variable, Estimate, pval = `Pr...z..`)
+
+
+
+df <- full_join(mnl.cov.summary, mnl.exp.summary, by = "Variable")
+
+kable(df, 
+      "html",
+      digits = 4,
+      col.names = c("Variable",
+                    "Estimate",
+                    "p-value",
+                    "Estimate",
+                    "p-value"),
+      caption = "Models: multinomial logit with covariates (MNL-COV) and multinomial logit with expanded coefficients (MNL-EXP)") %>%
+  kable_styling() %>%
+  add_header_above(c(" " = 1, "MNL-COV" = 2, "MNL-EXP" = 2)) %>%
+  footnote(general = c(paste0("Log-Likelihood: MNL-COV = ", round(mnl.cov$logLik[1], digits = 3),
+                            "; MNL-EXP = ", round(mnl.exp$logLik[1], digits = 3))))
+```
+
+The $AIC$ of MNL-COV is:
+```{r}
+as.numeric(2 * length(coef(mnl.cov)) - 2 * mnl.cov$logLik)
+```
+
+and the $AIC$ of MNL-EXP is:
+```{r}
+as.numeric(2 * length(coef(mnl.exp)) - 2 * mnl.exp$logLik)
+```
+
+The minimum $AIC$ is still for latent class model LC2. If we calculate the relative likelihood with respect to the best performing multinomial logit model:
+```{r}
+as.numeric(exp(((2 * length(coef(lc2)) - 2 * lc2$logLik$maximum) - (2 * length(coef(mnl.cov)) - 2 * mnl.cov$logLik))/2))
+```
+
+Clearly, latent class model LC2 is still the best candidate for fit.
+
+## Adding variables to the latent class selection model
+
+The latent class model can accommodate individual level attributes in the class selection model. The model thus becomes:
+$$
+p_q = \frac{e^{\gamma'_q x_i}}{\sum_{z=1}^Qe^{\gamma'_z x_i}}
+$$
+where now $\gamma_q$ is a vector of size $1 \times h$ and $x_1$ is a vector of $h$ individual-level attributes. As before, $\gamma_1 = 0$.
+
+To estimate a model with variables in the selection model, the fifth part of the formula is used, as shown next (call this model LC2-COV):
+```{r}
+lc2.cov <- gmnl(choice ~ cost + risk | 0 | 0 | 0 | dwage, 
+           data = RT,
+           model = 'lc', 
+           Q = 2,
+           panel = TRUE,
+           method = "nm",
+           iterlim = 1200)
+summary(lc2.cov)
+```
+
+The $AIC$ of this model is:
+```{r}
+as.numeric(2 * length(coef(lc2.cov)) - 2 * lc2.cov$logLik$maximum)
+```
+
+which improves on the $AIC$ of the LC2 model:
+```{r}
+as.numeric(2 * length(coef(lc2)) - 2 * lc2$logLik$maximum)
+```
+
+The relative likelihood is now:
+```{r}
+as.numeric(exp(((2 * length(coef(lc2.cov)) - 2 * lc2.cov$logLik$maximum) - (2 * length(coef(lc2)) - 2 * lc2$logLik$maximum))/2))
+```
+
+Which clearly indicates the improved performance of the model LC2-COV.
+
+The model still points at two classes of decision-makers, cost-averse and risk-averse. However, the probability of membership in those classes now changes as a function of declared wage. The following figure explores the shares of the classes by levels of wage:
+```{r}
+#Create a dataframe for plotting:
+df <- data.frame(dwage = seq(min(RT$dwage), to = max(RT$dwage), by = (max(RT$dwage) - min(RT$dwage))/100))
+
+# Use the class selection model to calculate the membership probabilities
+df <- df %>% mutate(p_1 = 1 - exp(coef(lc2.cov)["(class)2"] + coef(lc2.cov)["dwage:class2"] * dwage)/(1 + exp(coef(lc2.cov)["(class)2"] + coef(lc2.cov)["dwage:class2"] * dwage)),
+                    p_2 = exp(coef(lc2.cov)["(class)2"] + coef(lc2.cov)["dwage:class2"] * dwage)/(1 + exp(coef(lc2.cov)["(class)2"] + coef(lc2.cov)["dwage:class2"] * dwage)))
+
+# Plot
+ggplot(df, aes(x = dwage)) + 
+  geom_ribbon(aes(ymin = 0, ymax = 1), fill = "blue") + 
+  geom_ribbon(aes(ymin = 0, ymax = p_1), fill = "orange") +
+  ylab("Probability of class membership") +
+  annotate("text", x = 25, y = 0.22, label = "Class 1", color = "white") +
+  annotate("text", x = 250, y = 0.75, label = "Class 2", color = "white")
+```
+
+The plot indicates that individuals with lower declared wages have a higher probability of being in class 1, which is risk-averse. This tends to decline quite rapidly as declared wage increases, and overall most members of the population tend to be risk-averse.
+
+## Exercise
+
+Load the following dataset from the `AER` package:
+```{r} 
+data("TravelMode", package = "AER")
+```
+
+1. Estimate a latent class logit model. Justify your modelling decisions, including the number of classes to use and the use of covariates.
