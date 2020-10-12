@@ -9,7 +9,9 @@ output:
 
 ## Introduction
 
-The course makes extensive use of R and RStudio. Here are the instructions to install these two tools.
+The course makes extensive use of R and RStudio. Here are the instructions to install these two tools. 
+
+Note: please read these instructions in the html format.
 
 ## Learning Objectives
 
@@ -48,11 +50,6 @@ Before introducing some basic functionality in R, lets quickly take a tour R Stu
 ###	The RStudio IDE
 
 The RStudio IDE provides a complete interface to interact with the language R. It consists of a window with several panes. Some panes include in addition several tabs. There are the usual drop-down menus for common operations, such as creating new files, saving, common commands for editing, etc. See Figure \@ref(fig:RStudio-IDE) below.
-
-```{r}
-library(knitr)
-```
-
 
 ```{r RStudio-IDE, fig.cap= "\\label{fig:RStudio-IDE}The RStudio IDE", echo=FALSE}
 knitr::include_graphics(rep("00-Figure-1.png"))

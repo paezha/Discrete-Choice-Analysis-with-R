@@ -66,7 +66,7 @@ $$
 f(x) = \left\{
         \begin{array}{lc}
             0 & \quad x \le b \\
-            \frac{1}{a - b} & \quad b> x > a \\
+            \frac{1}{a - b} & \quad b < x < a \\
             0 & \quad x \ge a \\
         \end{array}
     \right.
@@ -133,7 +133,7 @@ ggplot() +
   ylab("f(x)") # Label the y axis
 ```
 
-Since the probability expression is given in terms of the difference of the random utilities, if we assume that the random terms $\epsilon$ follow the EV Type I distribution, their difference (i.e., $\epsilon_n = \epsilon_j - \epsilon_i$) follows the logistic distribution. As before, the area under the curve of the function needs to be calculated to obtain a probability. Unfortunately, this needs to be done by integration. Fortunately, this integral has an analytical solution, or so-called _closed form_:
+Since the probability expression is given in terms of the difference of the random utilities, if we assume that the random terms $\epsilon$ follow the EV Type I distribution, their difference (i.e., $\epsilon_n = \epsilon_j - \epsilon_k$) follows the logistic distribution. As before, the area under the curve of the function needs to be calculated to obtain a probability. Unfortunately, this needs to be done by integration. Fortunately, this integral has an analytical solution, or so-called _closed form_:
 $$
 F(x; \mu,\sigma) = \frac{1}{1 + e^{-(\epsilon_n-\mu)/\sigma}}
 $$

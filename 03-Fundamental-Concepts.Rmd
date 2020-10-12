@@ -72,9 +72,21 @@ library(tidyverse)
 library(evd)
 ```
 
-## Utility maximization
 
-We will begin by defining a conceptual model of choice based on neo-classical economics, fundamentally consumer choice. The conceptual framework in neo-classical economics is based on the concept of _utility_.
+## Choices mecanisms: Utility maximization
+
+A choice is a result of a decision-making process that can be described as follows: first, the decision-maker defines the problem for which a decision is required; second, the decision-maker identifies the existing alternatives and evaluates each alternative based on a set of attributes; finally, the decision-maker makes a choice based on a decision-rule (also referred to as choice mecanism).
+
+Let's take  the example of a university student as the decision-maker. The choice problem could be to decide which mode to use to travel to university. The existing alternatives would be defined based on the modes available to the decision-maker, either as a result of transport network (e.g.: public transport supply) or personal characteristics (e.g.: car or bicycle ownership). Let's assume here that the student has the possibility to either walk or use public transport to university. The student will then characterize each alternative based on a set of attributes that are important to him (e.g.:travel time and travel cost). Suppose that the two trips have the following characteristics:
+
+- walk: travel time = 25 minutes, cost = $0
+- public transport: travel time = 7 minutes, cost =$3
+
+Using this information, the student will finally make a choice based on a decision-rule. The decision rule could be to take the cheapest mode, the fastest mode or a trade-off between the cost and the travel time (e.g.: the student is willing to pay $1 for each reduction of 5 minutes in travel time). 
+
+The decision-rule refers to the internal mechanism or thought process made by the decision-maker to select a unique alternative, using the information that is available to him. This mechanism is central to the the conceptualization of choice modelling. While every individual may have a different mechanism, the literature has proposed a series of decision rules that can be used to model choices.
+
+In this section, we will begin here by defining a conceptual model of choice where the decision rule is based on neo-classical economics, fundamentally consumer choice. The conceptual framework in neo-classical economics is based on the concept of _utility_.
 
 ### What is utility?
 
@@ -170,7 +182,7 @@ $$
 f(x) = \left\{
         \begin{array}{lc}
             0 & \quad x \le -L \\
-            \frac{1}{2L} & \quad -L> x > L \\
+            \frac{1}{2L} & \quad -L < x < L \\
             0 & \quad x \ge L \\
         \end{array}
     \right.
@@ -211,7 +223,7 @@ $$
 f(x) = \left\{
         \begin{array}{lc}
             0 & \quad x \le b \\
-            \frac{1}{a - b} & \quad b> x > a \\
+            \frac{1}{a - b} & \quad b < x < a \\
             0 & \quad x \ge a \\
         \end{array}
     \right.
@@ -229,7 +241,7 @@ In the case of our uniform distribution function, this is simply the area of the
 L <- 2
 
 # Define an upper limit for calculating the probability
-X <- 0
+X <- 2
 
 # Create a data frame for plotting
 df <- data.frame(x =seq(from = -(L+1), to = L+1, by = 0.01)) %>% mutate(y = uniform(x, L))
@@ -252,7 +264,7 @@ $$
 F(x) = \left\{
         \begin{array}{lc}
             0 & \quad x \le -L \\
-            \frac{x + L}{2L} & \quad -L> x > L \\
+            \frac{x + L}{2L} & \quad -L < x < L \\
             1 & \quad x \ge L \\
         \end{array}
     \right.
@@ -288,7 +300,7 @@ $$
 f(x) = \left\{
         \begin{array}{lc}
             0 & \quad x \le 0 \\
-            2x & \quad 0 > x > 1 \\
+            2x & \quad 0 < x < 1 \\
             0 & \quad x \ge 1 \\
         \end{array}
     \right.
@@ -320,7 +332,7 @@ $$
 F(x) = \left\{
         \begin{array}{lc}
             0 & \quad x \le 0 \\
-            \frac{x \times 2x}{2} = x^2 & \quad 0 > x > 1 \\
+            \frac{x \times 2x}{2} = x^2 & \quad 0 < x < 1 \\
             1 & \quad x \ge 1 \\
         \end{array}
     \right.
@@ -343,7 +355,7 @@ ggplot(data = df, aes(x, y)) +
   ylim(c(0, 1)) + # Set the limits of the y axis
   geom_hline(yintercept = 0) + # Add y axis
   geom_vline(xintercept = 0) + # Add x axis
-  ylab("f(x)") # Label the y axis
+  ylab("F(x)") # Label the y axis
 ```
 
 It should be clear from the examples above that calculating probabilities is nothing more than finding the area under the curve of a function. When the function is relatively simple, as the uniform or the linear distributions that we used for the examples, calculating the areas is also straightforward, since the functions describe simple geometric shapes. When the function is more involved, that becomes less straighforward. For example, consider the following function:
@@ -351,7 +363,7 @@ $$
 f(x) = \left\{
         \begin{array}{lc}
             0 & \quad x \le 0 \\
-            4x^3 & \quad 0 > x > 1 \\
+            4x^3 & \quad 0 < x < 1 \\
             0 & \quad x \ge 0 \\
         \end{array}
     \right.
@@ -399,7 +411,7 @@ $$
 P_{\text{Do-Nothing}} = \left\{
         \begin{array}{lc}
             0 & \quad V_{\text{Do-Nothing}} - V_{\text{New-Phone}} \le -L \\
-            \frac{V_{\text{Do-Nothing}} - V_{\text{New-Phone}} + L}{2L} & \quad -L> V_{\text{Do-Nothing}} - V_{\text{New-Phone}} > L \\
+            \frac{V_{\text{Do-Nothing}} - V_{\text{New-Phone}} + L}{2L} & \quad -L< V_{\text{Do-Nothing}} - V_{\text{New-Phone}} < L \\
             1 & \quad V_{\text{Do-Nothing}} - V_{\text{New-Phone}} \ge L \\
         \end{array}
     \right.
