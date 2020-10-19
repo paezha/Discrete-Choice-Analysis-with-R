@@ -114,9 +114,9 @@ The dataset is in "wide" form, which means that there is one record per decision
 H <- mlogit.data(Heating, shape = "wide", choice = "depvar", varying = c(3:12))
 ```
 
-In the above, the argument `varying` lets the function know that the variables in the columns 3 through 13 in the dataframe are alternative-specific, and therefore vary across utility functions. Once that the format of the table has been changed from "wide" to "long", the number of rows changes from $900$ (the number of decision makers) to $4500$: this is the number of decision makers ($900$) times the number of alternatives ($5$).
+In the above, the argument `varying` lets the function know that the variables in the columns 3 through 12 in the dataframe are alternative-specific, and therefore vary across utility functions. Once that the format of the table has been changed from "wide" to "long", the number of rows changes from $900$ (the number of decision makers) to $4500$: this is the number of decision makers ($900$) times the number of alternatives ($5$).
 
-Before estimating an initial model, we need to define the utility functions that we wish to estimate. Since there are five alternatives, we define the following five functions (with heat pump as the reference level):
+Before estimating an initial model, we need to define the utility functions that we wish to estimate. Since there are five alternatives, we define the following five functions (with the electric central system as the reference level):
 $$
 \begin{array}{ccc}
 V_{\text{ec}} = & 0 & + \beta_1\text{ic.ec}\\
@@ -184,7 +184,7 @@ $$
 In the case of discrete choice models, the dependent variable that we are interested in is the probability of choosing alternative $j$. Louviere et al. [-@Louviere2000stated, p. 58-59] show that, given a discrete choice model, the marginal effect is:
 
 $$
-M^{P_{in}}_{x_{jnk}} = \beta_{k}(\delta_{ij}-P_{jn})
+M^{P_{in}}_{x_{jnk}} = \beta_{jk}(\delta_{ij}-P_{jn})
 $$
 where $P_{jn}$ is the probability of decision-maker $n$ selecting alternative $j$ and $\beta_{jk}$ is the coefficient that corresponds to variable $x_{jnk}$. This measures the change in probability as a result of a one-unit change in $x_{jnk}$.
 
@@ -225,7 +225,7 @@ ic_max[3:7] <- max_cost
 
 If we quickly examine the dataframe with the minimum installation costs:
 ```{r}
-head(ic_min)
+head(ic_max)
 ```
 
 We can see that we have simulated a dataset that includes the minimum installation cost of every system. We did not modify any of the other variables (they are not part of the model, so this does not matter).
@@ -265,7 +265,7 @@ Of the different systems, the probability of choosing Electric Central changes t
 The direct marginal effect is defined as follows:
 
 $$
-M^{P_{in}}_{x_{ink}} = \beta_{k}(1-P_{in})
+M^{P_{in}}_{x_{ink}} = \beta_{ik}(1-P_{in})
 $$
 
 This measure is useful to answer the question:
@@ -283,7 +283,7 @@ Based on the values summarized above, we can calculate the direct marginal effec
 -0.00168108 * (1 - 0.672)
 ```
 
-The values above indicate that the probabilities of choosing an electric central system would decrease by approximately $0.00064$%, $0.00061$%, $0.00055$% if the installation cost increased by one dollar from the minimum, mean, and maximum installation cost, respectively.
+The values above indicate that the probabilities of choosing a gas central system would decrease by approximately $0.00064$%, $0.00061$%, $0.00055$% if the installation cost increased by one dollar from the minimum, mean, and maximum installation cost, respectively.
 
 ### Cross-marginal effects
 
@@ -308,7 +308,7 @@ Based on the values summarized above, we can calculate the cross-marginal effect
 -(-0.00168108 * 0.672)
 ```
 
-The values above indicate that the probabilities of choosing an electric central system would _increase_ by approximately $0.0010$%, $0.0011$%, $0.0011$% if the cost of installing a gas central heating system increased by one dollar from the minimum, mean, and maximum installation cost, respectively.
+The values above indicate that the probabilities of choosing an electric central heating system would _increase_ by approximately $0.0010$%, $0.0011$%, $0.0011$% if the cost of installing a gas central heating system increased by one dollar from the minimum, mean, and maximum installation cost, respectively.
 
 ## Elasticity
 
@@ -324,13 +324,13 @@ Following a similar logic as above, there are two cases of the elasticity, direc
 
 ### Direct-point elasticity
 
-Direct-point elasticity is calculated at a point value of $x_ink$ (attribute $k$ of alternative $i$ of decision-maker $k$) with respect to the probability of selecting alternative $i$. This elasticity is useful when our question about behavior is as follows:
+Direct-point elasticity is calculated at a point value of $x_ink$ (attribute $k$ of alternative $i$ of decision-maker $n$) with respect to the probability of selecting alternative $i$. This elasticity is useful when our question about behavior is as follows:
 
 > "How much would the probability of choosing alternative $i$ change if its attribute $k$ changed by one percent?"
 
 In terms of the present example:
 
-> "How much would the probability of choosing heating system $i$ change if its installation cost changed by one percent?"
+> "How much would the probability of choosing heating system gas central system change if its installation cost changed by one percent?"
 
 The direct-point elasticity for a discrete choice model is given by:
 
@@ -346,7 +346,7 @@ Based on the values summarized above, we can calculate the direct-point elastici
 -0.00168108 * 1158.90 * (1 - 0.672)
 ```
 
-These values indicate that the probability of choosing the electric central system with the lowest installation cost declines by approximately $0.31$% when the installation cost increases by $1$%. When the installation cost is the mean and the max, the probability of selecting the electric central system declines by approximately $0.47$% and $0.64$% respectively when the cost of installation increases by $1$%.
+These values indicate that the probability of choosing the gas central system with the lowest installation cost declines by approximately $0.28$% when the installation cost increases by $1$%. When the installation cost is the mean and the max, the probability of selecting the electric central system declines by approximately $0.47$% and $0.64$% respectively when the cost of installation increases by $1$%.
 
 Notice that the elasticity tends to give greater values than the marginal effect. This is because a one-percent change in installation costs represents a much larger amount of change in the variable than a one dollar change.
 
@@ -438,7 +438,7 @@ $$
 
 In other words, the marginal effect is the difference in the probability of choosing $i$ when the dummy variable is $1$ versus when it is $0$.
 
-Next, we will estimate a second model that uses the regions variable to illustrate this (call this Model 2):
+We will estimate a second model that uses the regions variable to illustrate this (call this Model 2):
 ```{r}
 mod2 <- mlogit(depvar ~ ic | region, Heating, shape = "wide", choice = "depvar", reflevel = "ec", varying = c(3:7))
 summary(mod2)
@@ -454,6 +454,8 @@ ic_mean_region <- ic_mean %>%
 ic_mean_region$region <- c("valley", "scostl", "mountn", "ncostl")
 ```
 
+
+We then calculate the probabilities associated with each region and heating system. Notice that for each region, the sum of the probabilities is equal to 1.
 
 ```{r}
 p_region_ic_mean <- data.frame(Region = c("valley", "scostl", "mountn", "ncostl"),
@@ -492,15 +494,16 @@ V_{\text{hp}} = & \beta_{hp} & + \beta_1\text{ic.hp} + \beta_2\text{oc.hp}\\
 \end{array}
 $$
 
-The model can be reestimated using these constants. The option `reflevel` is used to select the alternative that will work as reference (call this Model 3; notice that the columns that vary needs to be updated to include the new alternative-related variable):
+The model can be estimated again using these constants. The option `reflevel` is used to select the alternative that will work as reference (call this Model 3; notice that the columns that vary needs to be updated to include the new alternative-related variable):
+
 ```{r}
 mod3 <- mlogit(depvar ~ ic + oc, Heating, shape = "wide", choice = "depvar", reflevel = "ec", varying = c(3:12))
 summary(mod3)
 ```
 
-So, how can this model be used to understand consumer preferences? Recall that the question is at what rate are consumers willing to pay for installation relative to operation.
+Now, how can this model be used to understand consumer preferences? Recall that the question is at what rate are consumers willing to pay for installation relative to operation.
 
-The coefficients of the model provide useful information. Suppose that we would like to know at what rate consumers would be willing to trade one aspect of the good for another, whithout compromising the utility they derive from it. In effect we would like to know how changes in one attribute relate to changes in the other. In the present case, we want to know how installation costs change with respect to operation costs, while mainting the utility (i.e., the change in utility is zero):
+The coefficients of the model provide useful information. Suppose that we would like to know at what rate consumers would be willing to trade one aspect of the good for another, without compromising the utility they derive from it. In effect we would like to know how changes in one attribute relate to changes in the other. In the present case, we want to know how installation costs change with respect to operation costs, while maintaining the utility (i.e., the change in utility is zero):
 
 $$
 \partial U = 0 = \beta_1\partial ic + \beta_{2}\partial oc
@@ -518,7 +521,7 @@ $$
 -\frac{\partial ic}{\partial oc} = \frac{\beta_2}{\beta_1} = \frac{-0.0069}{-0.0015} = 4.56
 $$
 
-The willingness to pay is an additional 4.56 dollars in installation costs per every dollar of operation cost per year. The discount rate is:
+The willingness to pay is an additional 4.56 dollars in installation cost per every dollar of operation cost per year. The discount rate is:
 
 $$
 r = \frac{1}{4.56} = 0.219 = 21.9\%
@@ -528,11 +531,11 @@ This information can be used to assess the behavior of consumers.
 
 ## Simulating market changes
 
-To the extent that random utility models can capture consumer preferences, they are useful to understand patterns of substitution. Once a model has been estimated simulating market changes involves creating a new data matrix to which the model can be applied. Lets take a look at two examples.
+To the extent that random utility models can capture consumer preferences, they are useful to understand patterns of substitution. Once a model has been estimated, simulating market changes involves creating a new data matrix to which the model can be applied. Let's take a look at two examples.
 
 ### Incentives
 
-Heat pumps are on average more expensive than other heating systems, but they are also more energy-efficient. Suppose then that the government, which has perhaps carbon emission targets that it wishes to meet, is analyzing a policy to encourage the adoption of heat pumps. The policy is to offer a rebate of 15% on the installation cost of heat pumps. As a consequence of this policy, consumers who install a heat pump and apply for the rebate pay only 85% of the cost of installation.
+Heat pumps are on average more expensive than other heating systems in terms of installation, but they are also more energy-efficient. Suppose then that the government, which has perhaps carbon emission targets that it wishes to meet, is analyzing a policy to encourage the adoption of heat pumps. The policy is to offer a rebate of 15% on the installation cost of heat pumps. As a consequence of this policy, consumers who install a heat pump and apply for the rebate pay only 85% of the cost of installation.
 
 To simulate this scenario, we copy the input dataframe after simulating the rebate, replacing the cost of installation as follows: 
 ```{r}
@@ -546,9 +549,11 @@ data.frame(Policy = c("Do nothing", "15% rebate"),
                  apply(predict(mod3, newdata = mlogit.data(H_rebate, shape = "wide", choice = "depvar", varying = c(3:12))), 2, mean)))
 ```
 
+In this example, we see that the market share (of probability of selecting a heat pumps) increases with the 15% rebate, while the market shares of other heating systems slightly decreases. This is in line with the policy objectives of the rebate on the installation of heat pumps.
+
 ### Introduction of a new system
 
-Suppose for example that a more efficient electric system is developed using newer technologies. The cost of installation is more expensive due to the cost of the new technology (cost of installation is $200 dollars higher than the electric central system). On the other hand, the cost of operation is only 75% that of the electric central systems. The preceding analysis suggests that consumers are willing to spend more in installation in exchange for savings in operation costs. What would be the penetration of this new system?
+Now suppose for example that a more efficient electric system is developed using newer technologies. The cost of installation is more expensive due to the cost of the new technology (cost of installation is $200 dollars higher than the electric central system). On the other hand, the cost of operation is only 75% that of the electric central systems. The preceding analysis suggests that consumers are willing to spend more in installation in exchange for savings in operation costs. What would the market penetration of this new system be?
 
 To simulate this situation, we begin by creating a model matrix based on Model 3: 
 ```{r}

@@ -276,9 +276,9 @@ We can begin by defining a very simple formula that considers only travel time. 
 f1 <- mFormula(choice ~ time)
 ```
 
-The function `model.matrix` allows us to see how the formula is applied to the data (we use `head()` to display only the top rows of the model matrix):
+The function `model.matrix` allows us to see how the formula is applied to the data (we first convert the model matrix into a dataframe and then use the 8 function to display the top rows):
 ```{r}
-head(model.matrix(f1, mc_commute_long, 8))
+head(as.data.frame(model.matrix(f1, mc_commute_long)))
 ```
 
 We can see that the formula includes by default the alternative specific coefficients, in this case using car as the reference alternative. The corresponding utility functions are as follows:
@@ -313,7 +313,7 @@ f2 <- mFormula(choice ~ time | sidewalk_density)
 
 The model matrix is now:
 ```{r}
-head(model.matrix(f2, mc_commute_long))
+head(as.data.frame(model.matrix(f2, mc_commute_long)))
 ```
 
 And the utility functions are therefore:
@@ -357,7 +357,7 @@ Note that, since we do not define other alternative-specific variables with gene
 
 This formula leads to the following model matrix:
 ```{r}
-head(model.matrix(f3, mc_commute_long))
+head(as.data.frame(model.matrix(f3, mc_commute_long)))
 ```
 
 The utility functions for this are:
@@ -710,7 +710,7 @@ The prediction dataframe now includes the range of sidewalk densities that we ar
 
 The setup for the simulation essentially amounts to: what is the probability of choosing each mode for a trip that originates in an area with a sidewalk density of 5? Of 10? For the simulation, we also need to set the values of other variables of interest. Since the model has the variable `time` we need to also set it to a desired value, for instance, the median trip duration (paying attention to remove the missing values):
 ```{r}
-median(mc_commute_long$time, na.rm = TRUE)
+median(mc_commute_predict$time, na.rm = TRUE)
 ```
 
 The median trip length is 10 minutes, so we replace the current values in the prediction dataframe:
