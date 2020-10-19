@@ -102,7 +102,7 @@ prbt <- mlogit(choice ~ vcost + travel + wait | 1,
 
 Notice that the nesting structure places all land-based modes in a nest and air in a separate nest (you can try different nesting structures if you wish!). 
 ```{r fig-nesting-structure, fig.cap= "\\label{fig:fig-nesting-structure}Nests in the nested logit model", echo=FALSE}
-knitr::include_graphics(rep("09-Figure-1.jpg"))
+knitr::include_graphics(rep("10-Figure-1.jpg"))
 ```
 
 The results of these models are summarized in Table \ref(@table-base-models) below. 

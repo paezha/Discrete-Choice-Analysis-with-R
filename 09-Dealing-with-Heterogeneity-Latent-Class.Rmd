@@ -35,7 +35,10 @@ The airport in Freetown is not on the mainland, and the alternatives for travel 
 
 The choice set is not balanced, meaning that not all alternatives were available to all individuals surveyed for this study. This is due to the seasonality or occasional unavailability of some modes. For the example in this chapter, we will extract a subset of observations for those individuals who had the four alternatives available as part of their choice set. To do this, we identify all respondents with four modes: 
 ```{r}
-all_available <- RiskyTransport %>% group_by(chid) %>% summarise(no_rows = length(chid)) %>% filter(no_rows == 4) %>% select(chid)
+all_available <- RiskyTransport %>% 
+  group_by(chid) %>% 
+  summarise(no_rows = length(chid), .groups = 'drop') %>% 
+  filter(no_rows == 4) %>% select(chid)
 ```
 
 Next, we do an inner join of those respondents with the full dataset. This joins will only preserve the rows in the table corresponding to the respondents in `all_available`:
@@ -47,7 +50,8 @@ The two key variables (in addition to the mode chosen) are the generalized cost 
 ```{r}
 df <- RT %>% group_by(mode) %>% summarize(use = sum(choice),
                                     min_cost = min(cost), mean_cost = mean(cost), max_cost = max(cost),
-                                    min_risk = min(risk), mean_risk = mean(risk), max_risk = max(risk))
+                                    min_risk = min(risk), mean_risk = mean(risk), max_risk = max(risk),
+                                    .groups = 'drop')
 df$use <- df$use/sum(df$use)
 
 kable(df, 
@@ -69,7 +73,7 @@ The two most popular modes are Water Taxi and Ferry, with Hovercraft as a distan
 
 The dataset includes information on number of seats, noise, crowdness, convenience of location, and clientele by mode. Finally, it includes information about the decision-makers, including whether they are African, their declared life expectancy, their declared hourly wage, their imputed hourly wage, their level of education, a self-ranked response on their degree of fatalism, gender, age, whether they have children, and if they know how to swim.
 
-Althought the survey includes sample weights, we will ignore those after subsetting the data.
+Although the survey includes sample weights, we will ignore those after subsetting the data.
 
 We add to the dataset some interactions and non-linear terms:
 ```{r}
@@ -80,7 +84,10 @@ RT <- RT %>% mutate(`cost:dwage` = cost * dwage,
 
 The dataset is in "long" form, which means that there is one record per decision-making situation per decision-maker. Therefore, we must format the dataframe in preparation for use with `mlogit` and `gmnl`:
 ```{r}
-RT <- mlogit.data(RT, shape = "long", choice = "choice", alt.var = "mode", id.var = "id")
+junk <- dfidx(RiskyTransport, 
+              choice = "choice", 
+              idx = list(c("chid", "id"), "mode"),
+              idnames = c("chid", "alt"))
 ```
 
 ## How to use this note
@@ -120,7 +127,7 @@ where `safe` is the probability of completing a trip safely.
 This model is estimated as follows, supressing the constants in the second term of the formula:
 ```{r}
 mnl.rt0 <- mlogit(choice ~ cost + risk | 0, 
-                data = RT)
+                data = junk)
 summary(mnl.rt0)
 ```
 
@@ -301,7 +308,7 @@ $$
 We proceed to estimate latent class models as follows, with $Q=2$ and $Q=3$ (i.e., two and three latent classes):
 ```{r}
 lc2 <- gmnl(choice ~ cost + risk | 0 | 0 | 0 | 1, 
-           data = RT,
+           data = junk,
            model = 'lc', 
            Q = 2,
            panel = TRUE,

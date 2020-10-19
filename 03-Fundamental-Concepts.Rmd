@@ -1,5 +1,5 @@
 ---
-title: "02 Fundamental Concepts"
+title: "03 Fundamental Concepts"
 output: html_notebook
 ---
 
@@ -466,7 +466,7 @@ Answer the following questions.
 Consider the function shown in Figure \@ref(fig:fig-triangle). This is called the triangle or tent function.
 
 ```{r fig-triangle, fig.cap= "\\label{fig:fig-triangle}Triangle (or tent) function", echo=FALSE}
-knitr::include_graphics(rep("02-Figure-1.jpg"))
+knitr::include_graphics(rep("03-Figure-1.jpg"))
 ```
 
 4. Show that the triangle function in the figure is a valid probability distribution function.

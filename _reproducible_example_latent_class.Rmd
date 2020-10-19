@@ -1,0 +1,76 @@
+---
+title: "Reproducible example latent class"
+output: html_notebook
+---
+
+# Context
+
+Package `mlogit` deprecated class `mlogit.data` and uses instead `dfidx`. I am having issues using the new data class with package `gmnl`. This is a reproducible example of the issue.
+
+## Preliminaries
+
+Load the packages used:
+```{r message=FALSE}
+library(tidyverse)
+library(mlogit)
+library(gmnl)
+```
+
+Session information:
+```{r}
+sessionInfo()
+```
+
+
+## Reproducible example
+
+I will use a data set available in the `mlogit` package:
+```{r}
+data("RiskyTransport", package = "mlogit")
+```
+
+The choice set is not balanced, meaning that not all alternatives were available to all individuals surveyed for this study. This is due to the seasonality or occasional unavailability of some modes. For the example, I will extract a subset of observations for those individuals who had the four alternatives available as part of their choice set. To do this, I identify all respondents with four modes: 
+```{r}
+all_available <- RiskyTransport %>% 
+  group_by(chid) %>% 
+  summarise(no_rows = length(chid), .groups = 'drop') %>% 
+  filter(no_rows == 4) %>% select(chid)
+```
+
+Next, we do an inner join of those respondents with the full dataset. This joins will only preserve the rows in the table corresponding to the respondents in `all_available`:
+```{r}
+RT <- inner_join(RiskyTransport, all_available, by = "chid") %>% drop_na()
+```
+
+Although the survey includes sample weights, we will ignore those after subsetting the data.
+
+We add to the dataset some interactions and non-linear terms:
+```{r}
+RT <- RT %>% mutate(`cost:dwage` = cost * dwage,
+                    `risk:dwage` = risk * dwage,
+                    dwage2 = dwage^2)
+```
+
+The dataset is in "long" form, which means that there is one record per decision-making situation per decision-maker. We must format the dataframe in preparation for use with `mlogit` and `gmnl`:
+```{r}
+RT_dfidx <- dfidx(RT, 
+              choice = "choice", 
+              idx = list(c("chid", "id"), "mode"),
+              idnames = c("chid", "alt"))
+```
+
+A multinomial logit model is estimated as follows, suppressing the constants in the second term of the formula:
+```{r}
+mnl.rt0 <- mlogit(choice ~ cost + risk | 0, 
+                data = RT_dfidx)
+summary(mnl.rt0)
+```
+We proceed to estimate latent class models as follows, with $Q=2$ (i.e., two latent classes):
+```{r}
+lc2 <- gmnl(choice ~ cost + risk | 0 | 0 | 0 | 1, 
+           data = RT_dfidx,
+           model = 'lc', 
+           Q = 2,
+           panel = TRUE,
+           method = "bhhh")
+```

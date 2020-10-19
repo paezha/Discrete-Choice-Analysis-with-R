@@ -1,5 +1,5 @@
 ---
-title: "01b Exploratory data analysis"
+title: "02 Exploratory data analysis"
 output: html_notebook
 ---
 
@@ -30,7 +30,6 @@ In this practice, you will learn about:
 
 1. Different ways to explore the data
 2. Bivariate and multivariate visualization techniques.
-
 
 ## Bivariate analysis
 

@@ -1,5 +1,5 @@
 ---
-title: "04 Practical Matters"
+title: "05 Practical Matters"
 output: html_notebook
 ---
 
@@ -251,10 +251,10 @@ head(mc_commute_long, 8)
 
 Since there are four alternatives in this case, each row corresponds to the choice situation for an alternative for an individual. We notice that the row names now have the format `#.Alt`, where `#` is the number of the decision-maker and `Alt` is the name of the alternative. In this way the first four rows of the table correspond to the first decision-maker who, faced with four alternatives, chose HSR (public transportation) - as recorded in the column `choice`. The next four rows correspond to the second decision-maker in the sample (who also chose HSR), and so on, four rows per decision-maker. More generally, there will be $J$ rows per decision-maker. When an attribute is missing, this means that the alternative was not available to the decision-maker. For example:
 ```{r}
-select(mc_commute_long, time) %>% head(8)
+head(mc_commute_long[,c(1, 59:60)], 8)
 ```
 
-Here we see that the modes "Car" and "Cycle" were not available to decision-maker 1, and "Cycle" was not available to decision-maker 2.
+Here we see that the modes "Car" and "Cycle" were not available to decision-maker 1 (id: 566872636), and "Cycle" was not available to decision-maker 2 (id: 566873140).
 
 The first step towards developing a choice model is to specify the utility functions for the desired model. The package `mlogit` uses the package `mFormula` to create the functions. This package creates objects that build upon the [`Formula` package](https://CRAN.R-project.org/package=Formula ) for multi-component formulas. As seen above, utility functions can potentially have multiple components, so the functionality to build formulas in `mFormula` and `Formula` is quite useful.
 
@@ -703,7 +703,7 @@ mc_commute_predict$sidewalk_density <- rep(seq(0, 60, 5), each = 4)
 
 We can examine the results of simulating the sidewalk density:
 ```{r}
-select(mc_commute_predict, sidewalk_density) %>% head(8)
+head(mc_commute_predict["sidewalk_density"], 8)
 ```
 
 The prediction dataframe now includes the range of sidewalk densities that we are interested in.
@@ -720,7 +720,7 @@ mc_commute_predict$time <- 10
 
 Examine the relevant variables of the prediction dataframe:
 ```{r}
-mc_commute_predict %>% select(time, sidewalk_density) %>% summary()
+mc_commute_predict[c("time", "sidewalk_density")] %>% summary()
 ```
 
 Next, predict the probabilities using the `predict()` function and `model2`:

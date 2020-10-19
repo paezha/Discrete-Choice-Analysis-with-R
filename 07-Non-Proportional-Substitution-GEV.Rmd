@@ -158,7 +158,7 @@ For instance, in the context of the present example, it is plausible to say that
 
 A way to capture this is by specifying a branching structure whereby alternatives thought to share similar but missing attributes. Three examples of choice structures are shown in Figure \@ref(fig:fig-choice-structures): a multinomial choice structure, such as in the model above; and two plausible nested choice structures. 
 ```{r fig-choice-structures, fig.cap= "\\label{fig:fig-choice-structures}Three Examples of Choice Structures", echo=FALSE}
-knitr::include_graphics(rep("06-Figure-1.jpg"))
+knitr::include_graphics(rep("07-Figure-1.jpg"))
 ```
 
 The intuition behind the nested choice structures is that decision-makers decide first whether they want an electric- or gas-based system first, before deciding which system specifically; or, as an alternative, that decision-makers decide whether they want a room or central system, before deciding on a specific system. It is important to know that if the systems were highly differentiated through the specification of the utility functions, the nesting structure would be unnecessary. However, since, the question of whether the patterns of substitution should be non-proportional is an empirical one, and the objective of this chapter is to introduce a class of models that are useful to capture non-proportional substitution patterns based on the Extreme Value distribution used to derive the multinomial logit model.
