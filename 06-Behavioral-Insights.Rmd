@@ -526,7 +526,6 @@ The willingness to pay is an additional 4.56 dollars in installation cost per ev
 $$
 r = \frac{1}{4.56} = 0.219 = 21.9\%
 $$
-
 This information can be used to assess the behavior of consumers.
 
 ## Simulating market changes
