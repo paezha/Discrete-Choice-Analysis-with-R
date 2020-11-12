@@ -1,34 +1,12 @@
 ---
-title: "12==== Practical Matters"
+title: "12==== Examples"
 output: html_notebook
 ---
 
-# Practical issues in specification and estimation {#chapter-4}
 
->  "In theory, there is no difference between theory and practice. But in practice, there is."
->
-> --- Benjamin Brewster
+## Examples
 
-
-> "An ounce of practice is generally worth more than a ton of theory.
->
-> --- E.F. Schumacher
-
-## Theory and practice
-
-Chapters \@ref(chapter-2) and \@ref(chapter-3) presented a conceptual framework (a theory of behavior) and the necessary apparatus (based on probability theory) to implement the conceptual framework. This theoretical introduction was necessary to begin work from a solid foundation, and it provides an intuitive and elegant framework to study decision-making, and a powerful one too; Daniel McFadden was awarded the Sveriges Riksbank Prize in Economic Sciences ([Nobel Prize](https://www.nobelprize.org/prizes/economic-sciences/2000/mcfadden/diploma/)) for his contributions to random utility modelling.
-
-Although not described in detail in previous chapters, it is worthwhile to dwell for a moment on the history of the development of the logit model as a random utility model.
-
-In his Nobel Lecture, [McFadden](https://en.wikipedia.org/wiki/Daniel_McFadden) [-@McFadden2001economic] recounts the path that led to the development of random utility models for discrete choices. Like most important discoveries, it is a meandering path. It began early in the 20th century with a theory for economic behavior (i.e., utility) that considered heterogeneous preferences that in practice were difficult to verify empirically because of data limitations. Indeed, studies before the 1960s mostly considered aggregated demand with representative agents (i.e., archetypical consumers) to accommodate this limitation in data availability. It was only when individual-level data became more widely collected and within reach of researchers that it became possible to pay attention to the behavior of individual agents. 
-
-While economists were busy with models of aggregated demand, researchers in psychometrics and mathematical psychology, chiefly [L.L Thurstone](https://en.wikipedia.org/wiki/Louis_Leon_Thurstone) and [R.D. Luce](https://en.wikipedia.org/wiki/R._Duncan_Luce), were busy providing the technical basis for modelling what Thurstone termed _Comparative Judgement_ (in the sense of making a decision or forming an opinion). In particular, Luce introduced the axiom of Independence of Irrelevant Alternatives (discussed in Chapter \@ref(chapter-3)). According to McFadden (2001, p. 353), this axiom "simplified experimental collection of choice data by allowing multinomial choice probabilities to be inferred from binomial choice experiments." [J. Marschak](https://en.wikipedia.org/wiki/Jacob_Marschak) was the first to introduce the work of Thurstone to econometrics in 1960, and also coined the term _Random Utility Maximizing_ (RUM) that eventually prevailed over the comparative judgement terminology of Thurstone. McFadden's early contributions to this body of research was developing an econometric version of Luce's model, with strict (i.e., systematic) utilities specified as functions of the attributes of the alternatives. This allowed a research to link unobserved preference heterogeneity to a fully consistent description of the distribution of demand. Since the 1970s, discrete choice analysis has been a burgeoning area of research with a plethora of applications in economics, marketing, and travel behavior, among many other disciplines.
-
-This brief story neatly illustrates the complex interplay between theory and practice.
-
-Early attempts to study demand were limited due to practical considerations (i.e., the absence of data at the individual level). Once appropriate data became available, new studies continued to push the theoretical envelope. Indeed, theoretical questions have continued to inspire newer way to collect data and novel methods, and these in turn have helped us to refine our understanding of behavior. See as an example the work on decision-making in social situations [@Akerlof1997social; @Axhausen2005social; @Paez2007social] which inspired the use of new data sources [e.g., @Carrasco2007social @Axhausen2008social; @Scott2012social; @Chen2016social] as well as novel modelling approaches [e.g., @Dugundji2005discrete; @Dugundji2013social; @Kamargianni2014social] and empirical work [e.g., @vandenBerg2009social; @Goetzke2011bicycle; @Matous2017social].
-
-Now that the preceding chapters have armed us with the theory and basic concepts to implement random utility models, it is proper that we turn our attention to the practical aspects of modelling. The best way to ensure that the concepts take hold, in my view, is to get your hands on a dataset and struggle with the practicalities of cleaning and organizing data, specifying the utility functions (a task that is more art than science), and estimating models. These skills are mostly transferable to other modelling techniques, so we will begin by applying them to the most fundamental of discrete choice models, namely the multinomial logit.  
+NOTE: The development of this notebook is in progress! Use with parcimony! It is being developed with the students of the course CIV6719 - Polytechnique Montreal.
 
 ## How to use this note
 
@@ -39,22 +17,6 @@ print("Hats off to you, Prof. McFadden")
 
 If you are working with the Notebook version of the document, you can run the code by clicking the 'play' icon on the top right corner of the chunk. If you are reading the web-book version of the document, you will often see that the code has already been executed. You can still try it by copying and pasting into your R or RStudio console.
 
-## Learning objectives
-
-In this practice, you will learn about:
-
-1. Specification of utility functions.
-2. Maximum likelihood estimation.
-3. Estimation of multinomial logit models.
-4. McFadden's $\rho^2$
-5. The likelihood ratio test.
-
-## Suggested readings
-
-- Ben-Akiva, M. Lerman, [-@Benakiva1985discrete] Discrete Choice Analysis: Theory and Applications to Travel Demand, **Chapters 4 and 5**, MIT Press.
-- Hensher, D.A., Rose, J.M., Greene, W.H [-@hensher2005applied] Applied Choice Analysis: A Primer, **Chapter 10**, Cambridge University Press.
-- Ortuzar JD, Willumsen LG [-@Ortuzar2011modelling] Modelling Transport, Fourth Edition, **Chapter 8**, John Wiley and Sons.
-- Train [-@Train2009discrete] Discrete Choice Methods with Simulation, Second Edition, **Chapter 3**, Cambridge University Press.
 
 ## Preliminaries
 
@@ -75,7 +37,7 @@ Load the dataset used in this section:
 load("Commute Mac Wide.RData")
 ```
 
-## Example: Specifying the utility functions
+## Example: Dataset
 
 We will now proceed to work with a practical example, using the dataset that you encountered before in Chapter \@ref(chapter-1). This dataset contains information on various modes of transportation used by people commuting to McMaster University in Canada [@Whalen2013]. The dataset was loaded above as part of the preliminaries of this chapter. We can begin by exploring the data. Please note that this is the same dataset that you used in Chapter \@ref(chapter-1), but not the same file. For convenience, the dataset was pre-processed. The contents of the dataframe can be quickly seen by means of the function `head()`. This function will display the first few top rows of the dataframe:
 ```{r}
@@ -114,15 +76,8 @@ colnames(mc_commute_long)
 
 Besides identifier variables `id` and `chid`, and the variable for `choice`, we see that several variables are specific to the individual decision-makers. These are `parking` (availability of a parking pass), `vehind` (whether the decision-maker had individual access to a private vehicle), `gender`, `age`, `shared` (living in shared accommodations away from the family home), `family` (living at the family home), and `child` (respondent was responsible for at least one minors in the household). Furthermore, some variables relate to the physical environment of the place of residence (`street_density` and `sidewalk_density`), in addition to the coordinates of the place of residence (geocoded to the nearest major intersection or postal code centroid). One variable is alternative specific, namely `time` (travel time in minutes). And, as noted before, three variables are specific to public transportation, namely `access` (access time to public transportation in minutes), `wait` (waiting time in minutes), and `transfer` (number of transfers when traveling by public transportation).
 
-We can begin by defining a very simple formula that considers only travel time. We will save this object as `f1`:
-```{r}
-f1 <- mFormula(choice ~ time)
-```
 
-Define now a formula with an individual-specific variable, say sidewalk density at the place of residence, and call it `f2`:
-```{r}
-f2 <- mFormula(choice ~ time | sidewalk_density)
-```
+## Example: A logit model of mode choice
 
 
 Here, we try a different formula, where time has alternative-specific instead of generic coefficients, and call it `f3`:
@@ -133,10 +88,6 @@ f3 <- mFormula(choice ~ 0 | sidewalk_density | time)
 Note that, since we do not define other alternative-specific variables with generic coefficients, we have to explicitly state that there are `0` such variables!
 
 
-## Example: A logit model of mode choice
-
-Coming back to the transportation mode choice dataset, we had already defined some formulas (i.e., utility functions) that we can use to estimate a model.
-
 
 The value (output) of the function can be named and saved to an object for further analysis or for further processing, post-estimation. Begin by estimating a model using the simplest of our formulas:
 ```{r}
@@ -145,60 +96,54 @@ model1 <- mlogit(f1, mc_commute_long)
 summary(model1)
 ```
 
-The negative coefficient for time indicates that time is a "cost", in other words, the utility of travelling tends to decline with increasing travel times. This indicates that slower modes will tend to have lower utilities.
+The negative coefficient for time indicates that time is a "cost", in other words, the utility of traveling tends to decline with increasing travel times. This indicates that slower modes will tend to have lower utilities.
 
-Constant: for the same time, people are less likely to drive
+The interpretation of the constants is as follows: for the same travel time, people are less likely to drive vs all other modes (all constants are positive).
 
-Only sidewalk density 
+Let's now try a new model with only sidewalk density: 
 
 ```{r}
 f4 <- mFormula(choice ~ 0| sidewalk_density )
 model4 <- mlogit(f4, mc_commute_long)
 summary(model4)
 ```
--> higher sidewalk density -> lower probability of travelling by car
+The results can be interpreted as follows: higher sidewalk density is associated lower probability of traveling by car compared to all other modes (all coefficients are positive)
 
 
-Sidewalk density and time 
+We now include both sidewalk density and time in the model:
 ```{r}
 f2 <- mFormula(choice ~ time | sidewalk_density)
 model2 <- mlogit(f2, mc_commute_long)
 summary(model2)
 ```
-What we observe is that sidewalk density is no longer significant for HSR and Cycle. This suggests that it was potentially capture some of the effect ot the time variable:
-Areas with high sidewalk density are closer to University and therefore have lower travel times in general. Since utility of slow modes increases when time decreases, we capture here that utility of slower modes increases with sidewalk density (partly due to lower travel times).
+What we observe is that sidewalk density is no longer significant for HSR and Cycle. This suggests that it was potentially capturing some of the effects of the time variable:
+areas with high sidewalk density are closer to the University and therefore have lower travel times in general. Since utility of slow modes increases when time decreases, we capture here that utility of slower modes increases with sidewalk density (partly due to lower travel times). Note the the coefficient of the time variable is consistent between model 1 and model 2.
 
 Should we keep the time variable in?
--> Limits of unobserved variables, importance of specifying the model
- 
 
-
-Assessing the inclusion of sidewalk density
+We can assess the contribution of adding the sidewalk density variable to the model with only the time variable with the use of a likelihood ratio test:
 ```{r}
 lrtest(model1,model2)
 ```
-Statistically different log likelihood results
+The statistically significant result indicates that we gain information by including the sidewalk density variable.
 
-
-Time with alternative specific coefficients
+Let's now test a alternative-specific coefficient for the time variable, as it is expected that the perception of the effect of time of utiliy might differ from mode to mode.
 ```{r}
 f3 <- mFormula(choice ~ 0 | sidewalk_density | time)
 model3 <- mlogit(f3, mc_commute_long)
 summary(model3)
 ```
-What do you notice?
-Sidewalk density is now significant for cycling.
+What do you notice? The time coefficients are all significant, but in different directions. How to interpret the results?
 
-Time coefficients are all significant, but in different directions. How to interpret the results?
-
-Whether to have alternative-specific or generic constants? (beta car = beta walk)
+Since the model with the generic time coefficient is a restricted version of the model with the specific time coefficient (beta car= beta walk = beta cycle = beta HSR), it is possible to compare both models with a likelihood ratio test. 
 ```{r}
 lrtest(model2,model3)
 ```
 
 
 
-Transit specific attributes (wait and transfer). Generic or specific?
+
+We can also include transit specific attributes (wait and transfer). Since there is only one alternative with these attributes, there will be only one coefficient, which can be included as generic:
 
 ```{r}
 f8 <- mFormula(choice ~ wait + transfer | sidewalk_density | time  )
@@ -206,7 +151,8 @@ model8 <- mlogit(f8, mc_commute_long, reflevel = "HSR")
 summary(model8)
 ```
 
-Socio-economic characteristics
+
+Let's now add socio-economic characteristics:
 
 ```{r}
 f9 <- mFormula(choice ~ wait + transfer | sidewalk_density + gender + child | time)
@@ -215,7 +161,9 @@ summary(model9)
 ```
 
 
-Street density and sidewalk density
+
+
+Let's now look a bit closer to the street density and sidewalk density variables:
 ```{r}
 f3 <- mFormula(choice ~ time | sidewalk_density | 0)
 model3 <- mlogit(f3, mc_commute_long)
@@ -230,19 +178,21 @@ summary(model5)
 ```
 
 
-street_Density and sidewalk density
+What happens if we include both
 
 ```{r}
-f4 <- mFormula(choice ~ time | sidewalk_density + street_density)
-model4 <- mlogit(f4, mc_commute_long)
-summary(model4)
+f7 <- mFormula(choice ~ time | sidewalk_density + street_density)
+model7 <- mlogit(f7, mc_commute_long)
+summary(model7)
 ```
+The signs for street density become negative and significant for cycling and walking.
+
 Are the results logical? Intuitive? Denser streets  = less walking and cycling compared to car?
 
 ```{r}
 cor(mc_commute$sidewalk_density,mc_commute$street_density)
 ```
-New variable: sidewalk ratio: proportion of sidewalk to streets
+We can try creating a new variable to avoid issues of correlation.  Sidewalk ratio= proportion of sidewalk to streets
 
 ```{r}
 mc_commute_long$sidewalk_ratio = mc_commute_long$sidewalk_density/mc_commute_long$street_density
@@ -255,202 +205,150 @@ More sidewalk/street = more cycling and walking. Why? Type of environment? Subur
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Coming back to a simpler model:
 ```{r}
 f2 <- mFormula(choice ~ time | sidewalk_density)
 model2 <- mlogit(f2, mc_commute_long)
 summary(model2)
 ```
 
-Gender
+Adding the gender variable:
 
 ```{r}
-f7 <- mFormula(choice ~ time | sidewalk_density + gender)
-model7 <- mlogit(f7, mc_commute_long)
-summary(model7)
+f10 <- mFormula(choice ~ time | sidewalk_density + gender)
+model10 <- mlogit(f10, mc_commute_long)
+summary(model10)
 ```
 
-Men less likely to walk than to take the car. In line with theory, but performance of the model is not statistically different (see below). But since is in line with theory we can keep it.
+Men are less likely to walk than to take the car compared to women. In line with theory, but performance of the model is not statistically different (see below). We can nonetheless keep the gender variable in as the results are consistent with theory and the model remains stable.
 
 
 ```{r}
-lrtest(model2,model7)
+lrtest(model2,model10)
 ```
 
-
+Comparing with dsecriptive statistics:
 ```{r}
 mosaic(gender ~ choice, mc_commute, main="Mode choice vs gender")
 ```
+`
+
+
+## Example: A nested logit model of mode choice
+
+Previous logit model
+```{r}
+f3 <- mFormula(choice ~ 0 | sidewalk_density + gender | time)
+model3 <- mlogit(f3, mc_commute_long)
+summary(model3)
+```
+
+Nested logit Active vs Motorized
 
 ```{r}
-f7 <- mFormula(choice ~  time + wait | sidewalk_density + gender)
-model7 <- mlogit(f7, mc_commute_long)
-summary(model7)
+nl2 <- mlogit(choice ~ 0 | sidewalk_density + gender | time, mc_commute_long,
+             nests = list(active = c( 'Cycle', 'Walk'), motorized = c('HSR', 'Car')),
+             un.nest.el = FALSE,
+             steptol = 1e-12)
+summary(nl2)
+```
+Negative inclusive value: not consistent with random utility maximization. (If lambda increases, utility decreases). Model is not valid
+
+
+```{r}
+1 - nl2$coefficients["iv:active"]
+1 - nl2$coefficients["iv:motorized"]
+```
+
+
+```{r}
+lrtest(nl2,model3)
+```
+We gain information but..?
+
+
+What happens if we coerce to identical lambdas?
+
+```{r}
+nl3 <- mlogit(choice ~ 0 | sidewalk_density + gender | time, mc_commute_long,
+             nests = list(active = c( 'Cycle', 'Walk'), motorized = c('HSR', 'Car')),
+             un.nest.el = TRUE,
+             steptol = 1e-12)
+summary(nl3)
+```
+Does it make sense to use the same inclusive value?
+
+```{r}
+1 - 0.266
+```
+The value is between the two inclusive values above.
+
+Comparison with the logit model:
+```{r}
+lrtest(nl3,model3)
+```
+
+Can we compare the nested logit with a likelihood test?
+
+```{r}
+lrtest(nl3,nl2)
+```
+No statistically significant difference. (But in any case, there is no reason to use such nest structure given the different lambdas we obtain)
+
+
+
+Let's try other structures:
+
+Nested active and public transport vs car
+
+```{r}
+nl4 <- mlogit(choice ~ 0 | sidewalk_density + gender | time, mc_commute_long,
+             nests = list(active = c( 'Cycle', 'Walk','HSR'), motorized = c('Car')),
+             un.nest.el = FALSE,
+             steptol = 1e-12)
+summary(nl4)
+```
+Not possible to solve the model with different lambdas.
+
+What happens if we coerce to the same lambda?
+
+```{r}
+nl5 <- mlogit(choice ~ 0 | sidewalk_density + gender | time, mc_commute_long,
+             nests = list(active = c( 'Cycle', 'Walk','HSR'), motorized = c('Car')),
+             un.nest.el = TRUE,
+             steptol = 1e-12)
+summary(nl5)
 ```
 
 ```{r}
-f7 <- mFormula(choice ~  time  | sidewalk_density + gender + buses_comfortable)
-model7 <- mlogit(f7, mc_commute_long)
-summary(model7)
+1 - 0.87
 ```
+The correlation is relatively weak. The likelihood ratio tests is in line with this, whereas the nesting structure does not provide more information than a regular logit model:
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Note that it is possible to select the reference level for the utilities when estimating the model. For example, below we re-estimate the preceding model, but now using the utility of Walk as the reference:
 ```{r}
-model2 <- mlogit(f2, mc_commute_long, reflevel = "Walk")
-summary(model2)
+lrtest(nl5,model3)
 ```
 
-Notice that now two sidewalk coefficient are significant! While sidewalk density does not significantly change the utility of cycling with respect to walking, living in a place with high sidewalk density reduces the utility of "Car" and "HSR" _with respect to walking_.
 
-The value of the maximized log-likelihood and other model diagnostics are identical irrespective of which mode is selected as a utility. In essence, the models are the same, but they provide a different perspective on how some coefficients relate to each other across alternatives.
 
-We can visually explore how the probability of choosing different modes varies with sidewalk density. To do this we will first summarize the sidewalk density variable:
+
+Maybe public transport does not share so many unobserved attributes with active transport:
+
 ```{r}
-summary(mc_commute_long$sidewalk_density)
+nl6 <- mlogit(choice ~ 0 | sidewalk_density + gender | time, mc_commute_long,
+             nests = list(active = c( 'Cycle', 'Walk'), public = c('HSR'), motorized = c('Car')),
+             un.nest.el = TRUE,
+             steptol = 1e-12)
+summary(nl6)
 ```
-
-Copy the dataframe used to estimate the model, but only enough columns to explore sidewalk densities in the range between 0 and 60 , in intervals of 5. Therefore we need to copy 52 rows from the long table (thirteen levels of sidewalk density times four alternatives):
 ```{r}
-mc_commute_predict <- mc_commute_long[1:52,]
+1 - 0.28
 ```
-
-Replace the sidewalk density variable using values from 0 to 60, with an interval of 5. Since each alternative is a row, we need to create a sequence of replicated values as follows:
 ```{r}
-mc_commute_predict$sidewalk_density <- rep(seq(0, 60, 5), each = 4)
+lrtest(nl6,model3)
 ```
 
-We can examine the results of simulating the sidewalk density:
-```{r}
-head(mc_commute_predict["sidewalk_density"], 8)
-```
 
-The prediction dataframe now includes the range of sidewalk densities that we are interested in.
+Cross-nested logit : Attention
 
-The setup for the simulation essentially amounts to: what is the probability of choosing each mode for a trip that originates in an area with a sidewalk density of 5? Of 10? For the simulation, we also need to set the values of other variables of interest. Since the model has the variable `time` we need to also set it to a desired value, for instance, the median trip duration (paying attention to remove the missing values):
-```{r}
-median(mc_commute_predict$time, na.rm = TRUE)
-```
-
-The median trip length is 10 minutes, so we replace the current values in the prediction dataframe:
-```{r}
-mc_commute_predict$time <- 10
-```
-
-Examine the relevant variables of the prediction dataframe:
-```{r}
-mc_commute_predict[c("time", "sidewalk_density")] %>% summary()
-```
-
-Next, predict the probabilities using the `predict()` function and `model2`:
-```{r}
-probs <- predict(model2, newdata = mc_commute_predict)
-```
-
-The value (output) of `predict` is a 20-by-4 matrix that contains the probability for thirteen levels of sidewalk density (i.e., $0, 5, 10,\cdots, 60$), and four modes (Walk, Cycle, HSR, Car). To facilitate plotting, we add the sidewalk density values and then reshape that 13 times 4 matrix as follows:
-```{r}
-probs <- data.frame(sidewalk_density = seq(0, 60, 5), probs) %>% 
-  gather(key = "Mode", value = "Probability", -sidewalk_density)
-```
-
-By "gathering" the probabilities, now the data frame has one column with the mode and one column with the probability. We can then plot, using a different colors for each alternative:
-```{r}
-ggplot(data = probs, aes(x = sidewalk_density, y = Probability, color = Mode)) +
-  geom_line()
-```
-
-We can see that the probability of walking (for a trip that takes the median duration in the sample) tends to increase as the density of sidewalks increase. The probability of using the three other modes tends to decrease with sidewalk density, but more rapidly for HSR than for car or cycling.
-
-## Comparing models: McFadden's $\rho^2$
-
-The log-likelihood reported in the summary of the model is useful as a measure of goodness of fit. Recall that the likelihood of this model is bounded between $0$ and $1$, and therefore the log-likelihood is bounded at the upper end by $0$ (it is minus infinity at the lower end). We also know that higher values of the likelihood represent better fits. 
-
-One simple diagnostic to compare the fit of models is McFadden's $\rho^2$. This summary diagnostic is defined as follows:
-$$
-\rho^2 = 1 - \frac{l^*}{l_0}
-$$
-where $l^*$ is the value of the maximized log-likelihood and $l_0$ is the value of the log-likelihood of a null model (perhaps without constants, or a constants only model). If the model is uninformative, its log-likelihood will tend to the likelihood of the null model. In this case $l^*/l_0$ tends to one and therefore $\rho^2$ tends to zero. If the maximized log-likelihood of the model tends to 0 (the upper limit for the log-likelihood function), $\rho^2$ tends to one.
-
-Although $\rho^2$ is bounded between zero and one, just like the coefficient of determination $R^2$ in regression analysis, its interpretation is _not_ the same as for $R^2$. Whereas $R^2$ is interpreted as the proportion of variance explained by the model, $\rho^2$ lacks such an interpretation. Also, the values of $\rho^2$ tend to be lower, and values of $0.4$ are conventionally considered very good fits. The main utility of McFadden's $\rho^2$ is as a quick way of comparing the relative fit of different models, rather than assessing the fit against an absolute value of goodness of fit.
-
-## Comparing models: the likelihood ratio test
-
-Another way to compare models is by means of the likelihood ratio test. This test compares the log-likelihood of two models to assess whether they are significantly different. The test follows the $\chi^2$ distribution with degrees of freedom equal to the difference in the number of coefficients between the two models. The test requires a base model and a full model, and the base model must _nest_ within the full model. Nesting in this sense means that full model must be reducible to the base model by setting some coefficients to zero.
-
-For example, consider the utility functions of `model2`:
-$$
-\begin{array}{l}
-  V_{i\text{Car}} = 0 &+& \beta_1\text{time}_{i\text{Car}} &+& 0\\
-  V_{i\text{Walk}} = \mu_{\text{Walk}} &+& \beta_1\text{time}_{i\text{Walk}} &+& \gamma_{1}\text{swd}_{i}\\
-  V_{i\text{HSR}} = \mu_{\text{HSR}} &+& \beta_1\text{time}_{i\text{HSR}} &+& \gamma_{2}\text{swd}_{i}\\
-  V_{i\text{HSR}} = \mu_{\text{Cycle}} &+& \beta_1\text{time}_{i\text{Cycle}} &+& \gamma_{3}\text{swd}_{i}\\
-\end{array}  
-$$
-
-We can reduce this model to `model1` by setting $\gamma_{1}=\gamma_{2}=\gamma_{3}=0$:
-$$
-\begin{array}{l}
-  V_{i\text{Car}} = 0 &+& \beta_1\text{time}_{i\text{Car}}\\
-  V_{i\text{Walk}} = \mu_{\text{Walk}} &+& \beta_1\text{time}_{i\text{Walk}}\\
-  V_{i\text{HSR}} = \mu_{\text{HSR}} &+& \beta_1\text{time}_{i\text{HSR}}\\
-  V_{i\text{HSR}} = \mu_{\text{Cycle}} &+& \beta_1\text{time}_{i\text{Cycle}}\\
-\end{array}  
-$$
-
-In this way, `model1` "nests" in `model2`.
-
-In the summary of the models, the likelihood ratio test is reported. See:
-```{r}
-summary(model1)
-```
-
-The test reported in the output of the model is against the null model, that is, a model with no variables at all. This is the least informative of all models.
-
-When two non-null models need to be compared, the `lrtest` function implements the likelihood ratio test for two inputs, which are two `mlogit` models, as follows:
-```{r}
-lrtest(model1, model2)
-```
-
-Notice that the number of degrees of freedom (Df) is $3$: this is because there are three individual-specific parameters in `model2` that are not present in `model1`. The null hypothesis of the test is that the log-likelihood of the two models is not different, in other words, that the alternate model is not an improvement over the base model.
-
-In the present case, the very small $p$-value leads us to reject the null hypothesis, and the conclusion is that `model2`, which includes sidewalk density, is a significant improvement over `model1`, which does not.
-
-## Exercise
-
-1. In the example in this chapter we estimated the probabilities of choosing different modes by sidewalk density setting travel time to the in-sample median. Use `model2` to calculate the probability of choosing each mode but now for travel times 20, 30, 40. Discuss the results.
-
-2. Estimate a model using formula `f3` (call it `model3`). Discuss the output of this model.
-
-3. Use the likelihood ratio test to compare `model3` to `model1`.
-
-4. Can you use the likelihood ratio test to compare `model3` to `model2`? Discuss.
