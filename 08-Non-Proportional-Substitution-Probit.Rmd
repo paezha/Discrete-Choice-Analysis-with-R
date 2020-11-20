@@ -1,5 +1,5 @@
 ---
-title: "07 Non-Proportional Substitution Patterns II"
+title: "08 Non-Proportional Substitution Patterns II"
 output: html_notebook
 ---
 
@@ -31,6 +31,9 @@ The dataset is in "wide" form, which means that there is one record per decision
 ```{r}
 H <- mlogit.data(Heating, shape = "wide", choice = "depvar", varying = c(3:12))
 ```
+
+
+
 
 This is the same dataset used in the preceding chapter with five heating systems:
 
@@ -81,15 +84,21 @@ U_{nj} = V_{nj} + \epsilon_{nj}\\
 \cdots\\
 U_{nJ} = V_{nJ} + \epsilon_{nJ}
 $$
-The random utility terms can be collected as follows:
+The random utility terms can be collected as follows: (one error term for each alternative, for decision-maker n)
 $$
 \epsilon_n = [\epsilon_1, \cdots, \epsilon_j, \cdots, \epsilon_J] 
 $$
 
-Previously, the logit model was derived based on the assumption that the random utility terms $\epsilon_j$ were Extreme Value Type I. Now, the assumption is that the vector of random utilities $\epsilon_n$ follows the normal distribution with a mean vector of zero and a covariance matrix $\Sigma_n$ that can be a function of variables specific to a decision-maker. The probability distribution function is:
+Previously, the logit model was derived based on the assumption that the random utility terms $\epsilon_j$ were Extreme Value Type I. Now, the assumption is that the vector of random utilities $\epsilon_n$ follows the normal distribution with a mean vector of zero and a covariance matrix $\Sigma_n$ that can be a function of variables specific to a decision-maker.
+
+The probability distribution function is (differences between error terms):
 $$
 \phi(\epsilon_n)=\frac{1}{(2\pi)^{J/2}|\Sigma_n|^{1/2}}e^{-\frac{1}{2}\epsilon_n^T\Sigma_n^{-1}\epsilon_n}
 $$
+In the case of a probit, we have a vector since the distribution of the error terms can differ across alternatives. Also, the definition of each eni depends on the covariance matrix and the other error terms, since we assume some sort of correlation between the error terms (or at least a possible correlation). Therefore, we cannot simply obtain a simple formula for the differences between the errors terms (enj - eni), since the covariance matrix is unknown.
+
+The covariance matrix allows for a flexible correlation structure between the alternatives.
+
 
 As before, the probability of choosing alternative $j$ is given by the following expression:
 $$
@@ -117,7 +126,7 @@ $$
 \phi(\tilde{\epsilon}_n)=\frac{1}{(2\pi)^{J/2}|\tilde{\Sigma}_n|^{1/2}}e^{-\frac{1}{2}\tilde{\epsilon}_n^T\tilde{\Sigma}_n^{-1}\tilde{\epsilon}_n}
 $$
 
-
+TO ADD: CDF sigmoid shape
 
 Now we are ready to estimate a multinomial logit model (we called this Model 3 in Chapter \@ref(chapter-3)):
 ```{r}
@@ -136,18 +145,19 @@ summary(nl2)
 prob1 <- mlogit(depvar ~ ic + oc, H, reflevel = "ec", probit = TRUE, R=100)
 summary(prob1)
 ```
-
+ 
 ```{r eval=FALSE}
 prob2 <- mlogit(depvar ~ ic + oc, H, reflevel = "ec", probit = TRUE,
                 constPar=c('hp.hp', "gr.hp", "gr.gr", "gc.gr", "gc.gc", "er.hp"))
 summary(prob2)
 ```
-
+Applying a structure of error variances based on the central and room nests.
 ```{r eval=FALSE}
 prob3 <- mlogit(depvar ~ ic + oc, H, reflevel = "ec", probit = TRUE,
                 constPar=c("er.er", "gr.hp", "gc.gr", "er.hp", "er.gc"), R = 50)
 summary(prob3)
 ```
+Choleski factor of the covariance matrix for the Prob3 model:
 
 ```{r eval=FALSE}
 L1 <- matrix(0, 4, 4)
@@ -155,9 +165,17 @@ L1[!upper.tri(L1)] <- c(1, 0, coef(prob3)[7], 0, coef(prob3)[8], 0, coef(prob3)[
 L1
 ```
 
+Covariance matrix of the utility differences (correlation of errors = elements that are not captured in the model) :Multiplication of L1 by the transposition of L1 for the Prob3 model:
+
 ```{r eval=FALSE}
 L1 %*% t(L1)
 ```
+
+
+
+
+
+Covariance matrix for the Prob1 model:
 
 ```{r eval=FALSE}
 L1 <- matrix(0, 4, 4)
@@ -165,9 +183,14 @@ L1[!upper.tri(L1)] <- c(1, coef(prob1)[7:15])
 L1
 ```
 
+Multiplication of L1 by the transposition of L1 for the Prob1 model:
+
 ```{r eval=FALSE}
 L1 %*% t(L1)
 ```
+The covariance parameters are very difficult to interpret, especially when no structure is imposed on the covariance matrix.
+
+## Scenario of augmentation of the installation costs of gas central system.
 
 To simulate this scenario, we begin by copying the input dataframe:
 ```{r eval=FALSE}
@@ -186,6 +209,8 @@ data.frame(Policy = c("Do nothing", "15% rebate"),
                  apply(predict(mod3, newdata = H_rebate), 2, mean)))
 ```
 
+Results: Proportional substitution patterns. The ratio between the probabilities (with and without the rebate) are the same across all alternatives that remained with constant attributes (ec, er, gr and hp).
+
 Nested logit:
 ```{r eval=FALSE}
 data.frame(Policy = c("Do nothing", "15% rebate"),
@@ -193,12 +218,26 @@ data.frame(Policy = c("Do nothing", "15% rebate"),
                  apply(predict(nl2, newdata = H_rebate), 2, mean)))
 ```
 
+Results: Proportional substitution patterns within nests (room = er, gr; central = ec, gc, hp). The ratio between the probabilities (with and without the rebate) are the same across all alternatives that remained with constant attributes (ec, er, gr and hp), within each nests.
+
+
 Probit:
 ```{r eval=FALSE}
 data.frame(Policy = c("Do nothing", "15% rebate"),
            rbind(apply(predict(prob3, newdata = H), 2, mean),
                  apply(predict(prob3, newdata = H_rebate), 2, mean)))
 ```
+
+Let's calculate the ratios (Prebate/Pnothing)
+```{r eval=FALSE}
+DeltaPec= 0.0864/0.0715
+DeltaPer= 0.1115/0.0936
+DeltaPgc= 0.5833/0.6373
+DeltaPgr= 0.1520/0.1438
+DeltaPhp= 0.0696/0.0565
+```
+
+
 
 ## Exercise
 

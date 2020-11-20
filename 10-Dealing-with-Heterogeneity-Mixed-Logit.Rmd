@@ -1,9 +1,9 @@
 ---
-title: "09 Dealing with Heterogeneity II"
+title: "10 Dealing with Heterogeneity II"
 output: html_notebook
 ---
 
-# Dealing with Heterogeneity II: The Mixed Logit Model {#chapter-9}
+# Dealing with Heterogeneity II: The Mixed Logit Model {#chapter-10}
 
 > "Life produces a different taste each time you take it.”
 >
@@ -23,6 +23,7 @@ library(mlogit)
 library(gmnl)
 library(kableExtra)
 library(gridExtra)
+library(AER)
 ```
 
 ## More on taste variation
@@ -108,8 +109,9 @@ knitr::include_graphics(rep("10-Figure-1.jpg"))
 The results of these models are summarized in Table \ref(@table-base-models) below. 
 ```{r table-base-models}
 # Estimate a constants only model to calculate McFadden's _adjusted_ rho2
-mnl_null <- mlogit(choice ~ 1,
-             data = TM)
+# mnl_null <- mlogit(choice ~ 1, data = TM)
+# mnl_null$logLik[1]
+mnl_null_lo = -283.83
 
 mnl0.summary <- rownames_to_column(data.frame(summary(mnl0)$CoefTable), "Variable") %>%
   transmute(Variable, Estimate, pval = `Pr...z..`)
@@ -139,10 +141,11 @@ kable(df_logit,
   footnote(general = c(paste0("Log-Likelihood: MNL = ", round(mnl0$logLik[1], digits = 3),
                             "; NL = ", round(nl$logLik[1], digits = 3),
                             "; MNP = ", round(prbt$logLik[1], digits = 3)),
-                       paste0("McFadden Adjusted R^2: MNL = ", round(1 - (mnl0$logLik[1] - nrow(mnl0.summary)) / mnl_null$logLik[1], digits = 3),
-                              "; NL = ", round(1 - (nl$logLik[1] - nrow(nl.summary)) / mnl_null$logLik[1], digits = 3),
-                              "; MNP = ", round(1 - (prbt$logLik[1] - nrow(prbt.summary)) / mnl_null$logLik[1], digits = 3))))
+                       paste0("McFadden Adjusted R^2: MNL = ", round(1 - (mnl0$logLik[1] - nrow(mnl0.summary)) / mnl_null_lo, digits = 3),
+                              "; NL = ", round(1 - (nl$logLik[1] - nrow(nl.summary)) / mnl_null_lo, digits = 3),
+                              "; MNP = ", round(1 - (prbt$logLik[1] - nrow(prbt.summary)) / mnl_null_lo, digits = 3))))
 ```
+
 
 The nested logit model and the multinomial probit model, as discussed in the preceding chapters, accommodate correlations among alternatives. For instance, the inclusive value of the nested logit is in the $0<iv<1$ range, and it is significantly different from 1 (recall that when close to one, the model collapses to the multinomial logit model). The $z$-score to test whether it is different from one is:
 ```{r}
@@ -152,6 +155,10 @@ The nested logit model and the multinomial probit model, as discussed in the pre
 The multinomial probit model also has covariance components that are significant, although, as discussed before, it is not straightforward to interpret them.
 
 Based on the results of the models we can obtain some behavioral insights. For instance, we know that the ratio of two coefficients represents the _willingness to pay_. If we use the coefficients of the multinomial logit model in the example, we can see that the willingness to pay is 0.29 dollars per minute of travel time saved and 6.97 dollars per minute of waiting time saved:
+```{r}
+summary(mnl0)
+```
+
 $$
 \begin{array}{c}
 -\frac{\partial \text{vcost}}{\partial \text{travel}} = \frac{\beta_{travel}}{\beta_{vcost}} = \frac{-0.004}{-0.0139} \simeq 0.29 \\
@@ -577,8 +584,10 @@ mnl_exp <- mlogit(choice ~ vcost + travel + travel:income + travel:size + wait +
 
 Summarize results mnl with covariates:
 ```{r}
-mnl_null <- mlogit(choice ~ 1,
-             data = TM)
+# mnl_null <- mlogit(choice ~ 1, data = TM)
+
+mnl_null_lo = -283.83
+
 
 mnl1.summary <- rownames_to_column(data.frame(summary(mnl_cov)$CoefTable), "Variable") %>%
   transmute(Variable, Estimate, pval = `Pr...z..`)
@@ -600,8 +609,8 @@ kable(df_logit_2,
   add_header_above(c(" " = 1, "MNL - Covariates" = 2, "MNL - Expansion" = 2)) %>%
   footnote(general = c(paste0("Log-Likelihood: MNL - Covariates = ", round(mnl_cov$logLik[1], digits = 3),
                             "; MNL - Expansion = ", round(mnl_exp$logLik[1], digits = 3)),
-                       paste0("McFadden Adjusted R^2: MNL - Covariates = ", round(1 - (mnl_cov$logLik[1] - nrow(mnl1.summary)) / mnl_null$logLik[1], digits = 3),
-                              "; NL = ", round(1 - (mnl_exp$logLik[1] - nrow(mnl2.summary)) / mnl_null$logLik[1], digits = 3))))
+                       paste0("McFadden Adjusted R^2: MNL - Covariates = ", round(1 - (mnl_cov$logLik[1] - nrow(mnl1.summary)) / mnl_null_lo, digits = 3),
+                              "; NL = ", round(1 - (mnl_exp$logLik[1] - nrow(mnl2.summary)) / mnl_null_lo, digits = 3))))
 ```
 
 Both models above suggest that there at least some heterogeneity in behavior can be attributed to the two characteristics of the decision-makers investigated (income and party size). In particular, we can see from the expanded coefficients that the disutility of travel time and waiting time is greater at higher levels of income:
