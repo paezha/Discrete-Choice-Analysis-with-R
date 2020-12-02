@@ -30,6 +30,8 @@ library(readr)
 library(vcd)
 library(gplots)
 library(ggplot2)
+library(gmnl)
+library(kableExtra)
 ```
 
 Load the dataset used in this section:
@@ -351,4 +353,118 @@ lrtest(nl6,model3)
 
 
 Cross-nested logit : Attention
+
+## Example: Mixed logit
+
+Preliminary steps:
+Clean the working space:
+
+
+```{r}
+database = read.csv("C:/Users/boisj/OneDrive - polymtl.ca/Enseignement/CIV6719/A2020/Examples/apollo_swissRouteChoiceData.csv",header=TRUE)
+
+database$choice = as.factor(database$choice)
+levels(database$choice) <- c("1", "2")
+
+database = database %>% 
+  rename(
+    tt.1 = tt1,
+    tc.1 = tc1,
+    hw.1 = hw1,
+    ch.1 = ch1,
+    tt.2 = tt2,
+    tc.2 = tc2,
+    hw.2 = hw2,
+    ch.2 = ch2
+    )
+
+
+route <- mlogit.data(database, shape = "wide", choice = "choice", varying = c(3:10))
+# route = subset(route,!duplicated(route$ID))
+
+```
+
+
+
+Normal distribution
+
+```{r}
+mixl_w1 <- gmnl(choice ~ tt + tc + hw + ch | car_availability + business + hh_inc_abs,
+             data = route, model = "mixl", ranp = c(tt = "n", tc="n", hw="n"), R = 50)
+mixl_w1$logLik$message
+summary(mixl_w1)
+```
+Does it make sense to include attributes at the individual level here?
+
+
+Car availability  interaction with hw:
+```{r}
+mixl_w1 <- gmnl(choice ~ tt + tc + hw + hw:car_availability + ch | 1,
+             data = route, model = "mixl", ranp = c(tt = "n", tc="n", hw="n"), R = 50)
+mixl_w1$logLik$message
+summary(mixl_w1)
+```
+Result: the effect of longer headway increases for people who have a car. Does that make sense?
+
+```{r}
+mixl_w2 <- gmnl(choice ~ tt + tc + tc:hh_inc_abs + hw + hw:car_availability + ch | 1,
+             data = route, model = "mixl", ranp = c(tt = "n", tc="n", hw="n"), R = 50)
+mixl_w2$logLik$message
+summary(mixl_w2)
+```
+Result: the effect of higher costs is less negative when income increases. Does that make sense?
+
+```{r}
+mixl_w3 <- gmnl(choice ~ tt + tc + tc:hh_inc_abs + hw + hw:car_availability + ch + ch:business | 1,
+             data = route, model = "mixl", ranp = c(tt = "n", tc="n", hw="n"), R = 50)
+mixl_w3$logLik$message
+summary(mixl_w3)
+```
+
+
+
+
+
+## Example: Dataset
+Load the dataset used in this section:
+```{r}
+load("Commute Mac Wide.RData")
+mc_commute$id= as.integer(mc_commute$id)
+
+mc_commute = mc_commute %>% 
+  rename(
+    ID = id)
+
+mc_commute$choice = as.factor(mc_commute$choice)
+
+write.csv(mc_commute,"C:/Users/boisj/OneDrive - polymtl.ca/Enseignement/CIV6719/A2020/Examples/mc_commute_format2.csv", row.names = FALSE)
+```
+
+export dataset as csv
+
+
+```{r}
+mc_commute_format = read.csv("C:/Users/boisj/OneDrive - polymtl.ca/Enseignement/CIV6719/A2020/Examples/mc_commute_format2.csv",header=TRUE)
+mc_commute_format$choice = as.factor(mc_commute_format$choice)
+
+mc_commute_format$choiceid <- 1:nrow(mc_commute_format)
+
+
+Tr <- dfidx(mc_commute_format, shape = "wide", varying = 7:22, sep = ".",
+            idx = list(c("choiceid", "ID")), idnames = c(NA, "alt"))
+
+
+mc_commute_mixed <- mlogit.data(Tr, shape = "wide", choice = "choice", varying = 7:22)
+```
+
+
+```{r}
+mixl_w1 <- gmnl(choice ~ time | 1,
+             data = mc_commute_long, model = "mixl", ranp = c(time = "n"), R = 50)
+mixl_w1$logLik$message
+summary(mixl_w1)
+```
+
+
+
 

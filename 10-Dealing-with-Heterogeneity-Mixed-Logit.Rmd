@@ -30,6 +30,8 @@ library(AER)
 
 Chapter \@ref(chapter-8) introduced the latent class logit model, a technique useful to model taste variation. In this chapter, a variation on the theme will be introduced, namely the mixed logit model. We will see how the mixed logit model is related to the latent class logit model.
 
+TO ADD : Example of unimodal and bimodal distribution functions (binomial function created as the weighted sum of two unimodal functions)
+
 To illustrate the mixed logit model we will use a dataset from the `AER` package on the mode of transportation used by travelers traveling between Sydney and Melbourne:
 ```{r} 
 data("TravelMode", package = "AER")
@@ -59,10 +61,10 @@ df <- data.frame(Mode = c("air", "train", "bus", "car"),
                           median(filter(TravelMode, mode == "train")$wait), 
                           median(filter(TravelMode, mode == "bus")$wait), 
                           median(filter(TravelMode, mode == "car")$wait)),
-                 travel = c(median(filter(TravelMode, mode == "air")$gcost), 
-                            median(filter(TravelMode, mode == "train")$gcost), 
-                            median(filter(TravelMode, mode == "bus")$gcost), 
-                            median(filter(TravelMode, mode == "car")$gcost)),
+                 travel = c(median(filter(TravelMode, mode == "air")$travel), 
+                            median(filter(TravelMode, mode == "train")$travel), 
+                            median(filter(TravelMode, mode == "bus")$travel), 
+                            median(filter(TravelMode, mode == "car")$travel)),
                  Proportion = Proportion$no_rows/(nrow(TravelMode)/4)
                  )
 df %>%
@@ -303,7 +305,7 @@ P_j = \int\frac{e^{\beta_i'x_{ij}}}{\sum_k e^{\beta_i'x_{ik}}} \phi(\beta|\sigma
 $$
 where the integral provides the weighted average given a mixing distribution $\phi$.
 
-A consequence of mixing distributions is that despite the mixed logit, despite having a logit kernel, does not display proportional substitution. To see this, recall that the odds-ratio of the multinomial logit model was:
+A consequence of mixing distributions is that the mixed logit, despite having a logit kernel, does not display proportional substitution. To see this, recall that the odds-ratio of the multinomial logit model was:
 $$
 \frac{P_j}{P_m}=\frac{\frac{e^{V_{ij}}}{\sum_k e^{V_{ik}}}}{\frac{e^{V_{im}}}{\sum_k e^{V_{ik}}}} = \frac{e^{V_{ij}}}{e^{V_{im}}} 
 $$
@@ -342,7 +344,7 @@ V_{i,car} &=\beta_{car} &+ \beta_{vcost}vcost_{car}+\beta_{i,wait}wait_{car}+\be
 \end{array}
 $$
 
-And Model 2 (MIXL W), a model with random coefficients for both _travel_ and _wait_ time:
+And Model 3 (MIXL W&T), a model with random coefficients for both _travel_ and _wait_ time:
 $$
 \begin{array}{lll}
 V_{i,air} &= & + \beta_{vcost}vcost_{air} + \beta_{i,wait}wait_{air} + \beta_{i,travel}travel_{air}\\
@@ -373,7 +375,7 @@ mixl_t$logLik$message
 mixl_w <- gmnl(choice ~ vcost + travel + wait | 1,
              data = TM, model = "mixl", ranp = c(wait = "n"), R = 50)
 mixl_w$logLik$message
-#summary(mixl)
+#summary(mixl_w)
 
 # MIXL T&W
 mixl <- gmnl(choice ~ vcost + travel + wait | 1,
@@ -469,9 +471,15 @@ ggplot() +
 
 As seen in the figure, the response to waiting time is heterogeneous in the population. While in general most people dislike waiting, some dislike waiting more than others. The plot also suggests that some people may in fact _enjoy_ their wait time (notice how the distribution includes some positive values for the coefficient). We can calculate what proportion of the population has a positive response to waiting time:
 ```{r}
-1 - pnorm(-coef(mixl_w)['wait'] / coef(mixl_w)['sd.wait'])
+1-pnorm(0,mean=coef(mixl_w)['wait'],sd=coef(mixl_w)['sd.wait'])
 ```
 Accordingly, about 4.1% of the population has a positive parameter for waiting time.
+
+Another to formluate it : 
+
+```{r}
+1 - pnorm(-coef(mixl_w)['wait'] / coef(mixl_w)['sd.wait'])
+```
 
 As discussed above, the willingess to pay for reductions in waiting time was:
 $$
@@ -519,6 +527,8 @@ It can be seen from the figure that whereas the willingness to pay for saving wa
 
 ### Conditional distribution of the random coefficients
 
+This is a distribution conditional of values of disturbances (that were obtained were estimating the model)
+
 ```{r}
 plot(mixl_w, "wait", main = "Conditional distribution for wait (MIXL W)")
 ```
@@ -533,7 +543,7 @@ We will test two different models, with the specifications described below.
 Multinomial logit with individual-level covariates (MNL-Covariates):
 $$
 \begin{array}{lll}
-V_{i,air} &= & + \beta_{vcost}vcost_{air} + \beta_{i,wait}wait_{air} + \beta_{travel}travel_{air}\\
+V_{i,air} &= & + \beta_{vcost}vcost_{air} + \beta_{wait}wait_{air} + \beta_{travel}travel_{air}\\
 V_{i,train} &=\beta_{train} & + \beta_{vcost}vcost_{train} + \beta_{wait}wait_{train} + \beta_{travel}travel_{train} & + \beta_{train:income}income_i + \beta_{train:size}size_i\\
 V_{i,bus} &=\beta_{bus} &+ \beta_{vcost}vcost_{bus}+\beta_{wait}wait_{bus}+\beta_{travel}travel_{bus}& + \beta_{bus:income}income_i + \beta_{bus:size}size_i\\
 V_{i,car} &=\beta_{car} &+ \beta_{vcost}vcost_{car}+\beta_{wait}wait_{car}+\beta_{travel}travel_{car}& + \beta_{car:income}income_i + \beta_{car:size}size_i 
@@ -671,7 +681,7 @@ kable(mixl_table_2,
   kable_styling() %>%
   add_header_above(c(" " = 1, "MIXL W-1" = 2, "MIXL W-2" = 2)) %>%
   footnote(general = c(paste0("Log-Likelihood: MIXL W-1 = ", round(mixl_w1$logLik$maximum, digits = 3),
-                            "; MIXL W-2 = ", round(mixl_w1$logLik$maximum, digits = 3)),
+                            "; MIXL W-2 = ", round(mixl_w2$logLik$maximum, digits = 3)),
                        paste0("McFadden Adjusted R^2: MIXL W-1 = ", round(1 - (mixl_w1$logLik$maximum - nrow(mixl_w1.summary)) / mixl0$logLik$maximum, digits = 3),
                               "; MIXL W-2 = ", round(1 - (mixl_w2$logLik$maximum - nrow(mixl_w2.summary)) / mixl0$logLik$maximum, digits = 3))))
 ```
