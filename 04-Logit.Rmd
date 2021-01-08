@@ -22,7 +22,7 @@ In this chapter we will revisit the random utility terms in the probabilistic st
 ## How to use this note
 
 Remember that the source for the document you are reading is an R Notebook. Throughout the notes, you will find examples of code in segments of text called _chunks_. This is an example of a chunk:
-```{r}
+```{r hello-world}
 print("Hello, Prof. Train")
 ```
 
@@ -48,7 +48,7 @@ In this practice, you will learn about:
 ## Preliminaries
 
 Load the packages used in this section:
-```{r}
+```{r load-packages, message=FALSE}
 library(tidyverse)
 library(evd)
 ```

@@ -33,7 +33,7 @@ Now that the preceding chapters have armed us with the theory and basic concepts
 ## How to use this note
 
 Remember that the source for the document you are reading is an R Notebook. Throughout the notes, you will find examples of code in segments of text called _chunks_. This is an example of a chunk:
-```{r}
+```{r hello-world}
 print("Hats off to you, Prof. McFadden")
 ```
 
@@ -59,7 +59,7 @@ In this practice, you will learn about:
 ## Preliminaries
 
 Load the packages used in this section:
-```{r message=FALSE}
+```{r load-packages, message=FALSE}
 library(kableExtra)
 library(mlogit)
 library(plotly)
