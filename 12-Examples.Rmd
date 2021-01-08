@@ -1,0 +1,470 @@
+---
+title: "12==== Examples"
+output: html_notebook
+---
+
+
+## Examples
+
+NOTE: The development of this notebook is in progress! Use with parcimony! It is being developed with the students of the course CIV6719 - Polytechnique Montreal.
+
+## How to use this note
+
+Remember that the source for the document you are reading is an R Notebook. Throughout the notes, you will find examples of code in segments of text called _chunks_. This is an example of a chunk:
+```{r}
+print("Hats off to you, Prof. McFadden")
+```
+
+If you are working with the Notebook version of the document, you can run the code by clicking the 'play' icon on the top right corner of the chunk. If you are reading the web-book version of the document, you will often see that the code has already been executed. You can still try it by copying and pasting into your R or RStudio console.
+
+
+## Preliminaries
+
+Load the packages used in this section:
+```{r message=FALSE}
+library(kableExtra)
+library(mlogit)
+library(plotly)
+library(tidyverse)
+library(readr)
+library(vcd)
+library(gplots)
+library(ggplot2)
+library(gmnl)
+library(kableExtra)
+```
+
+Load the dataset used in this section:
+```{r}
+load("Commute Mac Wide.RData")
+```
+
+## Example: Dataset
+
+We will now proceed to work with a practical example, using the dataset that you encountered before in Chapter \@ref(chapter-1). This dataset contains information on various modes of transportation used by people commuting to McMaster University in Canada [@Whalen2013]. The dataset was loaded above as part of the preliminaries of this chapter. We can begin by exploring the data. Please note that this is the same dataset that you used in Chapter \@ref(chapter-1), but not the same file. For convenience, the dataset was pre-processed. The contents of the dataframe can be quickly seen by means of the function `head()`. This function will display the first few top rows of the dataframe:
+```{r}
+head(mc_commute, 8)
+```
+
+As you can see, the dataframe is in wide format, meaning that each row represents one decision-maker and the information about the choice situations is spread: for instance, there is one variable for travel time, but it appears in four columns, one for each of the alternatives ("Cycle", "Walk", "HSR", and "Car"). The package `mlogit` works with _long_ tables, where each row is a choice situation. Since wide tables are more common, the package includes a utility function to reshape the table. This is used below to convert our wide table into a long table. Notice that we need to indicate which variables are _varying_, meaning that they vary by alternative. In our wide table, there are four variables that vary by alternative: travel time (`time`), access time (`access`: the time needed to reach an HSR bus stop), waiting time (`wait`: time spent waiting for an HSR bus), and number of transfers when using HSR (`transfer`). The latter three variables are specific to HSR and therefore are set to zero for the modes "Car", Cycle", and "Walk".
+```{r}
+mc_commute_long <- mlogit.data(mc_commute, shape = "wide", choice = "choice", varying = 7:22)
+```
+
+If we examine the long table, we see that instead of each row being an individual, each row is a choice situation:
+```{r}
+head(mc_commute_long, 8)
+```
+
+Since there are four alternatives in this case, each row corresponds to the choice situation for an alternative for an individual. We notice that the row names now have the format `#.Alt`, where `#` is the number of the decision-maker and `Alt` is the name of the alternative. In this way the first four rows of the table correspond to the first decision-maker who, faced with four alternatives, chose HSR (public transportation) - as recorded in the column `choice`. The next four rows correspond to the second decision-maker in the sample (who also chose HSR), and so on, four rows per decision-maker. More generally, there will be $J$ rows per decision-maker. When an attribute is missing, this means that the alternative was not available to the decision-maker. For example:
+```{r}
+head(mc_commute_long[,c(1, 59:60)], 8)
+```
+
+Here we see that the modes "Car" and "Cycle" were not available to decision-maker 1 (id: 566872636), and "Cycle" was not available to decision-maker 2 (id: 566873140).
+
+The first step towards developing a choice model is to specify the utility functions for the desired model. The package `mlogit` uses the package `mFormula` to create the functions. This package creates objects that build upon the [`Formula` package](https://CRAN.R-project.org/package=Formula ) for multi-component formulas. As seen above, utility functions can potentially have multiple components, so the functionality to build formulas in `mFormula` and `Formula` is quite useful.
+
+Formulas for the `mlogit` package are defined using three parts:
+
+$$
+\text{choice} \sim \text{alternative specific vars with generic coefficients }|\text{ individual specific vars }|\text{ alternative specific vars with specific coefficients}  
+$$
+
+If we list all columns in the dataframe, we can see what variables are available for this analysis:
+```{r}
+colnames(mc_commute_long)
+```
+
+Besides identifier variables `id` and `chid`, and the variable for `choice`, we see that several variables are specific to the individual decision-makers. These are `parking` (availability of a parking pass), `vehind` (whether the decision-maker had individual access to a private vehicle), `gender`, `age`, `shared` (living in shared accommodations away from the family home), `family` (living at the family home), and `child` (respondent was responsible for at least one minors in the household). Furthermore, some variables relate to the physical environment of the place of residence (`street_density` and `sidewalk_density`), in addition to the coordinates of the place of residence (geocoded to the nearest major intersection or postal code centroid). One variable is alternative specific, namely `time` (travel time in minutes). And, as noted before, three variables are specific to public transportation, namely `access` (access time to public transportation in minutes), `wait` (waiting time in minutes), and `transfer` (number of transfers when traveling by public transportation).
+
+
+## Example: A logit model of mode choice
+
+
+Here, we try a different formula, where time has alternative-specific instead of generic coefficients, and call it `f3`:
+```{r}
+f3 <- mFormula(choice ~ 0 | sidewalk_density | time)
+```
+
+Note that, since we do not define other alternative-specific variables with generic coefficients, we have to explicitly state that there are `0` such variables!
+
+
+
+The value (output) of the function can be named and saved to an object for further analysis or for further processing, post-estimation. Begin by estimating a model using the simplest of our formulas:
+```{r}
+f1 <- mFormula(choice ~ time)
+model1 <- mlogit(f1, mc_commute_long)
+summary(model1)
+```
+
+The negative coefficient for time indicates that time is a "cost", in other words, the utility of traveling tends to decline with increasing travel times. This indicates that slower modes will tend to have lower utilities.
+
+The interpretation of the constants is as follows: for the same travel time, people are less likely to drive vs all other modes (all constants are positive).
+
+Let's now try a new model with only sidewalk density: 
+
+```{r}
+f4 <- mFormula(choice ~ 0| sidewalk_density )
+model4 <- mlogit(f4, mc_commute_long)
+summary(model4)
+```
+The results can be interpreted as follows: higher sidewalk density is associated lower probability of traveling by car compared to all other modes (all coefficients are positive)
+
+
+We now include both sidewalk density and time in the model:
+```{r}
+f2 <- mFormula(choice ~ time | sidewalk_density)
+model2 <- mlogit(f2, mc_commute_long)
+summary(model2)
+```
+What we observe is that sidewalk density is no longer significant for HSR and Cycle. This suggests that it was potentially capturing some of the effects of the time variable:
+areas with high sidewalk density are closer to the University and therefore have lower travel times in general. Since utility of slow modes increases when time decreases, we capture here that utility of slower modes increases with sidewalk density (partly due to lower travel times). Note the the coefficient of the time variable is consistent between model 1 and model 2.
+
+Should we keep the time variable in?
+
+We can assess the contribution of adding the sidewalk density variable to the model with only the time variable with the use of a likelihood ratio test:
+```{r}
+lrtest(model1,model2)
+```
+The statistically significant result indicates that we gain information by including the sidewalk density variable.
+
+Let's now test a alternative-specific coefficient for the time variable, as it is expected that the perception of the effect of time of utiliy might differ from mode to mode.
+```{r}
+f3 <- mFormula(choice ~ 0 | sidewalk_density | time)
+model3 <- mlogit(f3, mc_commute_long)
+summary(model3)
+```
+What do you notice? The time coefficients are all significant, but in different directions. How to interpret the results?
+
+Since the model with the generic time coefficient is a restricted version of the model with the specific time coefficient (beta car= beta walk = beta cycle = beta HSR), it is possible to compare both models with a likelihood ratio test. 
+```{r}
+lrtest(model2,model3)
+```
+
+
+
+
+We can also include transit specific attributes (wait and transfer). Since there is only one alternative with these attributes, there will be only one coefficient, which can be included as generic:
+
+```{r}
+f8 <- mFormula(choice ~ wait + transfer | sidewalk_density | time  )
+model8 <- mlogit(f8, mc_commute_long, reflevel = "HSR")
+summary(model8)
+```
+
+
+Let's now add socio-economic characteristics:
+
+```{r}
+f9 <- mFormula(choice ~ wait + transfer | sidewalk_density + gender + child | time)
+model9 <- mlogit(f9, mc_commute_long)
+summary(model9)
+```
+
+
+
+
+Let's now look a bit closer to the street density and sidewalk density variables:
+```{r}
+f3 <- mFormula(choice ~ time | sidewalk_density | 0)
+model3 <- mlogit(f3, mc_commute_long)
+summary(model3)
+```
+
+
+```{r}
+f5 <- mFormula(choice ~ time |street_density)
+model5 <- mlogit(f5, mc_commute_long)
+summary(model5)
+```
+
+
+What happens if we include both
+
+```{r}
+f7 <- mFormula(choice ~ time | sidewalk_density + street_density)
+model7 <- mlogit(f7, mc_commute_long)
+summary(model7)
+```
+The signs for street density become negative and significant for cycling and walking.
+
+Are the results logical? Intuitive? Denser streets  = less walking and cycling compared to car?
+
+```{r}
+cor(mc_commute$sidewalk_density,mc_commute$street_density)
+```
+We can try creating a new variable to avoid issues of correlation.  Sidewalk ratio= proportion of sidewalk to streets
+
+```{r}
+mc_commute_long$sidewalk_ratio = mc_commute_long$sidewalk_density/mc_commute_long$street_density
+f6 <- mFormula(choice ~ time |sidewalk_ratio)
+model6 <- mlogit(f6, mc_commute_long)
+summary(model6)
+```
+
+More sidewalk/street = more cycling and walking. Why? Type of environment? Suburban vs not?
+
+
+
+Coming back to a simpler model:
+```{r}
+f2 <- mFormula(choice ~ time | sidewalk_density)
+model2 <- mlogit(f2, mc_commute_long)
+summary(model2)
+```
+
+Adding the gender variable:
+
+```{r}
+f10 <- mFormula(choice ~ time | sidewalk_density + gender)
+model10 <- mlogit(f10, mc_commute_long)
+summary(model10)
+```
+
+Men are less likely to walk than to take the car compared to women. In line with theory, but performance of the model is not statistically different (see below). We can nonetheless keep the gender variable in as the results are consistent with theory and the model remains stable.
+
+
+```{r}
+lrtest(model2,model10)
+```
+
+Comparing with dsecriptive statistics:
+```{r}
+mosaic(gender ~ choice, mc_commute, main="Mode choice vs gender")
+```
+`
+
+
+## Example: A nested logit model of mode choice
+
+Previous logit model
+```{r}
+f3 <- mFormula(choice ~ 0 | sidewalk_density + gender | time)
+model3 <- mlogit(f3, mc_commute_long)
+summary(model3)
+```
+
+Nested logit Active vs Motorized
+
+```{r}
+nl2 <- mlogit(choice ~ 0 | sidewalk_density + gender | time, mc_commute_long,
+             nests = list(active = c( 'Cycle', 'Walk'), motorized = c('HSR', 'Car')),
+             un.nest.el = FALSE,
+             steptol = 1e-12)
+summary(nl2)
+```
+Negative inclusive value: not consistent with random utility maximization. (If lambda increases, utility decreases). Model is not valid
+
+
+```{r}
+1 - nl2$coefficients["iv:active"]
+1 - nl2$coefficients["iv:motorized"]
+```
+
+
+```{r}
+lrtest(nl2,model3)
+```
+We gain information but..?
+
+
+What happens if we coerce to identical lambdas?
+
+```{r}
+nl3 <- mlogit(choice ~ 0 | sidewalk_density + gender | time, mc_commute_long,
+             nests = list(active = c( 'Cycle', 'Walk'), motorized = c('HSR', 'Car')),
+             un.nest.el = TRUE,
+             steptol = 1e-12)
+summary(nl3)
+```
+Does it make sense to use the same inclusive value?
+
+```{r}
+1 - 0.266
+```
+The value is between the two inclusive values above.
+
+Comparison with the logit model:
+```{r}
+lrtest(nl3,model3)
+```
+
+Can we compare the nested logit with a likelihood test?
+
+```{r}
+lrtest(nl3,nl2)
+```
+No statistically significant difference. (But in any case, there is no reason to use such nest structure given the different lambdas we obtain)
+
+
+
+Let's try other structures:
+
+Nested active and public transport vs car
+
+```{r}
+nl4 <- mlogit(choice ~ 0 | sidewalk_density + gender | time, mc_commute_long,
+             nests = list(active = c( 'Cycle', 'Walk','HSR'), motorized = c('Car')),
+             un.nest.el = FALSE,
+             steptol = 1e-12)
+summary(nl4)
+```
+Not possible to solve the model with different lambdas.
+
+What happens if we coerce to the same lambda?
+
+```{r}
+nl5 <- mlogit(choice ~ 0 | sidewalk_density + gender | time, mc_commute_long,
+             nests = list(active = c( 'Cycle', 'Walk','HSR'), motorized = c('Car')),
+             un.nest.el = TRUE,
+             steptol = 1e-12)
+summary(nl5)
+```
+
+```{r}
+1 - 0.87
+```
+The correlation is relatively weak. The likelihood ratio tests is in line with this, whereas the nesting structure does not provide more information than a regular logit model:
+
+
+```{r}
+lrtest(nl5,model3)
+```
+
+
+
+
+Maybe public transport does not share so many unobserved attributes with active transport:
+
+```{r}
+nl6 <- mlogit(choice ~ 0 | sidewalk_density + gender | time, mc_commute_long,
+             nests = list(active = c( 'Cycle', 'Walk'), public = c('HSR'), motorized = c('Car')),
+             un.nest.el = TRUE,
+             steptol = 1e-12)
+summary(nl6)
+```
+```{r}
+1 - 0.28
+```
+```{r}
+lrtest(nl6,model3)
+```
+
+
+Cross-nested logit : Attention
+
+## Example: Mixed logit
+
+Preliminary steps:
+Clean the working space:
+
+
+```{r}
+database = read.csv("C:/Users/boisj/OneDrive - polymtl.ca/Enseignement/CIV6719/A2020/Examples/apollo_swissRouteChoiceData.csv",header=TRUE)
+
+database$choice = as.factor(database$choice)
+levels(database$choice) <- c("1", "2")
+
+database = database %>% 
+  rename(
+    tt.1 = tt1,
+    tc.1 = tc1,
+    hw.1 = hw1,
+    ch.1 = ch1,
+    tt.2 = tt2,
+    tc.2 = tc2,
+    hw.2 = hw2,
+    ch.2 = ch2
+    )
+
+
+route <- mlogit.data(database, shape = "wide", choice = "choice", varying = c(3:10))
+# route = subset(route,!duplicated(route$ID))
+
+```
+
+
+
+Normal distribution
+
+```{r}
+mixl_w1 <- gmnl(choice ~ tt + tc + hw + ch | car_availability + business + hh_inc_abs,
+             data = route, model = "mixl", ranp = c(tt = "n", tc="n", hw="n"), R = 50)
+mixl_w1$logLik$message
+summary(mixl_w1)
+```
+Does it make sense to include attributes at the individual level here?
+
+
+Car availability  interaction with hw:
+```{r}
+mixl_w1 <- gmnl(choice ~ tt + tc + hw + hw:car_availability + ch | 1,
+             data = route, model = "mixl", ranp = c(tt = "n", tc="n", hw="n"), R = 50)
+mixl_w1$logLik$message
+summary(mixl_w1)
+```
+Result: the effect of longer headway increases for people who have a car. Does that make sense?
+
+```{r}
+mixl_w2 <- gmnl(choice ~ tt + tc + tc:hh_inc_abs + hw + hw:car_availability + ch | 1,
+             data = route, model = "mixl", ranp = c(tt = "n", tc="n", hw="n"), R = 50)
+mixl_w2$logLik$message
+summary(mixl_w2)
+```
+Result: the effect of higher costs is less negative when income increases. Does that make sense?
+
+```{r}
+mixl_w3 <- gmnl(choice ~ tt + tc + tc:hh_inc_abs + hw + hw:car_availability + ch + ch:business | 1,
+             data = route, model = "mixl", ranp = c(tt = "n", tc="n", hw="n"), R = 50)
+mixl_w3$logLik$message
+summary(mixl_w3)
+```
+
+
+
+
+
+## Example: Dataset
+Load the dataset used in this section:
+```{r}
+load("Commute Mac Wide.RData")
+mc_commute$id= as.integer(mc_commute$id)
+
+mc_commute = mc_commute %>% 
+  rename(
+    ID = id)
+
+mc_commute$choice = as.factor(mc_commute$choice)
+
+write.csv(mc_commute,"C:/Users/boisj/OneDrive - polymtl.ca/Enseignement/CIV6719/A2020/Examples/mc_commute_format2.csv", row.names = FALSE)
+```
+
+export dataset as csv
+
+
+```{r}
+mc_commute_format = read.csv("C:/Users/boisj/OneDrive - polymtl.ca/Enseignement/CIV6719/A2020/Examples/mc_commute_format2.csv",header=TRUE)
+mc_commute_format$choice = as.factor(mc_commute_format$choice)
+
+mc_commute_format$choiceid <- 1:nrow(mc_commute_format)
+
+
+Tr <- dfidx(mc_commute_format, shape = "wide", varying = 7:22, sep = ".",
+            idx = list(c("choiceid", "ID")), idnames = c(NA, "alt"))
+
+
+mc_commute_mixed <- mlogit.data(Tr, shape = "wide", choice = "choice", varying = 7:22)
+```
+
+
+```{r}
+mixl_w1 <- gmnl(choice ~ time | 1,
+             data = mc_commute_long, model = "mixl", ranp = c(time = "n"), R = 50)
+mixl_w1$logLik$message
+summary(mixl_w1)
+```
+
+
+
+

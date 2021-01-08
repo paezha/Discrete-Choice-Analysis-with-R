@@ -1,9 +1,9 @@
 ---
-title: "06 Non-Proportional Substitution Patterns I"
+title: "07 Non-Proportional Substitution Patterns I"
 output: html_notebook
 ---
 
-# Non-Proportional Substitution Patterns I: Generalized Extreme Value Models {#chapter-6}
+# Non-Proportional Substitution Patterns I: Generalized Extreme Value Models {#chapter-7}
 
 > "Perfection is achieved, not when there is nothing more to add, but when there is nothing left to take away."
 >
@@ -44,7 +44,7 @@ The multinomial logit model is the workhorse of discrete choice analysis. As see
 
 When originally developed by Luce [@Luce1959individual; cited in @Train2009discrete], the logit model was based on the axiom of Independence of Irrelevant Alternatives. As discussed in Chapter \@ref(chapter-3), this property of the logit model implies _proportional substitution patterns_. 
 
-To illustrate this, lets revisit the model estimated in Chapter \@ref(chapter-5). This was a model of the choice of heating systems, with five different systems, namely Gas Central (gc), Gas Room (gr), Electric Central (ec), Electric Room (er), and Heat Pump (hp). 
+To illustrate this, let's revisit the model estimated in Chapter \@ref(chapter-5). This was a model of the choice of heating systems, with five different systems, namely Gas Central (gc), Gas Room (gr), Electric Central (ec), Electric Room (er), and Heat Pump (hp). 
 
 Now we are ready to estimate a multinomial logit model (we called this Model 3 in Chapter \@ref(chapter-3)):
 ```{r}
@@ -146,7 +146,7 @@ df %>%
                       "gc",
                       "gr",
                       "hp"),
-        digits = 2) %>%
+        digits = 3) %>%
   kable_styling()
 ```
 
@@ -285,7 +285,7 @@ As this illustrates, the multinomial logit is a particular case of a GEV model. 
 
 ## Nested Logit model
 
-The nested logit model is derived following the GEV modelling approach by assuming that the $J$ alternatives are uniquely allocated to one class the alternatives, called a nest. There are $S$ nests $B_s$ ($s=1,3,\cdots,S$).
+The nested logit model is derived following the GEV modelling approach by assuming that the $J$ alternatives are uniquely allocated to one class the alternatives, called a nest. There are $S$ nests $B_s$ ($s=1,2,3,\cdots,S$).
 
 Based on the above, we can define the following function:
 $$
@@ -348,7 +348,7 @@ $$
 
 Replacing $y_j = e^{V_j}$ gives the expression for the choice probability of the nested model:
 $$
-P_i = \frac{e^{V_i/\lambda_t} \Big(\sum_{j \in B_s}e^{V_j/\lambda_t} \Big)^{\lambda_t - 1}}{\sum_{s=1}^S \Big(\sum_{j \in B_s}e^{V_j/\lambda_s} \Big)^{\lambda_s}}
+P_i = \frac{e^{V_i/\lambda_t} \Big(\sum_{j \in B_t}e^{V_j/\lambda_t} \Big)^{\lambda_t - 1}}{\sum_{s=1}^S \Big(\sum_{j \in B_s}e^{V_j/\lambda_s} \Big)^{\lambda_s}}
 $$
 
 Superficially, the probability of the nested model resembles the multinomial probability, but the differences are important. One of the examples of nesting in Figure \@ref(fig:fig-choice-structures) can help to unpack the probability of the nested model.
@@ -369,7 +369,7 @@ Notice that the ratio of odds is:
 $$
 \frac{P_{ec}}{P_{gc}} = \frac{\frac{e^{V_{ec}/\lambda_{c}}(e^{V_{ec}/\lambda_{c}}+e^{V_{gc}/\lambda_{c}}+e^{V_{hp}/\lambda_{c}})^{\lambda_c-1}}
 {(e^{V_{ec}/\lambda_{c}}+e^{V_{gc}/\lambda_{c}}+e^{V_{hp}/\lambda_{c}})^{\lambda_c}+(e^{V_{er}/\lambda_{r}}+e^{V_{gr}/\lambda_{r}}+e^{V_{hp}/\lambda_{r}})^{\lambda_r}}}{\frac{e^{V_{gc}/\lambda_{c}}(e^{V_{ec}/\lambda_{c}}+e^{V_{gc}/\lambda_{c}}+e^{V_{hp}/\lambda_{c}})^{\lambda_c-1}}
-{(e^{V_{ec}/\lambda_{c}}+e^{V_{gc}/\lambda_{c}}+e^{V_{hp}/\lambda_{c}})^{\lambda_c}+(e^{V_{er}/\lambda_{r}}+e^{V_{gr}/\lambda_{r}}+e^{V_{hp}/\lambda_{r}})^{\lambda_r}}} = \frac{e^{V_{ec}/\lambda_{c}}}{e^{V_{gr}/\lambda_{r}}} = \frac{e^{V_{ec}}}{e^{V_{gc}}}
+{(e^{V_{ec}/\lambda_{c}}+e^{V_{gc}/\lambda_{c}}+e^{V_{hp}/\lambda_{c}})^{\lambda_c}+(e^{V_{er}/\lambda_{r}}+e^{V_{gr}/\lambda_{r}}+e^{V_{hp}/\lambda_{r}})^{\lambda_r}}} = \frac{e^{V_{ec}/\lambda_{c}}}{e^{V_{gc}/\lambda_{c}}} = \frac{e^{V_{ec}}}{e^{V_{gc}}}
 $$
 
 As you can see, the ratio of odds is independent from other alternatives: this is the same as the multinomial logit model. In fact, substitution patterns _within_ a nest are proportional, as they are in the case of the multinomial logit.  This is not the case when the ratio of odds is for two alternatives in different nests. For example, the probability of choosing an alternative in the nest for room systems, say "er", is:
@@ -403,7 +403,7 @@ where $Z_j$ are the attributes specific to the alternatives, whereas $W_s$ are a
 Based on the above decomposition, we can rewrite the choice probabilities as follows:
 $$
 \begin{eqnarray*}
-P_i &=& \frac{e^{(Z_i + W_t)/\lambda_t} \Big(\sum_{j \in B_t}e^{(Z_j + W_t)/\lambda_t} \Big)^{-1}\Big(\sum_{j \in B_t}e^{(Z_j + W_t)/\lambda_t} \Big)^{\lambda_t}}{\sum_{s=1}^S \Big(\sum_{j \in B_s}e^{{Z_j + W_s}/\lambda_s} \Big)^{\lambda_s}} \\
+P_i &=& \frac{e^{(Z_i + W_t)/\lambda_t} \Big(\sum_{j \in B_t}e^{(Z_j + W_t)/\lambda_t} \Big)^{-1}\Big(\sum_{j \in B_t}e^{(Z_j + W_t)/\lambda_t} \Big)^{\lambda_t}}{\sum_{s=1}^S \Big(\sum_{j \in B_s}e^{(Z_j + W_s)/\lambda_s} \Big)^{\lambda_s}} \\
 &=&\frac{e^{(Z_i + W_t)/\lambda_t} }{\sum_{j \in B_s}e^{(Z_j + W_t)/\lambda_t}}\frac{\Big(\sum_{j \in B_t}e^{(Z_j + W_t)/\lambda_t} \Big)^{\lambda_t}}{\sum_{s=1}^S \Big(\sum_{j \in B_s}e^{(Z_j + W_s)/\lambda_s} \Big)^{\lambda_s}}
 \end{eqnarray*}
 $$
@@ -483,8 +483,8 @@ where $\sigma_{\lambda_s}$ is the standard deviation of the inclusive value.
 
 The nested logit model can be estimated using `mlogit` by using additional argument in the `mlogit` function. We will illustrate this using the same example. The chunk of code below defines a formula with installation costs (ic) and operation costs (oc) as alternative specific variables with a generic coefficient. In addition, the nests are defined by means of a list. In this model, we define two nests that correspond to "room" systems (er and gr) and "central" systems (ec, gc, and hp). Call this model `nl1` for "nested logit 1":  
 ```{r}
-nl1 <- mlogit(depvar ~ ic + oc, H,
-             nests = list(room = c( 'er', 'gr'), central = c('ec', 'gc', 'hp')),
+nl1 <- mlogit(depvar ~ oc + ic, H,
+             nests = list(room = c( 'er', 'gr'), central = c('ec','gc','hp')),
              steptol = 1e-12)
 summary(nl1)
 ```
@@ -519,7 +519,11 @@ nl2 <- mlogit(depvar ~ ic + oc, H,
 summary(nl2)
 ```
 
-Note how the log-likelihood of the Nested Logit Model 2 is almost identical to the log-likelihood of the Nested Logit Model 1. Since `nl2` is more parsimonious, it makes sense to prefer this model.
+Note how the log-likelihood of the Nested Logit Model 2 is almost identical to the log-likelihood of the Nested Logit Model 1. Since `nl2` is more parsimonious, it makes sense to prefer this model. Also, the lilekihood ratio test confirms that there is not statistically significant difference between the two models (p-value = 0.66)
+
+```{r}
+lrtest(nl2, nl1)
+```
 
 ## Substitution patterns with the nested logit model
 
@@ -530,22 +534,23 @@ We begin by copying the model matrix:
 X <- model.matrix(nl2)
 ```
 
+
 Using the model matrix, we can calculate the utilities of each alternative. Notice that each utility is divided by the coefficient of the inclusive value:
 ```{r}
 # Electric central
 exp_V_ec <- exp((X[alt == c("ec"), "oc"] * coef(nl2)["oc"] + X[alt == c("ec"), "ic"] * coef(nl2)["ic"]) / coef(nl2)["iv"])
 
 # Gas central
-exp_V_gc <- exp((coef(nl2)["gc:(intercept)"] + X[alt == c("gc"), "oc"] * coef(nl2)["oc"] + X[alt == c("gc"), "ic"] * coef(nl2)["ic"]) / coef(nl2)["iv"])
+exp_V_gc <- exp((coef(nl2)["(Intercept):gc"] + X[alt == c("gc"), "oc"] * coef(nl2)["oc"] + X[alt == c("gc"), "ic"] * coef(nl2)["ic"]) / coef(nl2)["iv"])
 
 # Heat pump
-exp_V_hp <- exp((coef(nl2)["hp:(intercept)"] + X[alt == c("hp"), "oc"] * coef(nl2)["oc"] + X[alt == c("hp"), "ic"] * coef(nl2)["ic"]) / coef(nl2)["iv"])
+exp_V_hp <- exp((coef(nl2)["(Intercept):hp"] + X[alt == c("hp"), "oc"] * coef(nl2)["oc"] + X[alt == c("hp"), "ic"] * coef(nl2)["ic"]) / coef(nl2)["iv"])
 
 # Electric room
-exp_V_er <- exp((coef(nl2)["er:(intercept)"] + X[alt == c("er"), "oc"] * coef(nl2)["oc"] + X[alt == c("er"), "ic"] * coef(nl2)["ic"]) / coef(nl2)["iv"])
+exp_V_er <- exp((coef(nl2)["(Intercept):er"] + X[alt == c("er"), "oc"] * coef(nl2)["oc"] + X[alt == c("er"), "ic"] * coef(nl2)["ic"]) / coef(nl2)["iv"])
 
 # Gas room
-exp_V_gr <- exp((coef(nl2)["gr:(intercept)"] + X[alt == c("gr"), "oc"] * coef(nl2)["oc"] + X[alt == c("gr"), "ic"] * coef(nl2)["ic"]) / coef(nl2)["iv"])
+exp_V_gr <- exp((coef(nl2)["(Intercept):gr"] + X[alt == c("gr"), "oc"] * coef(nl2)["oc"] + X[alt == c("gr"), "ic"] * coef(nl2)["ic"]) / coef(nl2)["iv"])
 ```
 
 The conditional probabilities are the logit models within each nest:
@@ -696,7 +701,7 @@ df %>%
                       "hp",
                       "er",
                       "gr"),
-        digits = 2) %>%
+        digits = 3) %>%
   kable_styling()
 ```
 Notice that the patterns of substitution are no longer proportional between nests. Are these substitution patterns more sensible?
@@ -721,7 +726,7 @@ where $P_t$ is the marginal probability of choosing nest $t$ and $P_{i|t}$ is th
 
 The cross-elasticity for alternatives in a partition of the nest is:
 $$
-E^{P_{in}}_{x_{ink}} = -\Bigg[P_{t} + \Big(\frac{1}{\lambda_t-1}\Big)P_{i|t}\Bigg]\beta_{ik}x_{ink}
+E^{P_{jn}}_{x_{jnk}} = -\Bigg[P_{t} + \Big(\frac{1}{\lambda_t-1}\Big)P_{i|t}\Bigg]\beta_{ik}x_{ink}
 $$
 
 ## Exercise
@@ -763,7 +768,8 @@ Proportional substitution patterns imply that the new mode (red bus) draws equal
 
 2. Use model `nl2` in this chapter and calculate the direct-point elasticity at the mean values of the variables, for an increase in the installation costs of Gas Central systems.
 
-2. Use model `nl2` in this chapter and calculate the cross-point elasticity at the mean values of the variables, for an increase in the installation costs of Gas Central systems.
+
+3. Use model `nl2` in this chapter and calculate the cross-point elasticity at the mean values of the variables, for an increase in the installation costs of Gas Central systems.
 
 4. Reestimate the nested logit model in this chapter, but change the nests to types of energy as follows:
 

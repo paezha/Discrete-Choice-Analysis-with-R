@@ -1,9 +1,9 @@
 ---
-title: "09 Dealing with Heterogeneity II"
+title: "10 Dealing with Heterogeneity II"
 output: html_notebook
 ---
 
-# Dealing with Heterogeneity II: The Mixed Logit Model {#chapter-9}
+# Dealing with Heterogeneity II: The Mixed Logit Model {#chapter-10}
 
 > "Life produces a different taste each time you take it.”
 >
@@ -23,11 +23,14 @@ library(mlogit)
 library(gmnl)
 library(kableExtra)
 library(gridExtra)
+library(AER)
 ```
 
 ## More on taste variation
 
 Chapter \@ref(chapter-8) introduced the latent class logit model, a technique useful to model taste variation. In this chapter, a variation on the theme will be introduced, namely the mixed logit model. We will see how the mixed logit model is related to the latent class logit model.
+
+TO ADD : Example of unimodal and bimodal distribution functions (binomial function created as the weighted sum of two unimodal functions)
 
 To illustrate the mixed logit model we will use a dataset from the `AER` package on the mode of transportation used by travelers traveling between Sydney and Melbourne:
 ```{r} 
@@ -58,10 +61,10 @@ df <- data.frame(Mode = c("air", "train", "bus", "car"),
                           median(filter(TravelMode, mode == "train")$wait), 
                           median(filter(TravelMode, mode == "bus")$wait), 
                           median(filter(TravelMode, mode == "car")$wait)),
-                 travel = c(median(filter(TravelMode, mode == "air")$gcost), 
-                            median(filter(TravelMode, mode == "train")$gcost), 
-                            median(filter(TravelMode, mode == "bus")$gcost), 
-                            median(filter(TravelMode, mode == "car")$gcost)),
+                 travel = c(median(filter(TravelMode, mode == "air")$travel), 
+                            median(filter(TravelMode, mode == "train")$travel), 
+                            median(filter(TravelMode, mode == "bus")$travel), 
+                            median(filter(TravelMode, mode == "car")$travel)),
                  Proportion = Proportion$no_rows/(nrow(TravelMode)/4)
                  )
 df %>%
@@ -108,8 +111,9 @@ knitr::include_graphics(rep("10-Figure-1.jpg"))
 The results of these models are summarized in Table \ref(@table-base-models) below. 
 ```{r table-base-models}
 # Estimate a constants only model to calculate McFadden's _adjusted_ rho2
-mnl_null <- mlogit(choice ~ 1,
-             data = TM)
+# mnl_null <- mlogit(choice ~ 1, data = TM)
+# mnl_null$logLik[1]
+mnl_null_lo = -283.83
 
 mnl0.summary <- rownames_to_column(data.frame(summary(mnl0)$CoefTable), "Variable") %>%
   transmute(Variable, Estimate, pval = `Pr...z..`)
@@ -139,10 +143,11 @@ kable(df_logit,
   footnote(general = c(paste0("Log-Likelihood: MNL = ", round(mnl0$logLik[1], digits = 3),
                             "; NL = ", round(nl$logLik[1], digits = 3),
                             "; MNP = ", round(prbt$logLik[1], digits = 3)),
-                       paste0("McFadden Adjusted R^2: MNL = ", round(1 - (mnl0$logLik[1] - nrow(mnl0.summary)) / mnl_null$logLik[1], digits = 3),
-                              "; NL = ", round(1 - (nl$logLik[1] - nrow(nl.summary)) / mnl_null$logLik[1], digits = 3),
-                              "; MNP = ", round(1 - (prbt$logLik[1] - nrow(prbt.summary)) / mnl_null$logLik[1], digits = 3))))
+                       paste0("McFadden Adjusted R^2: MNL = ", round(1 - (mnl0$logLik[1] - nrow(mnl0.summary)) / mnl_null_lo, digits = 3),
+                              "; NL = ", round(1 - (nl$logLik[1] - nrow(nl.summary)) / mnl_null_lo, digits = 3),
+                              "; MNP = ", round(1 - (prbt$logLik[1] - nrow(prbt.summary)) / mnl_null_lo, digits = 3))))
 ```
+
 
 The nested logit model and the multinomial probit model, as discussed in the preceding chapters, accommodate correlations among alternatives. For instance, the inclusive value of the nested logit is in the $0<iv<1$ range, and it is significantly different from 1 (recall that when close to one, the model collapses to the multinomial logit model). The $z$-score to test whether it is different from one is:
 ```{r}
@@ -152,6 +157,10 @@ The nested logit model and the multinomial probit model, as discussed in the pre
 The multinomial probit model also has covariance components that are significant, although, as discussed before, it is not straightforward to interpret them.
 
 Based on the results of the models we can obtain some behavioral insights. For instance, we know that the ratio of two coefficients represents the _willingness to pay_. If we use the coefficients of the multinomial logit model in the example, we can see that the willingness to pay is 0.29 dollars per minute of travel time saved and 6.97 dollars per minute of waiting time saved:
+```{r}
+summary(mnl0)
+```
+
 $$
 \begin{array}{c}
 -\frac{\partial \text{vcost}}{\partial \text{travel}} = \frac{\beta_{travel}}{\beta_{vcost}} = \frac{-0.004}{-0.0139} \simeq 0.29 \\
@@ -296,7 +305,7 @@ P_j = \int\frac{e^{\beta_i'x_{ij}}}{\sum_k e^{\beta_i'x_{ik}}} \phi(\beta|\sigma
 $$
 where the integral provides the weighted average given a mixing distribution $\phi$.
 
-A consequence of mixing distributions is that despite the mixed logit, despite having a logit kernel, does not display proportional substitution. To see this, recall that the odds-ratio of the multinomial logit model was:
+A consequence of mixing distributions is that the mixed logit, despite having a logit kernel, does not display proportional substitution. To see this, recall that the odds-ratio of the multinomial logit model was:
 $$
 \frac{P_j}{P_m}=\frac{\frac{e^{V_{ij}}}{\sum_k e^{V_{ik}}}}{\frac{e^{V_{im}}}{\sum_k e^{V_{ik}}}} = \frac{e^{V_{ij}}}{e^{V_{im}}} 
 $$
@@ -335,7 +344,7 @@ V_{i,car} &=\beta_{car} &+ \beta_{vcost}vcost_{car}+\beta_{i,wait}wait_{car}+\be
 \end{array}
 $$
 
-And Model 2 (MIXL W), a model with random coefficients for both _travel_ and _wait_ time:
+And Model 3 (MIXL W&T), a model with random coefficients for both _travel_ and _wait_ time:
 $$
 \begin{array}{lll}
 V_{i,air} &= & + \beta_{vcost}vcost_{air} + \beta_{i,wait}wait_{air} + \beta_{i,travel}travel_{air}\\
@@ -366,7 +375,7 @@ mixl_t$logLik$message
 mixl_w <- gmnl(choice ~ vcost + travel + wait | 1,
              data = TM, model = "mixl", ranp = c(wait = "n"), R = 50)
 mixl_w$logLik$message
-#summary(mixl)
+#summary(mixl_w)
 
 # MIXL T&W
 mixl <- gmnl(choice ~ vcost + travel + wait | 1,
@@ -462,9 +471,15 @@ ggplot() +
 
 As seen in the figure, the response to waiting time is heterogeneous in the population. While in general most people dislike waiting, some dislike waiting more than others. The plot also suggests that some people may in fact _enjoy_ their wait time (notice how the distribution includes some positive values for the coefficient). We can calculate what proportion of the population has a positive response to waiting time:
 ```{r}
-1 - pnorm(-coef(mixl_w)['wait'] / coef(mixl_w)['sd.wait'])
+1-pnorm(0,mean=coef(mixl_w)['wait'],sd=coef(mixl_w)['sd.wait'])
 ```
 Accordingly, about 4.1% of the population has a positive parameter for waiting time.
+
+Another to formluate it : 
+
+```{r}
+1 - pnorm(-coef(mixl_w)['wait'] / coef(mixl_w)['sd.wait'])
+```
 
 As discussed above, the willingess to pay for reductions in waiting time was:
 $$
@@ -512,6 +527,8 @@ It can be seen from the figure that whereas the willingness to pay for saving wa
 
 ### Conditional distribution of the random coefficients
 
+This is a distribution conditional of values of disturbances (that were obtained were estimating the model)
+
 ```{r}
 plot(mixl_w, "wait", main = "Conditional distribution for wait (MIXL W)")
 ```
@@ -526,7 +543,7 @@ We will test two different models, with the specifications described below.
 Multinomial logit with individual-level covariates (MNL-Covariates):
 $$
 \begin{array}{lll}
-V_{i,air} &= & + \beta_{vcost}vcost_{air} + \beta_{i,wait}wait_{air} + \beta_{travel}travel_{air}\\
+V_{i,air} &= & + \beta_{vcost}vcost_{air} + \beta_{wait}wait_{air} + \beta_{travel}travel_{air}\\
 V_{i,train} &=\beta_{train} & + \beta_{vcost}vcost_{train} + \beta_{wait}wait_{train} + \beta_{travel}travel_{train} & + \beta_{train:income}income_i + \beta_{train:size}size_i\\
 V_{i,bus} &=\beta_{bus} &+ \beta_{vcost}vcost_{bus}+\beta_{wait}wait_{bus}+\beta_{travel}travel_{bus}& + \beta_{bus:income}income_i + \beta_{bus:size}size_i\\
 V_{i,car} &=\beta_{car} &+ \beta_{vcost}vcost_{car}+\beta_{wait}wait_{car}+\beta_{travel}travel_{car}& + \beta_{car:income}income_i + \beta_{car:size}size_i 
@@ -577,8 +594,10 @@ mnl_exp <- mlogit(choice ~ vcost + travel + travel:income + travel:size + wait +
 
 Summarize results mnl with covariates:
 ```{r}
-mnl_null <- mlogit(choice ~ 1,
-             data = TM)
+# mnl_null <- mlogit(choice ~ 1, data = TM)
+
+mnl_null_lo = -283.83
+
 
 mnl1.summary <- rownames_to_column(data.frame(summary(mnl_cov)$CoefTable), "Variable") %>%
   transmute(Variable, Estimate, pval = `Pr...z..`)
@@ -600,8 +619,8 @@ kable(df_logit_2,
   add_header_above(c(" " = 1, "MNL - Covariates" = 2, "MNL - Expansion" = 2)) %>%
   footnote(general = c(paste0("Log-Likelihood: MNL - Covariates = ", round(mnl_cov$logLik[1], digits = 3),
                             "; MNL - Expansion = ", round(mnl_exp$logLik[1], digits = 3)),
-                       paste0("McFadden Adjusted R^2: MNL - Covariates = ", round(1 - (mnl_cov$logLik[1] - nrow(mnl1.summary)) / mnl_null$logLik[1], digits = 3),
-                              "; NL = ", round(1 - (mnl_exp$logLik[1] - nrow(mnl2.summary)) / mnl_null$logLik[1], digits = 3))))
+                       paste0("McFadden Adjusted R^2: MNL - Covariates = ", round(1 - (mnl_cov$logLik[1] - nrow(mnl1.summary)) / mnl_null_lo, digits = 3),
+                              "; NL = ", round(1 - (mnl_exp$logLik[1] - nrow(mnl2.summary)) / mnl_null_lo, digits = 3))))
 ```
 
 Both models above suggest that there at least some heterogeneity in behavior can be attributed to the two characteristics of the decision-makers investigated (income and party size). In particular, we can see from the expanded coefficients that the disutility of travel time and waiting time is greater at higher levels of income:
@@ -662,7 +681,7 @@ kable(mixl_table_2,
   kable_styling() %>%
   add_header_above(c(" " = 1, "MIXL W-1" = 2, "MIXL W-2" = 2)) %>%
   footnote(general = c(paste0("Log-Likelihood: MIXL W-1 = ", round(mixl_w1$logLik$maximum, digits = 3),
-                            "; MIXL W-2 = ", round(mixl_w1$logLik$maximum, digits = 3)),
+                            "; MIXL W-2 = ", round(mixl_w2$logLik$maximum, digits = 3)),
                        paste0("McFadden Adjusted R^2: MIXL W-1 = ", round(1 - (mixl_w1$logLik$maximum - nrow(mixl_w1.summary)) / mixl0$logLik$maximum, digits = 3),
                               "; MIXL W-2 = ", round(1 - (mixl_w2$logLik$maximum - nrow(mixl_w2.summary)) / mixl0$logLik$maximum, digits = 3))))
 ```
