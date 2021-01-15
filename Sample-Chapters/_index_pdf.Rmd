@@ -1,58 +1,42 @@
---- 
-title: "An Introduction to Discrete Choice Analysis"
-subtitle: "A Course in R"
+---
+title: "Preface"
 author: 
-  - Antonio Paez, School of Earth, Environment, and Society, McMaster University
-  - Geneviève Boisjoly, Département des génies civil, géologique et des mines, Polytechnique de Montréal
-date: "`r Sys.Date()`"
-site: bookdown::bookdown_site
-output: bookdown::gitbook
-documentclass: book
+date:
+output: pdf_document
 bibliography: [book.bib, packages.bib]
-biblio-style: apalike
-link-citations: yes
-github-repo: paezha/Discrete-Choice-Analysis-with-R
-description: "These notes were created by Antonio Paez and Geneviève Boisjoly as a resource for teaching discrete choice analysis in graduate courses at McMaster and Polytechnique de Montréal."
 ---
 
-# Preface {-}
-
 >'Would you tell me, please, which way I ought to go from here?'
->
 >'That depends a good deal on where you want to get to,' said the Cat.
->
 >'I don't much care where -' said Alice.
->
 >'Then it doesn't matter which way you go,' said the Cat.
->
 >'- so long as I get SOMEWHERE,' Alice added as an explanation.
->
 >'Oh, you're sure to do that,' said the Cat, 'if you only walk long enough.'
 >
 > --- Lewis Carroll, Alice in Wonderland
-
-
+  
+  
 >"We are our choices."
 >
 > --- Jean-Paul Sartre
 
 ## Choices, choices, choices {-}
 
-We are what we choose or we choose what we are. The choices we make have important implications for how we interact with the world. We live in a time when resources continue to become increasingly scarce. In this context, the way people make choices is informative about their preferences and where collectively we are going. This includes routine activities, such as deciding how to travel for everyday purposes, for instance walking or cycling, driving, or using transit. Or longer term decision, such as whether to contract more expensive but environmentally less damaging low impact energy sources; buy hybrid, electric, or gasoline vehicles; the frequency with which they travel by plane; to live in a distant suburb where rent is low, or in a central city where space is at a premium; and many others.
+We are what we choose or we choose what we are. The choices we make have important implications for how we interact with the world. We live in a time when resources grow increasingly scarce. In this context, the way people make choices is informative about their preferences and where we, collectively, are going. This includes routine activities, such as deciding how to travel for everyday purposes, for instance walking or cycling, driving, or using transit. But longer term decisions are also of interest, such as whether to contract more expensive but environmentally less damaging low impact energy sources; whether to buy hybrid, electric, or gasoline vehicles; the frequency with which they travel by plane; to live in a distant suburb where rent is low, or in a central city where space is at a premium. These are just some examples of the myriads of choices that we all make individually and collectively in the course of a lifetime.
 
-Understanding decision-making is also important so that the world, or more accurately the social institutions that collectively represent us in our interactions with the world, can better accommodate and possibly even nudge our preferences towards socially desirable outcomes. What tradeoffs are members of the public willing to contemplate when choosing alternative mobility? Is it the range of vehicles? Their price? The time it takes to charge an electric vehicle? The satisfaction of being green? Should governments subdidize purchases of efficient heating? If so, what is the effect of a certain amount in subsidy? Do consumers prefer more range in electric vehicles, and how much are they willing to pay for it? Does the tradoff justify the increase in production cost?
+Understanding decision-making is also important to ensure that the world, or more accurately the social institutions that collectively represent us in our interactions with the world, can better accommodate and possibly even nudge our preferences towards socially desirable outcomes. What trade-offs are members of the public willing to contemplate when choosing alternative mobility? Is it the range of a new electric vehicle? Or its price? The time it takes to charge its battery? The satisfaction of being green? Should governments subsidize purchases of efficient heating systems? If so, what is the effect of a certain amount in subsidy? Do consumers prefer more range in electric vehicles, and how much are they willing to pay for it? Does the trade-off justify the increase in production costs?
 
-These questions are important as governments and businesses try to understand the way the public will respond to taxation, programs, engineering, or production decisions.
+These questions are important for governments and businesses as they try to understand the way the public will respond to taxation, programs, engineering, or production decisions.
 
-In simple terms, discrete choice analysis is a way to understand behavior when there are implicit markets, and in this way it represents a form of hedonic price analysis. 
+In very simple terms, discrete choice analysis is a family of modeling techniques that are useful to understand behavior when there are implicit markets. In this way, discrete choice analysis represents a form of hedonic price analysis. 
 
-What are prices? In very general terms a price is a quantity offered in payment for one unit of a good or service. Early economies were based on bartering, a system of exchange that is limited use in even moderately complex economic systems. For instance, imagine a moderately sophisticated economy where people already have ceased being generalists to become specialists of some sort. Someone who spends time making shoes probably has limited time to tend chickens or understand the law of the land.
+But what are prices? Broadly speaking, a price is a quantity offered in payment for one unit of a good or service. Some people speculate that early economies were based on bartering. This assumes a relatively simple economic system, and yet one where people already have ceased being generalists to become specialists of some sort, and therefore sometimes desire to exchange goods and/or services with each other. Someone who specializes in making bread probably has only limited time to grow wheat, or to mine salt, or to make shoes. The same thing goes for everyone who has specialized, and cannot meet all his needs using only his own labor and resources.
 
-Imagine that you make and sell shoes. People need shoes and may be willing to offer some quantity of something in exchange for them. The person who breeds chicken maybe willing to offer one chicken for a pair of shoes. Is that a fair price? How can you determine whether that exchange is sensible?
+Imagine for instance that you bake bread. Some of your neighbors need bread and may be willing to offer some quantity of something in exchange for it. The person who breeds chicken maybe willing to offer one chicken for three loafs of freshly baked bread. Is that a fair exchange? How can anyone determine whether that exchange is sensible? Well, if both parties agree that one chicken is a satisfactory exchange for three loafs of bread, we can maybe say that the price of one loaf of bread is one third of a chicken.
 
-Imagine now that you need a divorce, and a lawyer's services are required for this. How many shoes should you offer the lawyer for a divorce? And what if the lawyer already has shoes?? Maybe the lawyer would prefer to be paid in chickens...
+Imagine now that you need someone to mend your roof, and the services of yet another member of your community (who has specialized in going up ladders and thatching) are required for this. How many loafs of bread should you offer this person for making sure that you don't have leaks when it rains? And what if the thatcher has allergies and cannot eat bread?? But maybe this person would agree to do the work if he received chickens in exchange...
 
-The situation is further complicated by the reliance of bartering on some kind of trust system: as a seller, in a bartering system, there are no simple ways of ensuring the quality of the exchange! For instance, what if the lawyer is a crook, or the farmer gives you diseased chickens for your top-notch, high-quality shoes? In small systems, where agents can recognize each other, trust is enforced by reputation - if the lawyer is crooked, or the farmer is known to feed lead to the poultry, other actors can avoid transactions with them. If your shoes fall apart in the first rain, people will begin to avoid doing business with you!
+As you can imagine, this simple system is unwieldy. Beside the need to coordinate multiple actors in what potentially is a two-way transaction (baker-to-thatcher becomes baker-to-farmer-to-thatcher), the situation is further complicated by the bartering's reliance on some kind of trust system: as a a person offering a good or a service in a bartering system, there are no simple ways of ensuring the quality of the exchange! For example, what if the thatcher is a crook, or the farmer gives you diseased chickens for your top-notch, high-quality, mouth-watering loafs of bread? In small systems, where agents can recognize each other, trust is enforced by reputation - if the thatcher is crooked, or the farmer is known to feed lead to the poultry, other actors can avoid transactions with them. If leaks begin as soon as it begins to rain, people will begin to avoid doing business with the thatcher!
 
 As these simple examples illustrate, bartering is a complicated way of setting prices, and this becomes increasingly complex (except in very exceptional situations) when an economy produces hundreds, thousands, or even more different products and services.
 
@@ -76,7 +60,10 @@ The basic assumption (which happens to hold in many cases) is that the level of 
 
 The intersection of the supply and demand curves determines simultaneously prices _and_ the quantity of a good/service produced/consumed. Since prices "float", they can adjust to changes in supply and/or demand. In Figure 1, for example, when demand for a good or service (say divorces) increases, there is an incentive for lawyers to work more hours. Since there is a limited number of hours that lawyers can work (there is scarcity), this is reflected in a higher price, since those who can afford it will be willing to pay more for a scarce but desirable service.
 
-![Fig 1. Supply and Demand Relationship](Supply-Demand.png)
+```{r supply-demand-figure, echo=FALSE, fig.align='center', fig.cap="\\label{fig:supply-demand-figure} Supply and demand relationships", out.width = "50%"}
+#R render map for output
+knitr::include_graphics('Supply-Demand.png')
+```
 
 A third system is a mixed economy, where prices are left to float but within limits or with other corrective mechanisms, such as subsidies or taxes.
 
@@ -102,24 +89,26 @@ Each author organizes topics in a way that is logical to them. Some texts begin 
 
 For presentation I have in the past relied heavily on Train's book to organize my graduate seminar. I find this style of presentation sufficiently intuitive, when combined with some relevant topics introduced at key points. For example, I find that it makes sense to have a discussion of specification and estimation of models after introducing the logit model. In this way, the details of specifying utility functions can be presented in the context of an operational model. Readers will notice that this notes tend to follow Train closely, using a thematic approach, moving from the fundamentals, introducing the logit model, and then by families of models, i.e., GEV, probit, and so on.
 
-Beginning early in the text, readers are asked to get their hands dirty with code. This is a very deliberate decision. Most books on discrete choice analysis are software-independent, meaning that they cover the topics without making reference to a particular statistical package for analysis. Others rely for presentation on a specific software. For instance, Hensher et al. [-@hensher2005applied] refer extensively to the software `NLOGIT`, a software package sold by [Econometric Software, Inc.](http://www.limdep.com/). Yet other packages were originally developed independently of a statistical computing project. One example is Michel Bierlaire's [BIOGEME](http://biogeme.epfl.ch/). Not being associated with a statistical computing project means that synergies with other packages cannot be realized. Newer versions of BIOGEME now exist written almost exclusively in Python and that allow the package to benefit from the Python Data Analysis Library [Pandas](https://pandas.pydata.org/).
+Beginning early in the text, readers are asked to get their hands dirty with code. This is a very deliberate decision. Most books on discrete choice analysis are software-independent, meaning that they cover the topics without making reference to a particular statistical package for analysis. Others rely for presentation on a specific software. For instance, Hensher et al. [-@hensher2005applied] refer extensively to the software `NLOGIT`, a software package sold by [Econometric Software, Inc.](http://www.limdep.com/). Yet other packages were originally developed independently of a statistical computing project. One example is Michel Bierlaire's [BIOGEME](http://biogeme.epfl.ch/). Not being associated with a statistical computing project means that synergies with other packages cannot be realized. Newer versions of BIOGEME now exist written almost exclusively in Python which allow the package to benefit from the Python Data Analysis Library [Pandas](https://pandas.pydata.org/).
 
 For this text, I have chosen `R`. `R` is a generalist statistical language with a very broad user base. I personally find `R` more accessible than Python, for example, as an introduction to statistical and data analysis computing, particularly with the support of a good Interactive Development Environment such as [RStudio](https://www.rstudio.com/). 
 
-Packages (the fundamental units of shareable code in `R`) benefit from the synergyes of many developers and users sharing their code in a transparent and open way. Ten years ago it would have been very difficult to write a book on discrete choice modelling based on `R`: the earliest version of Croissant's `mlogit` package [@Croissant2019mlogit] dates from 2009; the earliest version of Sarrias and Daziano's `gmnl` package [@Sarrias2017multinomial] dates from 2015. Secondly, `R` and related packages are free. It is my conviction that research can be accelerated by the generous contributions of developers who graciously share their code with the world. By doing this, they help to maintain the cost of research low, and thus enable more people around the world to engage in it. That said, there is a potential disadvantage: unlike more established (especially commercial) packages that have been kicking around for years if not decades, newer `R` packages may still have some limitations. To mention one, the current versions of the packages `mlogit` and `gmnl` are implemented exclusively for universal choice set, in other words, under the assumption that all alternatives are available to all decision-makers. There are situations, For example, suppose 
+Packages (the fundamental units of shareable code in `R`) benefit from the synergies of many developers and users sharing their code in a transparent and open way. Ten years ago it would have been very difficult to write a book on discrete choice modelling based on `R`: the earliest version of Croissant's `mlogit` package [@Croissant2019mlogit] dates from 2009; the earliest version of Sarrias and Daziano's `gmnl` package [@Sarrias2017multinomial] dates from 2015. Secondly, `R` and related packages are free. It is my conviction that research can be accelerated by the generous contributions of developers who graciously share their code with the world. By doing this, they help to maintain the cost of research low, and thus enable more people around the world to engage in it. That said, there is a potential disadvantage: unlike more established (especially commercial) packages that have been kicking around for years if not decades, newer `R` packages may still have some limitations. To mention one, the current versions of the packages `mlogit` and `gmnl` are implemented exclusively for universal choice set, in other words, under the assumption that all alternatives are available to all decision-makers. There are situations, For example, suppose 
 
-My plan for this text, therefore, is to cover a topic in each section that builds on previous material. I have used the materials presented in these notes (in different incarnations) for teaching discrete choice analysis in different settings. Primarily, these notes have been used in the course **GEOG 738** _Discrete Choice Analysis_ at McMaster University. This course is a full (Canadian) graduate term, which typically means 11 or 12 weeks of classes. The course is organized as a 2-hour seminar that is offered once per week. Accordingly, each section is designed to cover very approximately the material that I am used to cover in a 2 hour seminar.
+Our plan for this text, therefore, is to cover a topic in each section that builds on previous material. I have used the materials presented in these notes (in different incarnations) for teaching discrete choice analysis in different settings. Primarily, these notes have been used in the course **GEOG 738** _Discrete Choice Analysis_ at McMaster University. This course is a full (Canadian) graduate term, which typically means 11 or 12 weeks of classes. The course is organized as a 2-hour seminar that is offered once per week. Accordingly, each section is designed to cover very approximately the material that I am used to cover in a 2 hour seminar.
 
-As I continue to work on these notes, I hope to be able to add optional (or bonus) chapters, that could be used 1) to extend a course on discrete choice analysis beyond the 12 week horizon of the Canadian graduate school term, and/or 2) to offer more advanced material to interested readers.
+As we continue to work on these notes, we hope to be able to add optional (or bonus) chapters, that could be used 1) to extend a course on discrete choice analysis beyond the 12 week horizon of the Canadian graduate school term, and/or 2) to offer more advanced material to interested readers.
 
 ## Audience {-}
 
 The notes were designed for a graduate course, but are not necessarily limited to graduate students, and could indeed be a valuable resource to senior undergraduate students, instructors teaching discrete choice analysis, practitioners, experienced discrete choice modelers who wish to transition to the `R` ecosystem, and applied researchers. Discrete choice analysis has applications in economics, planning, transportation engineering, and public health, among many other fields, and this book should be of interest to people conducting empirical research and policy analysis in these fields. The prerequisites for using this book are an introductory college/university level course on multivariate statistics, ideally covering the fundamentals of probability theory and hypothesis testing. Working knowledge of multivariate linear regression analysis is a bonus but not strictly required. 
 
-We do not assume previous knowledge of `R`, and instead take what we hope is a gentle approach to introducing it in an intuitive way. For this reason, 
+We do not assume previous knowledge of `R`, and instead take what we hope is a gentle approach to introducing it in an intuitive way. The philosophy of the book is to start doing data analysis early and use many practical examples to explain the key concepts of DCA. The availability of open software, in our case `R`, means that the book can take a more practical to teach and learn than some of the older classics that predate many software packages (e.g., Ben Akiva and Lerman’s classic Discrete Choice Analysis: Theory and Application to Travel Demand). By embedding the topic of DCA into the larger `R` ecosystem, the skills developed by readers can be easily transferred and augmented with advanced data management, processing, and visualization techniques, in addition to having access to a multitude of dataset for practice purposes. The book begins with basic data analysis skills (with an emphasis on how to conduct meaningful and easy-to-communicate descriptive analysis) and continues to discrete choice statistical modeling (from simple binomial logit model to more complex mixture models). It also includes a wealth of material on the interpretation and presentation of results, including through predicted probabilities and scenario analysis.  
 
 ## Requisites {-}
 
-This book is not a course to learn `R`. The language is introduced progressively, and assumes that readers are computer-literate and have possible done some basic coding in the past. For readers who wish to learn `R` there are other sources such as Wickham and Grolemund [-@wickham2016r](https://r4ds.had.co.nz/) or Albert and Rizzo [@Albert2012r].
+This book is not a course to learn `R`. The language is introduced progressively, and assumes that readers are computer-literate and have possible done some basic coding in the past. For readers who wish to learn basic and advanced `R`, there are other other valuable resources such as Wickham and Grolemund [-@wickham2016r](https://r4ds.had.co.nz/) or Albert and Rizzo [@Albert2012r].
 
-To fully benefit from this text, up-to-date copies of [R](https://cran.r-project.org/) and [RStudio](https://www.rstudio.com/) are highly recommended. There are different packages that implement discrete choice methods in `R`. I will particularly rely on the packages [`mlogit`](https://CRAN.R-project.org/package=mlogit) and [`gmnl`](https://CRAN.R-project.org/package=gmnl).
+To fully benefit from this text, up-to-date copies of [R](https://cran.r-project.org/) and [RStudio](https://www.rstudio.com/) are highly recommended. There are different packages that implement discrete choice methods in `R`. We will particularly rely on the packages [`mlogit`](https://CRAN.R-project.org/package=mlogit) and [`gmnl`](https://CRAN.R-project.org/package=gmnl). Skills developed by the use of this book serve as a launching pad to later jump to more sophisticated, if more demanding, packages such as Hess and Palma’s [Apollo](http://www.apollochoicemodelling.com/manual.html).
+
+## References {-}
