@@ -12,11 +12,11 @@ bibliography: [book.bib, packages.bib]
 
 ## Why modelling choices?
 
-In Chapter \@ref(chapter-1) we discussed in a general fashion the use of models. There, we argued that modelling is an activity that helps us to isolate in a systematic way certain aspects of a process or thing, by way of abstraction and generalization. There are many kinds of models: analog (like sculptures, maquettes, scale models), conceptual (like mental maps), and mathematical/statistical models.
+In Chapter \@ref(chapter-1) we discussed in a general fashion the use of models. There, we argued that modeling is an activity that helps us to isolate in a systematic way certain aspects of a process or thing, by way of abstraction and generalization. There are many kinds of models: analog (like sculptures, maquettes, scale models), conceptual (like mental maps), and mathematical/statistical models.
 
-The raw materials of mathematical/statistical models are observations about the process or thing of interest, usually measurements that provide _data_. The tools are the statistical and mathematical techniques used to convert data into _information_. And the technical expertise is the knowledge and ability of the modeller to use the appropriate tools to the data, in order to extract as much information as possible, given the characteristics of the data and the process or thing.
+The raw materials of mathematical/statistical models are observations about the process or thing of interest, usually measurements that provide _data_. The tools are the statistical and mathematical techniques used to convert data into _information_. And the technical expertise is the knowledge and ability of the modeler to use the appropriate tools to the data, in order to extract as much information as possible, given the characteristics of the data and the process or thing.
 
-Modelling choices is simply a specialized field in the much broader field of mathematical and statistical modelling. The task of modelling choices is in many way similar to modelling limited-dependent and qualitative variables in statistics [@Maddala1983limited], however it is distinguished from models in that field by strong behavioral foundations. Indeed, where statistical models deal with probabilities of an item of interest being in a certain state, choice modelling deals with the probability of an agent _choosing_ an alternative. This is a subtle but important difference that we will highlight in due course. For the time being, it is sufficient to say that to model choices we need a conceptual model first on which to build the rest of the apparatus required for applied choice modelling. 
+Modeling choices is simply a specialized field in the much broader field of mathematical and statistical modeling. The task of modeling choices is in many way similar to modeling limited-dependent and qualitative variables in statistics [@Maddala1983limited], however it is distinguished from models in that field by strong behavioral foundations. Indeed, where statistical models deal with probabilities of an item of interest being in a certain state, choice modeling deals with the probability of an agent _choosing_ an alternative. This is a subtle but important difference that we will highlight in due course. For the time being, it is sufficient to say that to model choices we need a conceptual model first on which to build the rest of the apparatus required for applied choice modeling. 
 
 Before delving into the technical details, we can pause for a philosophical moment to think about human behavior and decision-making. There are different perspectives on human behavior.
 
@@ -38,7 +38,7 @@ With respect to physical processes, the [uncertainty principle](https://en.wikip
 
 This assumption has been challenged by studies that suggest some important physical constants can change with the age of the universe [@webb2001further]. In terms of human behavior, the assumption is even more problematic, if for no other reason that humans can in general act, if they so wish, in a contrarian way simply to demonstrate that there are no immutable social rules. This is only one of many reasons why behavioral detection [for instance, in airports; @Kirschenbaum2013cost] is problematic: if one knows the rules used for profiling, acting otherwise renders profiling ineffective.
 
-Does this mean that the state of the universe is not determined by the past? Not at all. For all we know, from the perspective of a hypothetical all-knowing being, it is. However, in practical terms, and for the reasons described briefly above, we humble non-all-knowing beigns, cannot rely on determinism for making statements about the state of the universe. In particular, we will make a distinction that is useful as part of developing a conceptual model of choice-making: 1) that there is an observer who typically lacks all relevant information about a choice process (let alone about the state of the universe); and 2) that the rules of decision making are not completely known and/or humans can, for idiosyncratic reasons, alter them at whim.
+Does this mean that the state of the universe is not determined by the past? Not at all. For all we know, from the perspective of a hypothetical all-knowing being, it is. However, in practical terms, and for the reasons described briefly above, we humble non-all-knowing beings, cannot rely on determinism for making statements about the state of the universe. In particular, we will make a distinction that is useful as part of developing a conceptual model of choice-making: 1) that there is an observer who typically lacks all relevant information about a choice process (let alone about the state of the universe); and 2) that the rules of decision making are not completely known and/or humans can, for idiosyncratic reasons, alter them at whim.
 
 ## How to use this note
 
@@ -63,7 +63,7 @@ In this practice, you will learn about:
 - Ben-Akiva, M. Lerman, [-@Benakiva1985discrete] Discrete Choice Analysis: Theory and Applications to Travel Demand, **Chapter 3**, MIT Press.
 - Hensher, D.A., Rose, J.M., Greene, W.H [-@hensher2005applied] Applied Choice Analysis: A Primer, **Chapter 3**, Cambridge University Press.
 - Louviere, J.J., Hensher, D.A., Swait, J.D. [-@Louviere2000stated] Stated Choice Methods: Analysis and Application, **Chapter 1**, Cambridge University Press.
-- Ortuzar JD, Willumsen LG [-@Ortuzar2011modelling] Modelling Transport, Fourth Edition, **Chapter 7**, John Wiley and Sons.
+- Ortuzar JD, Willumsen LG [-@Ortuzar2011modelling] Modeling Transport, Fourth Edition, **Chapter 7**, John Wiley and Sons.
 
 ## Preliminaries
 
@@ -76,7 +76,7 @@ library(evd)
 
 ## Choices mecanisms: Utility maximization
 
-A choice is a result of a decision-making process that can be described as follows: first, the decision-maker defines the problem for which a decision is required; second, the decision-maker identifies the existing alternatives and evaluates each alternative based on a set of attributes; finally, the decision-maker makes a choice based on a decision-rule (also referred to as choice mecanism).
+A choice is a result of a decision-making process that can be described as follows: first, the decision-maker defines the problem for which a decision is required; second, the decision-maker identifies the existing alternatives and evaluates each alternative based on a set of attributes; finally, the decision-maker makes a choice based on a decision-rule (also referred to as choice mechanism).
 
 Let's take  the example of a university student as the decision-maker. The choice problem could be to decide which mode to use to travel to university. The existing alternatives would be defined based on the modes available to the decision-maker, either as a result of transport network (e.g.: public transport supply) or personal characteristics (e.g.: car or bicycle ownership). Let's assume here that the student has the possibility to either walk or use public transport to university. The student will then characterize each alternative based on a set of attributes that are important to him (e.g.:travel time and travel cost). Suppose that the two trips have the following characteristics:
 
@@ -85,7 +85,7 @@ Let's take  the example of a university student as the decision-maker. The choic
 
 Using this information, the student will finally make a choice based on a decision-rule. The decision rule could be to take the cheapest mode, the fastest mode or a trade-off between the cost and the travel time (e.g.: the student is willing to pay $1 for each reduction of 5 minutes in travel time). 
 
-The decision-rule refers to the internal mechanism or thought process made by the decision-maker to select a unique alternative, using the information that is available to him. This mechanism is central to the the conceptualization of choice modelling. While every individual may have a different mechanism, the literature has proposed a series of decision rules that can be used to model choices.
+The decision-rule refers to the internal mechanism or thought process made by the decision-maker to select a unique alternative, using the information that is available to him. This mechanism is central to the the conceptualization of choice modeling. While every individual may have a different mechanism, the literature has proposed a series of decision rules that can be used to model choices.
 
 In this section, we will begin here by defining a conceptual model of choice where the decision rule is based on neo-classical economics, fundamentally consumer choice. The conceptual framework in neo-classical economics is based on the concept of _utility_.
 
@@ -160,7 +160,7 @@ $$
 P_{\text{Do-Nothing}} = P(V_{\text{Do-Nothing}} - V_{\text{New-Phone}} > \epsilon_{\text{New-Phone}} - \epsilon_{\text{Do-Nothing}})
 $$
 
-The expression above is the foundation of random utility modelling. Before we make more progress, however, we have to answer an important question.
+The expression above is the foundation of random utility modeling. Before we make more progress, however, we have to answer an important question.
 
 ## What about those random terms?
 
@@ -326,7 +326,7 @@ ggplot(data = df, aes(x, y)) +
   ylab("f(x)") # Label the y axis
 ```
 
-Clearly, $f(x) \ge 0$ for all values of $x$ in the interval $0 \le x \le 1$. We can verify that the area under the curve is 1. In this case the area is that of a triangle, i.e., $\frac{b \times h}{2}$. Since the base of the triange is $b=1$ and the height is $h=2$, we see that the area under the curve is 1.
+Clearly, $f(x) \ge 0$ for all values of $x$ in the interval $0 \le x \le 1$. We can verify that the area under the curve is 1. In this case the area is that of a triangle, i.e., $\frac{b \times h}{2}$. Since the base of the triangle is $b=1$ and the height is $h=2$, we see that the area under the curve is 1.
 
 Since this is a valid probability distribution function, we can use it to calculate the probability of $x \le X$ as above. The area under the curve when $x \le X$ is given by:
 $$
@@ -359,7 +359,7 @@ ggplot(data = df, aes(x, y)) +
   ylab("F(x)") # Label the y axis
 ```
 
-It should be clear from the examples above that calculating probabilities is nothing more than finding the area under the curve of a function. When the function is relatively simple, as the uniform or the linear distributions that we used for the examples, calculating the areas is also straightforward, since the functions describe simple geometric shapes. When the function is more involved, that becomes less straighforward. For example, consider the following function:
+It should be clear from the examples above that calculating probabilities is nothing more than finding the area under the curve of a function. When the function is relatively simple, as the uniform or the linear distributions that we used for the examples, calculating the areas is also straightforward, since the functions describe simple geometric shapes. When the function is more involved, that becomes less straightforward. For example, consider the following function:
 $$
 f(x) = \left\{
         \begin{array}{lc}

@@ -28,11 +28,11 @@ Model building requires three things:
 
 This is true whether the model is physical (for instance a sculpture), conceptual (a mental map), or statistical/mathematical (the gravity model or a regression model). 
 
-In the case of a sculpture, the raw materials can be marble, wood, or clay; the tools chisels, mallet, and spatula; and the technique the mastery of the sculptor when working with the tools and the materials. Anyone can try sculpture, and most people can create sculptures. These kind of models are evaluated by their aesthetic value, not necessarily their usefulness. But if the scultpure is poorly balanced and falls and breaks, then its value is limited by its structural integrity - the skill of the sculptor matters even if only in this sense.
+In the case of a sculpture, the raw materials can be marble, wood, or clay; the tools chisels, mallet, and spatula; and the technique the mastery of the sculptor when working with the tools and the materials. Anyone can try sculpture, and most people can create sculptures. These kind of models are evaluated by their aesthetic value, not necessarily their usefulness. But if the sculpture is poorly balanced and falls and breaks, then its value is limited by its structural integrity - the skill of the sculptor matters even if only in this sense.
 
 In the case of a mental map, the raw materials are ideas, the tools are a drawing surface and tools for writing, or maybe an app, and the technical expertise is the ability of the modeler to organize ideas in a useful way. There are useful conceptual models, and conceptual models that are less useful. Figure \@ref(fig:fig-conceptual-models) shows two example of conceptual models.
 
-In the case of mathematical/statistical models, the raw materials are data; the tools are descriptive statistics and statistical plots, and various forms of regression analysis; and the technical expertise is the ability of the modeler to select tools that are appropriate to the data, and to convince the data to "speak": in other words, to extract information from the data. As Moran said in the aphorism quoted at the top of this section, you can have data without information, but no information without data. Technical mastery is the degree to which a modeller can obtain information from data that is useful, accurate, and precise, to the extent that the raw materials permit.
+In the case of mathematical/statistical models, the raw materials are data; the tools are descriptive statistics and statistical plots, and various forms of regression analysis; and the technical expertise is the ability of the modeler to select tools that are appropriate to the data, and to convince the data to "speak": in other words, to extract information from the data. As Moran said in the aphorism quoted at the top of this section, you can have data without information, but no information without data. Technical mastery is the degree to which a modeler can obtain information from data that is useful, accurate, and precise, to the extent that the raw materials permit.
 
 Before moving on to the technical skills required for modeling, it is important to understand the raw materials and the tools. The objective of this note is to introduce some important concepts concerning data and data manipulation, and some useful tools.
 
@@ -75,7 +75,7 @@ In this practice, you will learn about:
 
 ## Ways of measuring stuff
 
-Previously we said that data are the raw material for modeling, but we did not say precisely what we meant by 'data'. You probably already have a working understanding of what 'data' means, but nonetheless lets begin with a definition. According to Mirriam-Webster, [data](https://www.merriam-webster.com/dictionary/data) are:
+Previously we said that data are the raw material for modeling, but we did not say precisely what we meant by 'data'. You probably already have a working understanding of what 'data' means, but nonetheless lets begin with a definition. According to Merriam-Webster, [data](https://www.merriam-webster.com/dictionary/data) are:
 
 >factual information (such as measurements or statistics) used as a basis for reasoning, discussion, or calculation
 
@@ -86,7 +86,7 @@ Measurement theory is a branch of mathematics concerned with observing and recor
 One fundamental contribution of the scientific method has been to produce standardized ways of measuring things. How would you measure the following things?
 
 - The temperature at which water freezes.
-- The tempreature at which nitrogen freezes.
+- The temperature at which nitrogen freezes.
 - The length of a trip.
 - Blood donations.
 - Different brands of peanut butter.
@@ -114,11 +114,11 @@ Sometimes, different measurement scales might represent different behavioral mec
 Quantitative measurements assign a number to an attribute, and the number quantifies the presence, strength, or intensity of the attribute. Within this class of variables, there are also two ways of measuring things.
 
 - Interval scale. A quantity can be assigned to an attribute, the values follow an order, and their differences can be computed and remain constant. Temperature is typically measured in interval scale. The difference between $10\,^{\circ}\mathrm{C}$ and $11\,^{\circ}\mathrm{C}$ is the same as the difference between $25\,^{\circ}\mathrm{C}$
-and $26\,^{\circ}\mathrm{C}$. The intervals are meaningful. However, $0\,^{\circ}\mathrm{C}$ does not imply the absence of temperature! Which is why measurements in Celsius and Farenheit do not coincide at zero. The lack of a natural zero for these scales means that the _ratios_ between two values are not meaningful: $4\,^{\circ}\mathrm{C}$
+and $26\,^{\circ}\mathrm{C}$. The intervals are meaningful. However, $0\,^{\circ}\mathrm{C}$ does not imply the absence of temperature! Which is why measurements in Celsius and Fahrenheit do not coincide at zero. The lack of a natural zero for these scales means that the _ratios_ between two values are not meaningful: $4\,^{\circ}\mathrm{C}$
 is not twice as hot as $2\,^{\circ}\mathrm{C}$, and $-12\,^{\circ}\mathrm{C}$
 is not four times as cold as $-3\,^{\circ}\mathrm{C}$.
 
-- Ratio scale. When there is an absolute value of zero to the thing being measured (to indicate absence!), attributes can be measured in a ratio scale. This combines the features of the previous scales of measurement: a number is esentially a label that follows a logical order and with differences that are meaningful. In addition to that, the ratios of variables are meaningful. For example, twenty dollars are twice as valuable as ten, and zero is the absence of value. Weight is a way of measuring mass, and zero is the absence of mass. Two hundred kilograms is twice as much mass as one hundred kilograms.
+- Ratio scale. When there is an absolute value of zero to the thing being measured (to indicate absence!), attributes can be measured in a ratio scale. This combines the features of the previous scales of measurement: a number is essentially a label that follows a logical order and with differences that are meaningful. In addition to that, the ratios of variables are meaningful. For example, twenty dollars are twice as valuable as ten, and zero is the absence of value. Weight is a way of measuring mass, and zero is the absence of mass. Two hundred kilograms is twice as much mass as one hundred kilograms.
 
 It is important to understand the different scales of measurement to be able to choose the appropriate tools for each. More on this below. But first, lets bring some actual data to play with.
 
@@ -148,7 +148,7 @@ library(readr)
 library(mlogit)
 ```
 
-Ocassionally there are messages displayed when loading a package. These messages are informative (they ask you to cite them in a certain style) or may give you warnings, for instance that identically named functions exist in several packages.  
+Occasionally there are messages displayed when loading a package. These messages are informative (they ask you to cite them in a certain style) or may give you warnings, for instance that identically named functions exist in several packages.  
 
 The function that we need to read the sample dataset is `read_csv()`, which is part of the `tidyverse` package. Note that you can name the value (or output) of a function by using `<-`. In this case, we wish to read an external file, and assign the results to an object called `mc_mode_choice`:
 ```{r}
@@ -204,7 +204,7 @@ Now the summary is appropriate categorical variable, and is a table of frequenci
 mc_mode_choice$choice[1] - mc_mode_choice$choice[4]
 ```
 
-The message indicates that the operation we tried to perform is not meaningful for factors. As long as R knows the appropirate measurement scale for your variables, it will try to steer you away from doing silly things with them.
+The message indicates that the operation we tried to perform is not meaningful for factors. As long as R knows the appropriate measurement scale for your variables, it will try to steer you away from doing silly things with them.
 
 Other variables included in this table are for time. These variables measure the duration in minutes (actual or imputed) for trips by different modes. For example, `timecycle` is the duration of a trip by bicycle for the journey reported by the respondent.
 
@@ -221,7 +221,7 @@ class(mc_mode_choice$choice)
 class(mc_mode_choice$timecycle)
 ```
 
-The Rstudio also allows you to quickly see the variables and their format in the environment panel.
+The RStudio also allows you to quickly see the variables and their format in the environment panel.
 
 ## More on indexing and data manipulation
 
@@ -326,7 +326,7 @@ We layer elements on a plot by using the `+` sign. It is only when we tell the p
 p + geom_area(aes(x = timecycle), stat = "bin", binwidth = 5)
 ```
 
-To improve the appearence of the plot, we also asked that the geom be rendered using a named color (blue for the color of the line, and also blue for the fill), and that it be transparent (the argument `alpha` controls opacity; a value of zero is transparent, a value of 1 is solid):
+To improve the appearance of the plot, we also asked that the geom be rendered using a named color (blue for the color of the line, and also blue for the fill), and that it be transparent (the argument `alpha` controls opacity; a value of zero is transparent, a value of 1 is solid):
 ```{r}
 p + geom_area(aes(x = timecycle), stat = "bin", binwidth = 5, fill = "blue", color = "blue", alpha = 0.6)
 ```
