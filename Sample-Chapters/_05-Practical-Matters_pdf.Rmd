@@ -234,23 +234,28 @@ Understanding the anatomy of utility functions is essential to properly specify 
 ## Example: Specifying the utility functions
 
 We will now proceed to work with a practical example, using the dataset that you encountered before in Chapter \@ref(chapter-1). This dataset contains information on various modes of transportation used by people commuting to McMaster University in Canada [@Whalen2013]. The dataset was loaded above as part of the preliminaries of this chapter. We can begin by exploring the data. Please note that this is the same dataset that you used in Chapter \@ref(chapter-1), but not the same file. For convenience, the dataset was pre-processed. The contents of the dataframe can be quickly seen by means of the function `head()`. This function will display the first few top rows of the dataframe:
-```{r}
+```{r eval=FALSE}
 head(mc_commute, 8)
 ```
 
-As you can see, the dataframe is in wide format, meaning that each row represents one decision-maker and the information about the choice situations is spread: for instance, there is one variable for travel time, but it appears in four columns, one for each of the alternatives ("Cycle", "Walk", "HSR", and "Car"). The package `mlogit` works with _long_ tables, where each row is a choice situation. Since wide tables are more common, the package includes a utility function to reshape the table. This is used below to convert our wide table into a long table. Notice that we need to indicate which variables are _varying_, meaning that they vary by alternative. In our wide table, there are four variables that vary by alternative: travel time (`time`), access time (`access`: the time needed to reach an HSR bus stop), waiting time (`wait`: time spent waiting for an HSR bus), and number of transfers when using HSR (`transfer`). The latter three variables are specific to HSR and therefore are set to zero for the modes "Car", Cycle", and "Walk".
+This dataframe is in wide format, meaning that each row represents one decision-maker and the information about the choice situations is spread: for instance, there is one variable for travel time, but it appears in four columns, one for each of the alternatives ("Cycle", "Walk", "HSR", and "Car"). The package `mlogit` works with _long_ tables, where each row is a choice situation. Since wide tables are more common, the package includes a utility function to reshape the table. This is used below to convert our wide table into a long table. Notice that we need to indicate which variables are _varying_, meaning that they vary by alternative. In our wide table, there are four variables that vary by alternative: travel time (`time`), access time (`access`: the time needed to reach an HSR bus stop), waiting time (`wait`: time spent waiting for an HSR bus), and number of transfers when using HSR (`transfer`). The latter three variables are specific to HSR and therefore are set to zero for the modes "Car", Cycle", and "Walk".
 ```{r}
-mc_commute_long <- mlogit.data(mc_commute, shape = "wide", choice = "choice", varying = 7:22)
+mc_commute_long <- mlogit.data(mc_commute, 
+                               shape = "wide", 
+                               choice = "choice", 
+                               varying = 7:22)
 ```
 
 If we examine the long table, we see that instead of each row being an individual, each row is a choice situation:
-```{r}
-head(mc_commute_long, 8)
+```{r eval=FALSE}
+head(mc_commute_long,
+     8)
 ```
 
 Since there are four alternatives in this case, each row corresponds to the choice situation for an alternative for an individual. We notice that the row names now have the format `#.Alt`, where `#` is the number of the decision-maker and `Alt` is the name of the alternative. In this way the first four rows of the table correspond to the first decision-maker who, faced with four alternatives, chose HSR (public transportation) - as recorded in the column `choice`. The next four rows correspond to the second decision-maker in the sample (who also chose HSR), and so on, four rows per decision-maker. More generally, there will be $J$ rows per decision-maker. When an attribute is missing, this means that the alternative was not available to the decision-maker. For example:
 ```{r}
-head(mc_commute_long[,c(1, 59:60)], 8)
+head(mc_commute_long[,c(1, 59:60)],
+     8)
 ```
 
 Here we see that the modes "Car" and "Cycle" were not available to decision-maker 1 (id: 566872636), and "Cycle" was not available to decision-maker 2 (id: 566873140).
@@ -268,7 +273,7 @@ $$
 $$
 
 If we list all columns in the dataframe, we can see what variables are available for this analysis:
-```{r}
+```{r eval=FALSE}
 colnames(mc_commute_long)
 ```
 
@@ -416,9 +421,11 @@ To estimate the coefficients of a model we need to define a criterion that we wi
 A common criterion used to estimate discrete choice models is the _likelihood_. So what is this likelihood? Previously we encountered probability distribution functions. These functions were defined by parameters (such as the location parameter and the dispersion parameter). Given the parameters, it is possible to calculate the probability of values for a variable $x$. A likelihood function is a similar concept, except that whereas in the probability functions the parameters were given, in a likelihood function the data are given and the parameters need to be obtained from the function.
 
 The relevant likelihood function for the multinomial logit model is as follows:
+
 $$
 L = \prod_{i=n}^N\prod_{j=1}^J P_{ij}^{y_{ij}}
 $$
+
 where $P_{ij}$ is the probability of decision-maker $i$ selecting alternative $j$ and $y_{ij}$ is an indicator variable that takes the value of $1$ if individual $i$ chose alternative $j$ and $0$ otherwise. The effect of the indicator variable is to turn the probabilities on and off, since $P^0 = 1$ and $P^1 = P$. Notice that the likelihood function is bounded between 0 and 1, but in the case of the logit model it is never exactly zero nor one, since the logit probabilities never take any of those exact values.
 
 We can explore the behavior of the likelihood function by means of a simple example. Consider a binomial logit model, that is, a model with only two alternatives in the choice set. The likelihood function of this model is as follows:
@@ -570,7 +577,7 @@ If you are working with the R Notebook, at this point you can try changing the c
 
 The likelihood function can be plotted as shown below. If you hover over the plot, you can see how the value of the likelihood changes as a function of $\mu$ and $\beta$:
 
-```{r fig-likelihood-function, echo=FALSE, fig.cap= "\\label{fig:fig-likelihood-function}Likelihood function for toy dataset"}
+```{r fig-likelihood-function, eval = FALSE, fig.cap= "\\label{fig:fig-likelihood-function}Likelihood function for toy dataset"}
 # Create a grid to plot the likelihood function
 mu = seq(from = -1, to = 1, by = 0.05)
 beta = seq(from = -2, to = 0, by = 0.05)
@@ -585,18 +592,30 @@ lkh <- function(mu = 0, beta = 0){
                          xiA = c(5, 2, 5, 1, 4, 3),
                          xiB = c(4, 5, 2, 6, 1, 4))
   
-  P1A <- (exp(beta * ts$xiA[1])/(exp(beta * ts$xiA[1]) + exp(mu + beta * ts$xiB[1])))
-  P1B <- (exp(mu + beta * ts$xiB[1])/(exp(beta * ts$xiA[1]) + exp(mu + beta * ts$xiB[1])))
-  P2A <- (exp(beta * ts$xiA[2])/(exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
-  P2B <- (exp(mu + beta * ts$xiB[2])/(exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
-  P3A <- (exp(beta * ts$xiA[3])/(exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
-  P3B <- (exp(mu + beta * ts$xiB[3])/(exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
-  P4A <- (exp(beta * ts$xiA[4])/(exp(beta * ts$xiA[4]) + exp(mu + beta * ts$xiB[4])))
-  P4B <- (exp(mu + beta * ts$xiB[4])/(exp(beta * ts$xiA[4]) + exp(mu + beta * ts$xiB[4])))
-  P5A <- (exp(beta * ts$xiA[5])/(exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
-  P5B <- (exp(mu + beta * ts$xiB[5])/(exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
-  P6A <- (exp(beta * ts$xiA[6])/(exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
-  P6B <- (exp(mu + beta * ts$xiB[6])/(exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
+  P1A <- (exp(beta * ts$xiA[1])/
+            (exp(beta * ts$xiA[1]) + exp(mu + beta * ts$xiB[1])))
+  P1B <- (exp(mu + beta * ts$xiB[1])/
+            (exp(beta * ts$xiA[1]) + exp(mu + beta * ts$xiB[1])))
+  P2A <- (exp(beta * ts$xiA[2])/
+            (exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
+  P2B <- (exp(mu + beta * ts$xiB[2])/
+            (exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
+  P3A <- (exp(beta * ts$xiA[3])/
+            (exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
+  P3B <- (exp(mu + beta * ts$xiB[3])/
+            (exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
+  P4A <- (exp(beta * ts$xiA[4])/
+            (exp(beta * ts$xiA[4]) + exp(mu + beta * ts$xiB[4])))
+  P4B <- (exp(mu + beta * ts$xiB[4])/
+            (exp(beta * ts$xiA[4]) + exp(mu + beta * ts$xiB[4])))
+  P5A <- (exp(beta * ts$xiA[5])/
+            (exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
+  P5B <- (exp(mu + beta * ts$xiB[5])/
+            (exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
+  P6A <- (exp(beta * ts$xiA[6])/
+            (exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
+  P6B <- (exp(mu + beta * ts$xiB[6])/
+            (exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
   
   P1A^ts$yiA[1] * P1B^ts$yiB[1] * 
   P2A^ts$yiA[2] * P2B^ts$yiB[2] * 
@@ -623,9 +642,11 @@ plot_ly(z = ~L, x = ~mu, y = ~beta) %>%
 
 ```
 
+```{r fig-log-likelihood-function, out.width= "15 cm", fig.align = "center", fig.cap= "\\label{fig:fig-log-likelihood-function}Example of a log-likelihood function", echo=FALSE}
+knitr::include_graphics(rep("05-LL-Function.png"))
+```
 
-
-From Figure \@ref(fig:fig-evi-distribution) we can see that the approximate values of the coefficients that maximize the likelihood function are $\mu=0.10$ and $\beta=-0.65$. If we use these coefficients to calculate the logit probabilities, we can compare to the probabilities of Experiments 1 and 2:
+From Figure \@ref(fig:fig-log-likelihood-function) we can see that the approximate values of the coefficients that maximize the likelihood function are $\mu=0.10$ and $\beta=-0.65$. If we use these coefficients to calculate the logit probabilities, we can compare to the probabilities of Experiments 1 and 2:
 ```{r}
 # Approximate values that maximize the likelihood function.
 mu <- 0.10
@@ -639,7 +660,8 @@ P2A_3 <- (exp(beta * ts$xiA[2])/
             (exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
 P2B_3 <- (exp(mu + beta * ts$xiB[2])/
             (exp(beta * ts$xiA[2]) + exp(mu + beta * ts$xiB[2])))
-P3A_3 <- (exp(beta * ts$xiA[3])/(exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
+P3A_3 <- (exp(beta * ts$xiA[3])/
+            (exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
 P3B_3 <- (exp(mu + beta * ts$xiB[3])/
             (exp(beta * ts$xiA[3]) + exp(mu + beta * ts$xiB[3])))
 P4A_3 <- (exp(beta * ts$xiA[4])/
@@ -652,7 +674,8 @@ P5B_3 <- (exp(mu + beta * ts$xiB[5])/
             (exp(beta * ts$xiA[5]) + exp(mu + beta * ts$xiB[5])))
 P6A_3 <- (exp(beta * ts$xiA[6])/
             (exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
-P6B_3 <- (exp(mu + beta * ts$xiB[6])/(exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
+P6B_3 <- (exp(mu + beta * ts$xiB[6])/
+            (exp(beta * ts$xiA[6]) + exp(mu + beta * ts$xiB[6])))
   
 L <-  P1A_3^ts$yiA[1] * P1B_3^ts$yiB[1] * 
   P2A_3^ts$yiA[2] * P2B_3^ts$yiB[2] * 
@@ -706,9 +729,12 @@ class(f3)
 ```
 
 The value (output) of the function can be named and saved to an object for further analysis or for further processing, post-estimation. Begin by estimating a model using the simplest of our formulas:
-```{r}
+```{r results="asis"}
 model1 <- mlogit(f1, mc_commute_long)
-summary(model1)
+stargazer::stargazer(model1, 
+                     header = FALSE,
+                     single.row = TRUE,
+                     title = "Estimation results: Model 1")
 ```
 
 The output of the function includes the estimated frequencies of alternatives in addition to information about the optimization procedure. For instance, the message "successive function values within tolerance limits" indicates that the algorithm converged normally. 
@@ -720,17 +746,23 @@ This simple model includes three alternative-specific constants and one alternat
 The negative coefficient for time indicates that time is a "cost", in other words, the utility of traveling tends to decline with increasing travel times. This indicates that slower modes will tend to have lower utilities.
 
 Finally, the maximized value of the log-likelihood function is reported, along with two diagnostics, McFadden R^2 (in reality $\rho^2$) and a likelihood ratio test. We will come back to these diagnostics below, but first, we will estimate a new model using the second formula.
-```{r}
+```{r results="asis"}
 model2 <- mlogit(f2, mc_commute_long)
-summary(model2)
+stargazer::stargazer(model2, 
+                     header = FALSE,
+                     single.row = TRUE,
+                     title = "Estimation results: Model 2")
 ```
 
 Now there is an individual-specific variable in the model (i.e., sidewalk density). Only one of those coefficients is significant at a conventional level of significance (i.e., $p<0.05$), and the values is positive. Since the reference is "Car", a positive value indicates that higher sidewalk density causes the utility of walking to increase with respect to the utility of using a car. The same is not true for HSR and "Cycle", whose coefficients for this attribute are not significantly different from "Car".
 
 Note that it is possible to select the reference level for the utilities when estimating the model. For example, below we re-estimate the preceding model, but now using the utility of Walk as the reference:
-```{r}
+```{r results="asis"}
 model2 <- mlogit(f2, mc_commute_long, reflevel = "Walk")
-summary(model2)
+stargazer::stargazer(model2, 
+                     header = FALSE,
+                     single.row = TRUE,
+                     title = "Estimation results: Model 2 (different reference variable)")
 ```
 
 Notice that now two sidewalk coefficient are significant! While sidewalk density does not significantly change the utility of cycling with respect to walking, living in a place with high sidewalk density reduces the utility of "Car" and "HSR" _with respect to walking_.
@@ -749,12 +781,16 @@ mc_commute_predict <- mc_commute_long[1:52,]
 
 Replace the sidewalk density variable using values from 0 to 60, with an interval of 5. Since each alternative is a row, we need to create a sequence of replicated values as follows:
 ```{r}
-mc_commute_predict$sidewalk_density <- rep(seq(0, 60, 5), each = 4)
+mc_commute_predict$sidewalk_density <- rep(seq(from = 0,
+                                               to = 60,
+                                               by = 5), 
+                                           each = 4)
 ```
 
 We can examine the results of simulating the sidewalk density:
 ```{r}
-head(mc_commute_predict["sidewalk_density"], 8)
+head(mc_commute_predict["sidewalk_density"], 
+     8)
 ```
 
 The prediction dataframe now includes the range of sidewalk densities that we are interested in.
@@ -776,18 +812,27 @@ mc_commute_predict[c("time", "sidewalk_density")] %>% summary()
 
 Next, predict the probabilities using the `predict()` function and `model2`:
 ```{r}
-probs <- predict(model2, newdata = mc_commute_predict)
+probs <- predict(model2, 
+                 newdata = mc_commute_predict)
 ```
 
 The value (output) of `predict` is a 20-by-4 matrix that contains the probability for thirteen levels of sidewalk density (i.e., $0, 5, 10,\cdots, 60$), and four modes (Walk, Cycle, HSR, Car). To facilitate plotting, we add the sidewalk density values and then reshape that 13 times 4 matrix as follows:
 ```{r}
-probs <- data.frame(sidewalk_density = seq(0, 60, 5), probs) %>% 
-  gather(key = "Mode", value = "Probability", -sidewalk_density)
+probs <- data.frame(sidewalk_density = seq(from = 0,
+                                           to = 60, 
+                                           by = 5), 
+                    probs) %>% 
+  gather(key = "Mode", 
+         value = "Probability", 
+         -sidewalk_density)
 ```
 
 By "gathering" the probabilities, now the data frame has one column with the mode and one column with the probability. We can then plot, using a different colors for each alternative:
 ```{r}
-ggplot(data = probs, aes(x = sidewalk_density, y = Probability, color = Mode)) +
+ggplot(data = probs,
+       aes(x = sidewalk_density, 
+           y = Probability,
+           color = Mode)) +
   geom_line()
 ```
 
@@ -831,16 +876,10 @@ $$
 
 In this way, `model1` "nests" in `model2`.
 
-In the summary of the models, the likelihood ratio test is reported. See:
+In the summary of the models, the likelihood ratio test is reported. The test reported in the output of the model is against the null model, that is, a model with no variables at all. This is the least informative of all models. When two non-null models need to be compared, the `lrtest` function implements the likelihood ratio test for two inputs, which are two `mlogit` models, as follows:
 ```{r}
-summary(model1)
-```
-
-The test reported in the output of the model is against the null model, that is, a model with no variables at all. This is the least informative of all models.
-
-When two non-null models need to be compared, the `lrtest` function implements the likelihood ratio test for two inputs, which are two `mlogit` models, as follows:
-```{r}
-lrtest(model1, model2)
+lrtest(model1, 
+       model2)
 ```
 
 Notice that the number of degrees of freedom (Df) is $3$: this is because there are three individual-specific parameters in `model2` that are not present in `model1`. The null hypothesis of the test is that the log-likelihood of the two models is not different, in other words, that the alternate model is not an improvement over the base model.

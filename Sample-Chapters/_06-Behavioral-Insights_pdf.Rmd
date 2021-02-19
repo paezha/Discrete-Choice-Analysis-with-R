@@ -94,9 +94,21 @@ Proportion <- Heating %>%
   group_by(depvar) %>%
   summarise(no_rows = length(depvar))
 
-df <- data.frame(System = c("Gas Central", "Gas Room", "Electric Central", "Electric Room", "Heat Pump"),
-                 Installation = c(median(Heating$ic.gc), median(Heating$ic.gr), median(Heating$ic.ec), median(Heating$ic.er), median(Heating$ic.hp)),
-                 Operation = c(median(Heating$oc.gc), median(Heating$oc.gr), median(Heating$oc.ec), median(Heating$oc.er), median(Heating$oc.hp)),
+df <- data.frame(System = c("Gas Central", 
+                            "Gas Room",
+                            "Electric Central", 
+                            "Electric Room", 
+                            "Heat Pump"),
+                 Installation = c(median(Heating$ic.gc), 
+                                  median(Heating$ic.gr),
+                                  median(Heating$ic.ec), 
+                                  median(Heating$ic.er), 
+                                  median(Heating$ic.hp)),
+                 Operation = c(median(Heating$oc.gc),
+                               median(Heating$oc.gr), 
+                               median(Heating$oc.ec), 
+                               median(Heating$oc.er), 
+                               median(Heating$oc.hp)),
                  Proportion = Proportion$no_rows/900
                  )
 df %>%
@@ -113,7 +125,10 @@ summary(Heating[,13:16]) %>%
 
 The dataset is in "wide" form, which means that there is one record per decision making unit (i.e. per household). The package `mlogit` works with data in "long" format, but I find it easier to work with the dataframes in their wide format for the purpose of post-estimation analysis. Fortunately (since changing the format of a dataset is a tedious if fairly elementary process), there is a function for changing the format. We will call this function when required:
 ```{r}
-H <- mlogit.data(Heating, shape = "wide", choice = "depvar", varying = c(3:12))
+H <- mlogit.data(Heating, 
+                 shape = "wide", 
+                 choice = "depvar", 
+                 varying = c(3:12))
 ```
 
 In the above, the argument `varying` lets the function know that the variables in the columns 3 through 12 in the dataframe are alternative-specific, and therefore vary across utility functions. Once that the format of the table has been changed from "wide" to "long", the number of rows changes from $900$ (the number of decision makers) to $4500$: this is the number of decision makers ($900$) times the number of alternatives ($5$).
@@ -130,15 +145,28 @@ V_{\text{hp}} = & \beta_{hp} & + \beta_1\text{ic.hp}\\
 $$
 
 These functions include only the installation cost of the systems (ic). The `mlogit` function can be used to estimate this model (call this Model 1), using the electric central system ("ec") as the reference level:
-```{r}
-mod1 <- mlogit(depvar ~ ic, Heating, shape = "wide", choice = "depvar", reflevel = "ec", varying = c(3:7))
-summary(mod1)
+```{r results="asis"}
+model1 <- mlogit(depvar ~ ic, 
+               Heating, 
+               shape = "wide", 
+               choice = "depvar", 
+               reflevel = "ec", 
+               varying = c(3:7))
+stargazer::stargazer(model1, 
+                     header = FALSE,
+                     single.row = TRUE,
+                     title = "Estimation results: Model 1 (wide data as input)")
 ```
 
 We can verify that this is identical to estimating the model in the long format:
-```{r}
-mod1 <- mlogit(depvar ~ ic, H, reflevel = "ec")
-summary(mod1)
+```{r results="asis"}
+model1 <- mlogit(depvar ~ ic,
+                 H, 
+                 reflevel = "ec")
+stargazer::stargazer(model1, 
+                     header = FALSE,
+                     single.row = TRUE,
+                     title = "Estimation results: Model 1 (long data as input)")
 ```
 
 ## The meaning of the coefficients
@@ -153,12 +181,16 @@ If you are familiar with linear regression analysis, you are probably used to th
 
 To understand why this is so, we must recall that underlying a logit model is a sigmoid relationship between the probabilities and the _differences in attributes_ among utility functions. As discussed in Chapter \@ref(chapter-3), the effect on the probability of choosing an alternative, given a change on some attribute, is not constant along the logit probability curve, and in fact depends on the initial value of the variable, as seen in Figure \@ref(fig:fig-logistic-shape-implication)) below.
 
-```{r fig-logistic-non-linear, fig.cap= "\\label{fig:fig-logistic-non-linear}The logit probability is not linear on the variables"}
+```{r fig-logistic-non-linear, echo = FALSE, fig.cap= "\\label{fig:fig-logistic-non-linear}The logit probability is not linear on the variables"}
 # Create a data frame for plotting
-df <- data.frame(x =seq(from = -5, to = 5, by = 0.01)) %>% mutate(y = plogis(x))
+df <- data.frame(x =seq(from = -5, 
+                        to = 5, 
+                        by = 0.01)) %>% 
+  mutate(y = plogis(x))
 
 # Plot
-logit_plot <- ggplot(data = df, aes(x, y)) +
+logit_plot <- ggplot(data = df, 
+                     aes(x, y)) +
   geom_line(color = "orange") +  # Plot cumulative distribution function
   ylim(c(0, 1)) + # Set the limits of the y axis
   geom_hline(yintercept = 0) + # Add y axis
@@ -167,10 +199,34 @@ logit_plot <- ggplot(data = df, aes(x, y)) +
 logit_plot +
   xlab(expression(paste(V[j], " - ", V[i], sep=""))) + # Label the x axis
   ylab(expression(paste(P[j]))) + # Label the y axis
-  annotate("segment", x = -3.75, xend = -2.5, y = 0.024, yend = 0.024, colour = "blue", linetype = "solid") +
-  annotate("segment", x = -2.5, xend = -2.5, y = 0.024, yend = 0.075, colour = "blue", linetype = "solid") +
-  annotate("segment", x = 0, xend = 1.25, y = 0.5, yend = 0.5, colour = "red", linetype = "dashed") +
-  annotate("segment", x = 1.25, xend = 1.25, y = 0.5, yend = 0.77, colour = "red", linetype = "dashed")
+  annotate("segment", 
+           x = -3.75, 
+           xend = -2.5, 
+           y = 0.024, 
+           yend = 0.024, 
+           colour = "blue", 
+           linetype = "solid") +
+  annotate("segment",
+           x = -2.5, 
+           xend = -2.5, 
+           y = 0.024, 
+           yend = 0.075, 
+           colour = "blue", 
+           linetype = "solid") +
+  annotate("segment", 
+           x = 0, 
+           xend = 1.25, 
+           y = 0.5, 
+           yend = 0.5,
+           colour = "red",
+           linetype = "dashed") +
+  annotate("segment",
+           x = 1.25, 
+           xend = 1.25, 
+           y = 0.5, 
+           yend = 0.77,
+           colour = "red", 
+           linetype = "dashed")
 ```
 
 A number of different techniques are available instead to assess the behavioral implications of changes in one or more of the attributes. We will cover some relevant techniques next.
@@ -211,11 +267,14 @@ ic_max <- Heating[1,]
 Next, we define the following vectors to retrieve the minimum, mean, and maximum installation costs for each heating system:
 ```{r}
 min_cost <- Heating %>%
-  select(starts_with("ic")) %>% apply(2, min)
+  select(starts_with("ic")) %>%
+  apply(2, min)
 mean_cost <- Heating %>%
-  select(starts_with("ic")) %>% apply(2, mean)
+  select(starts_with("ic")) %>% 
+  apply(2, mean)
 max_cost <- Heating %>%
-  select(starts_with("ic")) %>% apply(2, max)
+  select(starts_with("ic")) %>% 
+  apply(2, max)
 ```
 
 We now replace the cost of installation with these vectors. Since each vector contains five values (for five heating systems) we need to repeat the vector 4 times (for 4 regions):
@@ -234,20 +293,47 @@ We can see that we have simulated a dataset that includes the minimum installati
 
 Given the different values of installation cost (at min, mean, and max), we can predict the probabilities as follows (notice that predicting with an `mlogit` model requires the new data to be in long format, so we change the wide format by means of `mlogit.data`):
 ```{r}
-p_mod1_ic_min <- predict(mod1, newdata = mlogit.data(ic_min, shape = "wide", choice = "depvar", varying = 3:7))
-p_mod1_ic_mean <- predict(mod1, newdata = mlogit.data(ic_mean, shape = "wide", choice = "depvar", varying = 3:7))
-p_mod1_ic_max <- predict(mod1, newdata = mlogit.data(ic_max, shape = "wide", choice = "depvar", varying = 3:7))
+p_model1_ic_min <- predict(model1, 
+                           newdata = mlogit.data(ic_min, 
+                                                 shape = "wide", 
+                                                 choice = "depvar", 
+                                                 varying = 3:7))
+p_model1_ic_mean <- predict(model1, 
+                            newdata = mlogit.data(ic_mean,
+                                                  shape = "wide",
+                                                  choice = "depvar", 
+                                                  varying = 3:7))
+p_model1_ic_max <- predict(model1, 
+                           newdata = mlogit.data(ic_max, 
+                                                 shape = "wide", 
+                                                 choice = "depvar", 
+                                                 varying = 3:7))
 ```
 
 The probabilities at their corresponding costs are summarized below:
 ```{r}
-data.frame(System = c("Electric Central", "Electric Room", "Gas Central", "Gas Room", "Heat Pump"),
-      ic_min = ic_min %>% select(starts_with("ic")) %>% t() %>% as.numeric(),
-      p_min = p_mod1_ic_min %>% as.numeric(),
-      ic_mean = ic_mean %>% select(starts_with("ic")) %>% t() %>% as.numeric(),
-      p_mean = p_mod1_ic_mean %>% as.numeric(),
-      ic_max = ic_max %>% select(starts_with("ic")) %>% t() %>% as.numeric(),
-      p_max = p_mod1_ic_max %>% as.numeric()) %>%
+data.frame(System = c("Electric Central", 
+                      "Electric Room", 
+                      "Gas Central", 
+                      "Gas Room",
+                      "Heat Pump"),
+      ic_min = ic_min %>% 
+        select(starts_with("ic")) %>% 
+        t() %>% 
+        as.numeric(),
+      p_min = p_model1_ic_min %>% 
+        as.numeric(),
+      ic_mean = ic_mean %>% 
+        select(starts_with("ic")) %>% 
+        t() %>% 
+        as.numeric(),
+      p_mean = p_model1_ic_mean %>% 
+        as.numeric(),
+      ic_max = ic_max %>% 
+        select(starts_with("ic")) %>% 
+        t() %>% as.numeric(),
+      p_max = p_model1_ic_max %>% 
+        as.numeric()) %>%
   kable(col.names = c("System",
                       "Cost",
                       "Probability",
@@ -257,7 +343,10 @@ data.frame(System = c("Electric Central", "Electric Room", "Gas Central", "Gas R
                       "Probability"),
         digits = 3) %>%
   kable_styling() %>%
-  add_header_above(c(" " = 1, "Minimum Cost" = 2, "Mean Cost" = 2, "Maximum Cost" = 2))
+  add_header_above(c(" " = 1, 
+                     "Minimum Cost" = 2, 
+                     "Mean Cost" = 2, 
+                     "Maximum Cost" = 2))
 ```
 
 Of the different systems, the probability of choosing Electric Central changes the least as the cost of installation changes to the mean cost of such system, and the maximum cost. The probability of choosing Heat Pump is similar at its lowest installation cost to Electric Central, and changes substantially; it is true too that these systems can be more expensive. The probability of choosing Gas Central increases as its installation cost goes up, but this is in comparison to the maximum installation cost of every other system! Clearly, trying to understand the probabilities as the cost of every system changes is not straightforward. To understand the response of changing the installation cost by one unit at each of the three levels of cost above,_ _while other things remain constant_, we calculate the direct marginal effects, as shown next. 
@@ -387,21 +476,39 @@ Fortunately, all the effects discussed above can be easily calculated once that 
 
 The marginal effects can be computed by means of the `effects` function. This function takes four arguments, as follows: an `mlogit` model, the name of the covariate (or attribute) that we wish to examine, the type of effect, and the data for calculating the effects.
 
-For the marginal effects, the "type" of the effect is "(r)elative" for the probability and "(a)bsolute"" for the covariate. In the case of the marginal effects at the minimum values of cost we use `mod1` (our `mlogit` model object), indicate the covariate of interest (`ic` for installation cost), the type of effect ("ra"), and the input data (again, notice that the input data needs to be in long format; this is because the function needs to make predictions using the model):
+For the marginal effects, the "type" of the effect is "(r)elative" for the probability and "(a)bsolute"" for the covariate. In the case of the marginal effects at the minimum values of cost we use `model1` (our `mlogit` model object), indicate the covariate of interest (`ic` for installation cost), the type of effect ("ra"), and the input data (again, notice that the input data needs to be in long format; this is because the function needs to make predictions using the model):
 ```{r}
-effects(mod1, covariate = "ic", type = "ra", data = mlogit.data(ic_min, shape = "wide", choice = "depvar", varying = 3:7))
+effects(model1,
+        covariate = "ic",
+        type = "ra", 
+        data = mlogit.data(ic_min, 
+                           shape = "wide", 
+                           choice = "depvar", 
+                           varying = 3:7))
 ```
 
 The values on the diagonal of the table above are the direct marginal effects, and the values off the diagonal are the cross-marginal effects.
 
 The marginal effects at the mean values (sometimes called _MEM_, i.e., marginal effects at the mean) are:
 ```{r}
-effects(mod1, covariate = "ic", type = "ra", data = mlogit.data(ic_mean, shape = "wide", choice = "depvar", varying = 3:7))
+effects(model1,
+        covariate = "ic",
+        type = "ra", 
+        data = mlogit.data(ic_mean, 
+                           shape = "wide", 
+                           choice = "depvar", 
+                           varying = 3:7))
 ```
 
 And the marginal effects at the maximum values are:
 ```{r}
-effects(mod1, covariate = "ic", type = "ra", data = mlogit.data(ic_max, shape = "wide", choice = "depvar", varying = 3:7))
+effects(model1, 
+        covariate = "ic", 
+        type = "ra",
+        data = mlogit.data(ic_max, 
+                           shape = "wide",
+                           choice = "depvar", 
+                           varying = 3:7))
 ```
 
 You can verify that, with some small rounding error, they correspond to the values calculated previously.
@@ -410,15 +517,33 @@ You can verify that, with some small rounding error, they correspond to the valu
 
 As well, the direct-point and cross-point elasticities can be calculated using the `effects` function, however in this case the type of the effects is _relative_ both for the probability and for the covariate.
 ```{r}
-effects(mod1, covariate = "ic", type = "rr", data = mlogit.data(ic_min, shape = "wide", choice = "depvar", varying = 3:7))
+effects(model1, 
+        covariate = "ic", 
+        type = "rr", 
+        data = mlogit.data(ic_min, 
+                           shape = "wide",
+                           choice = "depvar", 
+                           varying = 3:7))
 ```
 
 The values on the diagonal of the table above are the direct-point elasticities, whereas other values are the cross-point elasticities.
 
 The effects can be calculated at various levels of the covariate of interest, for instance the mean and max:
 ```{r}
-effects(mod1, covariate = "ic", type = "rr", data = mlogit.data(ic_mean, shape = "wide", choice = "depvar", varying = 3:7))
-effects(mod1, covariate = "ic", type = "rr", data = mlogit.data(ic_max, shape = "wide", choice = "depvar", varying = 3:7))
+effects(model1, 
+        covariate = "ic", 
+        type = "rr", 
+        data = mlogit.data(ic_mean, 
+                           shape = "wide", 
+                           choice = "depvar", 
+                           varying = 3:7))
+effects(model1, 
+        covariate = "ic", 
+        type = "rr", 
+        data = mlogit.data(ic_max, 
+                           shape = "wide", 
+                           choice = "depvar", 
+                           varying = 3:7))
 ```
 
 ## A note about attributes in dummy format
@@ -441,9 +566,17 @@ $$
 In other words, the marginal effect is the difference in the probability of choosing $i$ when the dummy variable is $1$ versus when it is $0$.
 
 We will estimate a second model that uses the regions variable to illustrate this (call this Model 2):
-```{r}
-mod2 <- mlogit(depvar ~ ic | region, Heating, shape = "wide", choice = "depvar", reflevel = "ec", varying = c(3:7))
-summary(mod2)
+```{r results="asis"}
+model2 <- mlogit(depvar ~ ic | region, 
+               Heating, 
+               shape = "wide", 
+               choice = "depvar", 
+               reflevel = "ec", 
+               varying = c(3:7))
+stargazer::stargazer(model2, 
+                     header = FALSE,
+                     single.row = TRUE,
+                     title = "Estimation results: Model 2")
 ```
 
 Notice that none of the regional coefficients is significant, so we would likely not include these variables in the model. However, for the sake of the example, we will calculate the marginal effect of the dummy variables at the mean of installation cost.
@@ -453,18 +586,24 @@ We had already created a matrix with the mean of the installation cost. To add t
 ic_mean_region <- ic_mean %>% 
   mutate(count = 4) %>% 
   uncount(count)
-ic_mean_region$region <- c("valley", "scostl", "mountn", "ncostl")
+ic_mean_region$region <- c("valley", 
+                           "scostl",
+                           "mountn", 
+                           "ncostl")
 ```
-
 
 We then calculate the probabilities associated with each region and heating system. Notice that for each region, the sum of the probabilities is equal to 1.
 
 ```{r}
-p_region_ic_mean <- data.frame(Region = c("valley", "scostl", "mountn", "ncostl"),
-                               predict(mod2, newdata = mlogit.data(ic_mean_region,
-                                                                   shape = "wide", 
-                                                                   choice = "depvar", 
-                                                                   varying = 3:7), 
+p_region_ic_mean <- data.frame(Region = c("valley", 
+                                          "scostl", 
+                                          "mountn", 
+                                          "ncostl"),
+                               predict(model2, 
+                                       newdata = mlogit.data(ic_mean_region,
+                                                             shape = "wide",
+                                                             choice = "depvar", 
+                                                             varying = 3:7), 
                                        outcome = FALSE))
 p_region_ic_mean
 ```
@@ -473,7 +612,9 @@ The first row contains the probabilities of the different systems for valley (th
 
 The marginal effects of changing from the valley to other regions are:
 ```{r}
-data.frame (Effect = c("valley to scostl", "valley to mountn", "valley to ncostl"),
+data.frame (Effect = c("valley to scostl", 
+                       "valley to mountn",
+                       "valley to ncostl"),
             rbind (p_region_ic_mean[2, 2:6] - p_region_ic_mean[1, 2:6],
                    p_region_ic_mean[3, 2:6] - p_region_ic_mean[1, 2:6],
                    p_region_ic_mean[4, 2:6] - p_region_ic_mean[1, 2:6]))
@@ -498,9 +639,18 @@ $$
 
 The model can be estimated again using these constants. The option `reflevel` is used to select the alternative that will work as reference (call this Model 3; notice that the columns that vary needs to be updated to include the new alternative-related variable):
 
-```{r}
-mod3 <- mlogit(depvar ~ ic + oc, Heating, shape = "wide", choice = "depvar", reflevel = "ec", varying = c(3:12))
-summary(mod3)
+```{r results="asis"}
+model3 <- mlogit(depvar ~ ic + oc, 
+               Heating, 
+               shape = "wide", 
+               choice = "depvar", 
+               reflevel = "ec", 
+               varying = c(3:12))
+stargazer::stargazer(model1, 
+                     header = FALSE,
+                     single.row = TRUE,
+                     title = "Estimation results: Model 3")
+summary(model3)
 ```
 
 Now, how can this model be used to understand consumer preferences? Recall that the question is at what rate are consumers willing to pay for installation relative to operation.
@@ -540,14 +690,27 @@ Heat pumps are on average more expensive than other heating systems in terms of 
 
 To simulate this scenario, we copy the input dataframe after simulating the rebate, replacing the cost of installation as follows: 
 ```{r}
-H_rebate <- Heating %>% mutate(ic.hp = 0.85 * ic.hp)
+H_rebate <- Heating %>% 
+  mutate(ic.hp = 0.85 * ic.hp)
 ```
 
 We can calculate the market shares of the "do nothing" and "rebate" policies and compare their shares (which are the mean values of the predictions):
 ```{r}
 data.frame(Policy = c("Do nothing", "15% rebate"),
-           rbind(apply(predict(mod3, newdata = mlogit.data(Heating, shape = "wide", choice = "depvar", varying = c(3:12))), 2, mean),
-                 apply(predict(mod3, newdata = mlogit.data(H_rebate, shape = "wide", choice = "depvar", varying = c(3:12))), 2, mean)))
+           rbind(apply(predict(model3, 
+                               newdata = mlogit.data(Heating, 
+                                                     shape = "wide", 
+                                                     choice = "depvar", 
+                                                     varying = c(3:12))),
+                       2,
+                       mean),
+                 apply(predict(model3, 
+                               newdata = mlogit.data(H_rebate,
+                                                     shape = "wide",
+                                                     choice = "depvar",
+                                                     varying = c(3:12))),
+                       2,
+                       mean)))
 ```
 
 In this example, we see that the market share (of probability of selecting a heat pumps) increases with the 15% rebate, while the market shares of other heating systems slightly decreases. This is in line with the policy objectives of the rebate on the installation of heat pumps.
@@ -558,7 +721,7 @@ Now suppose for example that a more efficient electric system is developed using
 
 To simulate this situation, we begin by creating a model matrix based on Model 3: 
 ```{r}
-X <- model.matrix(mod3)
+X <- model.matrix(model3)
 ```
 
 Then, we create a new alternative by copying the attributes of electric central:
@@ -589,7 +752,7 @@ X <- X[order(chidb), ]
 
 This calculates the expression $e^{X\beta}$ and the sum, which are needed to compute the logit probabilities:
 ```{r}
-exp_Xb <- as.numeric(exp(X %*% coef(mod3)))
+exp_Xb <- as.numeric(exp(X %*% coef(model3)))
 sum_exp_Xb <- as.numeric(tapply(exp_Xb, sort(chidb), sum))
 ```
 
@@ -600,8 +763,16 @@ P <- exp_Xb / sum_exp_Xb[sort(chidb)]
 
 Convert to a matrix of logit probabilities, so that each row is the choice probabilities for a household:
 ```{r}
-P <- data.frame(matrix(P, ncol = 6, byrow = TRUE))
-P <- transmute(P, hp = P[, 5], ec = P[, 1], er = P[, 2], gc = P[, 3], gr = P[, 4], new = P[, 6])
+P <- data.frame(matrix(P, 
+                       ncol = 6, 
+                       byrow = TRUE))
+P <- transmute(P, 
+               hp = P[, 5], 
+               ec = P[, 1], 
+               er = P[, 2], 
+               gc = P[, 3], 
+               gr = P[, 4], 
+               new = P[, 6])
 ```
 
 We can verify that the sum of the probabilities for each household is 1:
@@ -616,7 +787,10 @@ apply(P, 2, mean)
 
 The new technology is estimated to have a penetration rate of approximately $10.4\%$. Compare to the original proportions of the systems:
 ```{r}
-apply(fitted(mod3, outcome = FALSE), 2, mean)
+apply(fitted(model3,
+             outcome = FALSE), 
+      2, 
+      mean)
 ```
 
 Can you discern the patterns of substitution here? Are these patterns of substitution reasonable?

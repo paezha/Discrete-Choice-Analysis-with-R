@@ -49,10 +49,10 @@ knitr::include_graphics(rep("01-Figure-1.jpg"))
 
 ## How to use this note
 
-The source for the document you are reading is an R Notebook. Notebooks are a form [_literate programming_](https://en.wikipedia.org/wiki/Literate_programming), a style of document that uses code to illustrate a discussion, as opposed to the traditional programming style that uses natural language to discuss/document the code. It flips around the usual technical writing approach to make it more intuitive and accessible. 
+The source for the document you are reading is an `R` Notebook. Notebooks are a form [_literate programming_](https://en.wikipedia.org/wiki/Literate_programming), a style of document that uses code to illustrate a discussion, as opposed to the traditional programming style that uses natural language to discuss/document the code. It flips around the usual technical writing approach to make it more intuitive and accessible. 
 
 Throughout the notes, you will find examples of code in segments of text called _chunks_. This is an example of a chunk:
-```{r hello-dca}
+```{r hello-dca, tidy="formatR"}
 print("Hello, Discrete Choice Analysis!")
 ```
 
@@ -63,9 +63,9 @@ If you are working with the Notebook version of the document, you can run the co
 In this practice, you will learn about:
 
 1. Different ways to measure stuff.
-2. Basic operations in R.
+2. Basic operations in `R`.
 3. Data classes, data types, and data transformations.
-4. The use of packages in R.
+4. The use of packages in `R`.
 5. Basic visualization.
 
 ## Suggested readings
@@ -75,7 +75,7 @@ In this practice, you will learn about:
 
 ## Ways of measuring stuff
 
-Previously we said that data are the raw material for modeling, but we did not say precisely what we meant by 'data'. You probably already have a working understanding of what 'data' means, but nonetheless lets begin with a definition. According to Merriam-Webster, [data](https://www.merriam-webster.com/dictionary/data) are:
+Previously we said that data are the raw material for modeling, but we did not say precisely what we meant by 'data'. You probably already have a working understanding of what 'data' means, but nonetheless we will begin with a definition. According to Merriam-Webster, [data](https://www.merriam-webster.com/dictionary/data) are:
 
 >factual information (such as measurements or statistics) used as a basis for reasoning, discussion, or calculation
 
@@ -120,48 +120,47 @@ is not four times as cold as $-3\,^{\circ}\mathrm{C}$.
 
 - Ratio scale. When there is an absolute value of zero to the thing being measured (to indicate absence!), attributes can be measured in a ratio scale. This combines the features of the previous scales of measurement: a number is essentially a label that follows a logical order and with differences that are meaningful. In addition to that, the ratios of variables are meaningful. For example, twenty dollars are twice as valuable as ten, and zero is the absence of value. Weight is a way of measuring mass, and zero is the absence of mass. Two hundred kilograms is twice as much mass as one hundred kilograms.
 
-It is important to understand the different scales of measurement to be able to choose the appropriate tools for each. More on this below. But first, lets bring some actual data to play with.
+It is important to understand the different scales of measurement to be able to choose the appropriate tools for each. More on this below. But first, we can bring some actual data to play with.
 
 ## Importing data
 
-There are several different ways of importing data in R. For this example, we will use part of a dataset that was analyzed by Whalen et al. [-@Whalen2013].
+There are several different ways of importing data in `R`. For this example, we will use part of a dataset that was analyzed by Whalen et al. [-@Whalen2013].
 
-At the very beginning, it is good practice to clear the workspace, to ensure that there are no extraneous items there. The workspace is where objects reside in memory during a session with R. The function for removing variables from the workspace is `rm()`. Another useful function is ``ls`, which retrieves a list of things in the workspace. So essentially we are asking R to remove all things in the workspace: 
-```{r}
+At the very beginning, it is good practice to clear the workspace, to ensure that there are no extraneous items there. The workspace is where objects reside in memory during a session with `R`. The function for removing variables from the workspace is `rm()`. Another useful function is `ls`, which retrieves a list of things in the workspace. So essentially we are asking `R` to remove all things in the workspace: 
+```{r, tidy="formatR"}
 rm(list = ls())
 ```
 
-Once that the workspace is empty, we can proceed to load a few packages that are useful. Packages are the basic units of reproducible code in the R multiverse. Packages allow a developer to create a self-contained unit of code that often is meant to achieve some task. For instance, there are packages in R that specialize in statistical techniques, such as [cluster analysis](https://cran.r-project.org/web/packages/cluster/index.html), [visualization](https://cran.r-project.org/web/packages/ggplot2/index.html), or [data manipulation](https://cran.r-project.org/web/packages/dplyr/). Some packages can be miscellaneous tools, or contain mostly datasets. Packages are a very convenient way of maintaining code, data, and documentation, and also of sharing all these resources.
+Once that the workspace is empty, we can proceed to load a few packages that are useful. Packages are the basic units of reproducible code in the `R` multiverse. Packages allow a developer to create a self-contained unit of code that often is meant to achieve some task. For instance, there are packages in `R` that specialize in statistical techniques, such as [cluster analysis](https://cran.r-project.org/web/packages/cluster/index.html), [visualization](https://cran.r-project.org/web/packages/ggplot2/index.html), or [data manipulation](https://cran.r-project.org/web/packages/dplyr/). Some packages can be miscellaneous tools, or contain mostly datasets. Packages are a very convenient way of maintaining code, data, and documentation, and also of sharing all these resources.
 
-Packages can be obtained from different sources (including making them!). One of the reasons why R has become so successful is the relative facility with which packages can be distributed. A package that I use frequently is called `tidyverse`. The `tidyverse` is a collection of functions for data manipulation, analysis, and visualization. This package can be downloaded and installed in your personal library of R packages by using the function `install.packages`, as follows:
-```{r eval=FALSE}
+Packages can be obtained from different sources (including making them!). One of the reasons why `R` has become so successful is the relative facility with which packages can be distributed. A package that I use frequently is called `tidyverse`. The `tidyverse` is a collection of functions for data manipulation, analysis, and visualization. This package can be downloaded and installed in your personal library of `R` packages by using the function `install.packages`, as follows:
+```{r eval=FALSE, tidy="formatR"}
 install.packages("tidyverse")
 ```
 
-The function `install.packages` retrieves packages from the [Comprehensive R Archive Network](https://cran.r-project.org/), or CRAN for short. CRAN is a collection of sites (accessible via the internet) that carry identical materials for distribution for R.
+The function `install.packages` retrieves packages from the [Comprehensive R Archive Network](https://cran.r-project.org/), or CRAN for short. CRAN is a collection of sites (accessible via the internet) that carry identical materials for distribution for `R`.
 
 Installing a package is similar to acquiring a book for your library. The book is there, but if you want to use it, you need to bring it to your workspace, so to speak. The function for retrieving a package from the library is natural enough `library()`. For the moment, we need the following packages. If you have not done so, take a moment to install them, as illustrated in the previous chunk.
-```{r message=FALSE}
+```{r message=FALSE, tidy="formatR"}
 library(tidyverse)
 library(readr)
-#library(caret)
 library(mlogit)
 ```
 
 Occasionally there are messages displayed when loading a package. These messages are informative (they ask you to cite them in a certain style) or may give you warnings, for instance that identically named functions exist in several packages.  
 
 The function that we need to read the sample dataset is `read_csv()`, which is part of the `tidyverse` package. Note that you can name the value (or output) of a function by using `<-`. In this case, we wish to read an external file, and assign the results to an object called `mc_mode_choice`:
-```{r}
+```{r warning=FALSE, tidy="formatR"}
 mc_mode_choice <- read_csv("Commute Mac.csv")
 ```
 
 It is possible to quickly examine the contents of the object by means of the function `head()`, which prints the top few rows of the object, if appropriate. For example:
-```{r}
+```{r , tidy="formatR"}
 head(mc_mode_choice)
 ```
 
 Here we can see that what we just read is a table with several variables: an id, a variable called `choice`, some variables for time, etc. Hopefully, when reading data there is also a metadata file, a data dictionary or something that defines what the data are. For example, what does it mean for choice to be "3" or "1"? Was time measured in hours, seconds, minutes, or something else? These variables will be described below. Before that, however, we can use a different function to get further insights into the contents of the table by means of the `summary()` function:
-```{r}
+```{r eval=FALSE, tidy="formatR"}
 summary(mc_mode_choice)
 ```
 
@@ -171,30 +170,30 @@ For example, the variable `choice` measures the use of one mode of transportatio
 
 ## Data Classes in `R`
 
-To understand why 2.618 of mode of transportation is not an appropriate summary measure for the variable `mode`, we need to know that R can work with different data classes, which include the following:
+To understand why 2.618 of mode of transportation is not an appropriate summary measure for the variable `mode`, we need to know that `R` can work with different data classes, which include the following:
 
 - Numerical
 - Character
 - Logical
 - Factor
 
-The ability to store information in different forms is important, because is allows R to distinguish what kind of operations are appropriate for a certain variable. Consider the following example (using indexing):
+The ability to store information in different forms is important, because is allows `R` to distinguish what kind of operations are appropriate for a certain variable. Consider the following example (using indexing):
 ```{r}
 mc_mode_choice$choice[1] - mc_mode_choice$choice[4]
 ```
 
-Lets unpack what the chunk above did. First, we call our table `mc_mode_choice`. The string sign `$` is used to reference columns in the table. Therefore, we asked R to go and look up the column `choice` in the table `mc_mode_choice`. Finally, the value between square brackets `[]` asks R to retrieve a value out of the column, in this example the first value in that column and then the fourth value. This system of referring to elements in tables is called _indexing_. Most computer languages use it, but the syntax is different. Again: `$` refers to a column, and `[]` is used to call values in that column.
+Let us unpack what the chunk above did. First, we call our table `mc_mode_choice`. The string sign `$` is used to reference columns in the table. Therefore, we asked `R` to go and look up the column `choice` in the table `mc_mode_choice`. Finally, the value between square brackets `[]` asks `R` to retrieve a value out of the column, in this example the first value in that column and then the fourth value. This system of referring to elements in tables is called _indexing_. Most computer languages use it, but the syntax is different. Again: `$` refers to a column, and `[]` is used to call values in that column.
 
 As we can see, the difference between the two values retrieved is $1$. But what is the meaning of "cycle" minus "walk", for instance?
 
-In reality, the variable `choice` was measured as a nominal variable: it just corresponds to a label indicating what mode was chosen by a respondent. But R does not know this. Before R can treat it as a nominal variable, the numbers need to be converted to a _factor_. Factors are the way R stores categorical variables (both nominal and ordinal). To convert the variable `choice` to a factor, we use the `factor()` function:
+In reality, the variable `choice` was measured as a nominal variable: it just corresponds to a label indicating what mode was chosen by a respondent. But `R` does not know this. Before `R` can treat it as a nominal variable, the numbers need to be converted to a _factor_. Factors are the way `R` stores categorical variables (both nominal and ordinal). To convert the variable `choice` to a factor, we use the `factor()` function:
 ```{r}
 mc_mode_choice$choice <- factor(mc_mode_choice$choice, labels = c("Cycle", "Walk", "HSR", "Car"))
 ```
 
-In the chunk above, we ask R to replace the contents of `mc_mode_choice$choice` with the value (output) of the function `factor`. Factor takes the contents of `mc_mode_choice$choice` and converts to a factor with labels as indicated by the argument `labels =` (the function `c()` is used to concatenate several values).
+In the chunk above, we ask `R` to replace the contents of `mc_mode_choice$choice` with the value (output) of the function `factor`. Factor takes the contents of `mc_mode_choice$choice` and converts to a factor with labels as indicated by the argument `labels =` (the function `c()` is used to concatenate several values).
 
-Lets summarize the result, by using the `summary()` function but only for this variable:
+We can summarize the result, by using the `summary()` function but only for this variable:
 ```{r}
 summary(mc_mode_choice$choice)
 ```
@@ -204,16 +203,16 @@ Now the summary is appropriate categorical variable, and is a table of frequenci
 mc_mode_choice$choice[1] - mc_mode_choice$choice[4]
 ```
 
-The message indicates that the operation we tried to perform is not meaningful for factors. As long as R knows the appropriate measurement scale for your variables, it will try to steer you away from doing silly things with them.
+The message indicates that the operation we tried to perform is not meaningful for factors. As long as `R` knows the appropriate measurement scale for your variables, it will try to steer you away from doing silly things with them.
 
 Other variables included in this table are for time. These variables measure the duration in minutes (actual or imputed) for trips by different modes. For example, `timecycle` is the duration of a trip by bicycle for the journey reported by the respondent.
 
-Lets summarize this variable again:
+Let us summarize this variable again:
 ```{r}
 summary(mc_mode_choice$timecycle)
 ```
 
-Notice that the shortest trip by bicycle would be less than a minute long, whereas the maximum is $100,000$ minutes long. Wait, what? That is over $1,600$ hours long. Is that even possible? In fact, no, it is not. The reason for these values is that when the original data were coded, whenever a respondent said that cycling was not a mode that was available to them, the time was coded as a very large and distinctive value. There were no trips taking $100,000$ minutes, this is just a code for "information not available". One problem with this manner of coding is that R does not know that the information is actually missing, but rather thinks it is a legitimate quantity. As a consequence, the mean is tens of thousands of minutes, despite the fact that half of all trips by bicycle were measured at less than 6 minutes long (see the median).
+Notice that the shortest trip by bicycle would be less than a minute long, whereas the maximum is $100,000$ minutes long. Wait, what? That is over $1,600$ hours long. Is that even possible? In fact, no, it is not. The reason for these values is that when the original data were coded, whenever a respondent said that cycling was not a mode that was available to them, the time was coded as a very large and distinctive value. There were no trips taking $100,000$ minutes, this is just a code for "information not available". One problem with this manner of coding is that `R` does not know that the information is actually missing, but rather thinks it is a legitimate quantity. As a consequence, the mean is tens of thousands of minutes, despite the fact that half of all trips by bicycle were measured at less than 6 minutes long (see the median).
 
 Next we will see a way to address this. One last thing before doing so: you can check the class an object with the function `class`
 ```{r}
@@ -225,7 +224,7 @@ The RStudio also allows you to quickly see the variables and their format in the
 
 ## More on indexing and data manipulation
 
-Indexing is a way of making reference to elements in a data object. There are numerous indexing methods in R that are appropriate for specific objects. Tables such as `mc_mode_choice` (called _data frames_) can be indexed in a few different ways. For example the next three chunks are equivalent in that they call the second column (`choice`) and in that column the second element:
+Indexing is a way of making reference to elements in a data object. There are numerous indexing methods in `R` that are appropriate for specific objects. Tables such as `mc_mode_choice` (called _data frames_) can be indexed in a few different ways. For example the next three chunks are equivalent in that they call the second column (`choice`) and in that column the second element:
 ```{r}
 mc_mode_choice[2, 2]
 ```
@@ -243,7 +242,7 @@ It is also possible to index by ranges of values. For example, the next chunks r
 mc_mode_choice[2:5, 7:8]
 ```
 
-Indexing is useful to subset data selectively. For example, we know that travel times coded as $100,000$ are actually cases where the corresponding mode was not available. Lets say that we wanted to summarize travel time by bicycle but without those cases. We can use logical statements when indexing. We could tell R to retrieve only those values that meet a certain condition. In the next chunk, we save the results of this to a new variable:
+Indexing is useful to subset data selectively. For example, we know that travel times coded as $100,000$ are actually cases where the corresponding mode was not available. Suppose that we wanted to summarize travel time by bicycle but without those cases. We can use logical statements when indexing. We could tell `R` to retrieve only those values that meet a certain condition. In the next chunk, we save the results of this to a new variable:
 ```{r}
 time.Cycle.clean <- mc_mode_choice$timecycle[mc_mode_choice$timecycle != 100000]
 ```
@@ -274,7 +273,8 @@ In natural language this would be something like "take mc_mode_choice and select
 
 The alternative, using indexing would look something like this:
 ```{r}
-time.Active.clean.the.hard.way <- mc_mode_choice[mc_mode_choice$timecycle != 100000 & mc_mode_choice$timewalk != 100000, 7:8]
+time.Active.clean.the.hard.way <- mc_mode_choice[mc_mode_choice$timecycle != 100000 & 
+                                                   mc_mode_choice$timewalk != 100000, 7:8]
 ```
 
 The expression becomes more convoluted and not as easy to read. It is also easier to make mistakes when writing it.
@@ -297,20 +297,30 @@ summary(time.Active.clean)
 ```
 
 Now, compare to the following plot:
-```{r}
+```{r , tidy="formatR"}
 ggplot(data = time.Active.clean) + 
-  geom_area(aes(x = timecycle), stat = "bin", binwidth = 5, fill = "blue", color = "blue", alpha = 0.6) +
-  geom_area(aes(x = timewalk), stat = "bin", binwidth = 5, fill = "yellow", color = "yellow", alpha = 0.6)
+  geom_area(aes(x = timecycle),
+            stat = "bin", 
+            binwidth = 5, 
+            fill = "blue", 
+            color = "blue", 
+            alpha = 0.6) +
+  geom_area(aes(x = timewalk), 
+            stat = "bin", 
+            binwidth = 5, 
+            fill = "yellow", 
+            color = "yellow", 
+            alpha = 0.6)
 ```
 
-The plot above was created using a package called `ggplot2`, also part of `tidyverse`. This package implements a grammar of graphics, and offers a very flexible way of creating plots in R.
+The plot above was created using a package called `ggplot2`, also part of `tidyverse`. This package implements a grammar of graphics, and offers a very flexible way of creating plots in `R`.
 
 `ggplot2` works by layering a series of objects, beginning with a blank plot, to which we can add things. The command to create a plot is `ggplot()`. This command accepts different arguments. For instance, we can pass data to it in the form of a data frame. We can also indicate different _aesthetic_ values, that is, the things that we wish to plot. None of this is plotted, though, until we indicate which kind of _geom_ or geometric object we wish to plot. For instance, you can see above that to create the figure we used `geom_area`. This geom is essentially a smoothed histogram.
 
-Lets break down these instructions. 
+Let us break down these instructions. 
 
 First we ask `ggplot2` to create a plot that will use the data frame `time.Active.clean`. We will name this object `p`:
-```{r}
+```{r tidy="styler"}
 p <- ggplot(data = time.Active.clean)
 ```
 
@@ -323,26 +333,55 @@ We have yet to tell `ggplot2` what the x axis is, what the y axis is, what shoul
 
 We layer elements on a plot by using the `+` sign. It is only when we tell the package to add some geometric element that it renders something on the plot. In the previous case, we told `ggplot2` to use the `geom_area` to create a smoothed histogram. Next, we need to indicate which `aes` (short for _aesthetics_) we wish to plot. The aesthetics map aspect of the dataset to the plot. For instance, by saying that the aesthetics include something for x, we tell `ggplot2` that that something should be mapped to the x axis (in this case one of the time variables in the data frame). The second argument is `stat = 'bin'`, which indicates that there is a statistical operation that happens, namely the data are binned for smoothing (small bins lead to less smoothing, large bins lead to more smoothing; try it!). After playing around with a few bin values, I selected 5:
 ```{r}
-p + geom_area(aes(x = timecycle), stat = "bin", binwidth = 5)
+p + 
+  geom_area(aes(x = timecycle), 
+            stat = "bin", 
+            binwidth = 5)
 ```
 
 To improve the appearance of the plot, we also asked that the geom be rendered using a named color (blue for the color of the line, and also blue for the fill), and that it be transparent (the argument `alpha` controls opacity; a value of zero is transparent, a value of 1 is solid):
 ```{r}
-p + geom_area(aes(x = timecycle), stat = "bin", binwidth = 5, fill = "blue", color = "blue", alpha = 0.6)
+p + 
+  geom_area(aes(x = timecycle), 
+            stat = "bin", 
+            binwidth = 5, 
+            fill = "blue", 
+            color = "blue", 
+            alpha = 0.6)
 ```
 
 The final plot was obtained by layering a second geom (in yellow) for a different variable (time by walking), so that we could compare them:
 ```{r}
 ggplot(data = time.Active.clean) + 
-  geom_area(aes(x = timecycle), stat = "bin", binwidth = 5, fill = "blue", color = "blue", alpha = 0.6) +
-  geom_area(aes(x = timewalk), stat = "bin", binwidth = 5, fill = "yellow", color = "yellow", alpha = 0.6)
+  geom_area(aes(x = timecycle),
+            stat = "bin",
+            binwidth = 5,
+            fill = "blue", 
+            color = "blue", 
+            alpha = 0.6) +
+  geom_area(aes(x = timewalk),
+            stat = "bin", 
+            binwidth = 5,
+            fill = "yellow",
+            color = "yellow",
+            alpha = 0.6)
 ```
 
 Notice that the x axis is labeled as "timecycle" despite the fact that the plot also includes time by walking. This can be fixed by changing the label as follows:
 ```{r}
 ggplot(data = time.Active.clean) + 
-  geom_area(aes(x = timecycle), stat = "bin", binwidth = 5, fill = "blue", color = "blue", alpha = 0.6) +
-  geom_area(aes(x = timewalk), stat = "bin", binwidth = 5, fill = "yellow", color = "yellow", alpha = 0.6) +
+  geom_area(aes(x = timecycle),
+            stat = "bin",
+            binwidth = 5, 
+            fill = "blue", 
+            color = "blue", 
+            alpha = 0.6) +
+  geom_area(aes(x = timewalk), 
+            stat = "bin", 
+            binwidth = 5, 
+            fill = "yellow", 
+            color = "yellow",
+            alpha = 0.6) +
   xlab("Time (in minutes)")
 ```
 
@@ -350,16 +389,21 @@ What do we learn from this plot? Would it have been possible to learn the same f
 
 The plot above is an example of a _univariate_ plot, since it is created to display the distribution of a single variable, not the way two or more variables relate. Imagine now that you would like to see how mode choice and sidewalk density at the place of residence relate. An appropriate statistical plot for two variables, one of which is nominal (`choice`) and another that is continuous (`side_den`), is the boxplot.
 
-Before creating the plot, lets summarize these two variables (notice the use of the pipe operator):
+Before creating the plot, let us summarize these two variables (notice the use of the pipe operator):
 ```{r}
-mc_mode_choice %>% select(c("choice", "side_den")) %>% summary()
+mc_mode_choice %>% 
+  select(c("choice", "side_den")) %>% 
+  summary()
 ```
 
 Sidewalk density is measured in $km/km^2$.
 
-Lets create the boxplot next. We begin by defining a `ggplot2` object with the data frame and aesthetics that we wish to use. In this case, we want to plot the categorical variable in the x axis and the quantitative variable in the y axis:
+We will create the boxplot next. We begin by defining a `ggplot2` object with the data frame and aesthetics that we wish to use. In this case, we want to plot the categorical variable in the x axis and the quantitative variable in the y axis:
 ```{r}
-ggplot(data = mc_mode_choice, aes(x = choice, y = side_den)) + geom_boxplot()
+ggplot(data = mc_mode_choice, 
+       aes(x = choice, 
+           y = side_den)) + 
+  geom_boxplot()
 ```
 
 What do we learn from this plot? Could we have derived a similar insight from the summary statistics?
@@ -371,7 +415,7 @@ There are many different geoms that can be used in `ggplot2`. You can always con
 
 You can also check the `ggplot2` [Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf) for more information on how to use this package.
 
-A last note. Many other visualization alternatives (for instance, Excel) provide point-and-click functions for creating plots. In contrast, ggplot2 in R requires that the plot be created by meticulously instructing the package what to do. While this is more laborious, it also means that you have complete control over the creation of plots, which in turn allows you to create more flexible and creative visuals.
+A last note. Many other visualization alternatives (for instance, Excel) provide point-and-click functions for creating plots. In contrast, `ggplot2` in `R` requires that the plot be created by meticulously instructing the package what to do. While this is more laborious, it also means that you have complete control over the creation of plots, which in turn allows you to create more flexible and creative visuals.
 
 ## Exercise
 

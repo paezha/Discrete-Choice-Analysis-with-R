@@ -68,7 +68,7 @@ In this practice, you will learn about:
 ## Preliminaries
 
 Load the packages used in this section:
-```{r}
+```{r message=FALSE}
 library(tidyverse)
 library(evd)
 ```
@@ -178,7 +178,7 @@ $$
 
 These two conditions say that the function must take values of at least zero for the interval of $x$ of interest, and that the area under the curve (that is what the integral means) must equal 1.
 
-Lets use an example to illustrate these properties. We will define the following function:
+Consider the following example to illustrate these properties. We will define the following function:
 $$
 f(x) = \left\{
         \begin{array}{lc}
@@ -201,11 +201,16 @@ uniform <- function(x, L)
 L <- 2
 
 # Create a data frame for plotting
-df <- data.frame(x =seq(from = -(L+1), to = L+1, by = 0.01)) %>% mutate(y = uniform(x, L))
+df <- data.frame(x =seq(from = -(L+1), 
+                        to = L+1, 
+                        by = 0.01)) %>% 
+  mutate(y = uniform(x, L))
 
 # Plot
-ggplot(data = df, aes(x, y)) +
-  geom_area(fill = "orange", alpha = 0.5) +
+ggplot(data = df, 
+       aes(x, y)) +
+  geom_area(fill = "orange", 
+            alpha = 0.5) +
   ylim(c(0, 1/(2 * L) + 0.2 * 1/(2 * L))) + # Set the limits of the y axis
   geom_hline(yintercept = 0) + # Add y axis
   geom_vline(xintercept = 0) + # Add x axis
@@ -245,13 +250,23 @@ L <- 2
 X <- 2
 
 # Create a data frame for plotting
-df <- data.frame(x =seq(from = -(L+1), to = L+1, by = 0.01)) %>% mutate(y = uniform(x, L))
-df_p <- data.frame(x =seq(from = -(L+1), to = X, by = 0.01)) %>% mutate(y = uniform(x, L))
+df <- data.frame(x =seq(from = -(L+1), 
+                        to = L+1, 
+                        by = 0.01)) %>% 
+  mutate(y = uniform(x, L))
+df_p <- data.frame(x =seq(from = -(L+1), 
+                          to = X, 
+                          by = 0.01)) %>% 
+  mutate(y = uniform(x, L))
 
 # Plot
-ggplot(data = df, aes(x, y)) +
-  geom_area(fill = "orange", alpha = 0.5) + # Plot distribution function
-  geom_area(data = df_p, fill = "orange", alpha = 1) + # Plot area under the curve
+ggplot(data = df, 
+       aes(x, y)) +
+  geom_area(fill = "orange", 
+            alpha = 0.5) + # Plot distribution function
+  geom_area(data = df_p, 
+            fill = "orange", 
+            alpha = 1) + # Plot area under the curve
   ylim(c(0, 1/(2 * L) + 0.2 * 1/(2 * L))) + # Set the limits of the y axis
   geom_hline(yintercept = 0) + # Add y axis
   geom_vline(xintercept = 0) + # Add x axis
@@ -283,10 +298,14 @@ cuniform <- function(x, L)
 L <- 2
 
 # Create a data frame for plotting
-df <- data.frame(x =seq(from = -(L+1), to = L+1, by = 0.01)) %>% mutate(y = cuniform(x, L))
+df <- data.frame(x =seq(from = -(L+1), 
+                        to = L+1, 
+                        by = 0.01)) %>% 
+  mutate(y = cuniform(x, L))
 
 # Plot
-ggplot(data = df, aes(x, y)) +
+ggplot(data = df, 
+       aes(x, y)) +
   geom_step(color = "orange") + # Plot cumulative distribution function
   ylim(c(0, 1)) + # Set the limits of the y axis
   geom_hline(yintercept = 0) + # Add y axis
@@ -315,11 +334,16 @@ linear <- function(x)
   ifelse( x > 0 & x <= 1, 2 * x, 0 ))
 
 # Create a data frame for plotting
-df <- data.frame(x =seq(from = 0, to = 1, by = 0.01)) %>% mutate(y = linear(x))
+df <- data.frame(x =seq(from = 0, 
+                        to = 1, 
+                        by = 0.01)) %>% 
+  mutate(y = linear(x))
 
 # Plot
-ggplot(data = df, aes(x, y)) +
-  geom_area(fill = "orange", alpha = 0.5) +
+ggplot(data = df,
+       aes(x, y)) +
+  geom_area(fill = "orange", 
+            alpha = 0.5) +
   ylim(c(0, 2)) + # Set the limits of the y axis
   geom_hline(yintercept = 0) + # Add y axis
   geom_vline(xintercept = 0) + # Add x axis
@@ -348,10 +372,14 @@ clinear <- function(x)
   ifelse( x > 0 & x <= 1, x^2, 1 ))
 
 # Create a data frame for plotting
-df <- data.frame(x =seq(from = -0.2, to = 1.2, by = 0.001)) %>% mutate(y = clinear(x))
+df <- data.frame(x =seq(from = -0.2, 
+                        to = 1.2, 
+                        by = 0.001)) %>% 
+  mutate(y = clinear(x))
 
 # Plot
-ggplot(data = df, aes(x, y)) +
+ggplot(data = df, 
+       aes(x, y)) +
   geom_step(color = "orange") +  # Plot cumulative distribution function
   ylim(c(0, 1)) + # Set the limits of the y axis
   geom_hline(yintercept = 0) + # Add y axis
@@ -378,11 +406,16 @@ cubic <- function(x)
   ifelse( x > 0 & x <= 1, 4 * x^3, 0 ))
 
 # Create a data frame for plotting
-df <- data.frame(x =seq(from = 0, to = 1, by = 0.01)) %>% mutate(y = cubic(x))
+df <- data.frame(x =seq(from = 0, 
+                        to = 1, 
+                        by = 0.01)) %>% 
+  mutate(y = cubic(x))
 
 # Plot
-ggplot(data = df, aes(x, y)) +
-  geom_area(fill = "orange", alpha = 0.5) +
+ggplot(data = df, 
+       aes(x, y)) +
+  geom_area(fill = "orange",
+            alpha = 0.5) +
   ylim(c(0, 4)) + # Set the limits of the y axis
   geom_hline(yintercept = 0) + # Add y axis
   geom_vline(xintercept = 0) + # Add x axis
@@ -397,7 +430,7 @@ This shows that the function is a valid probability distribution function. Howev
 
 ## A simple random utility discrete choice model
 
-We are now ready to deploy a probability distribution function to the probability of choosing an alternative. Returning to our binary choice example, lets assume that the difference in the random utility terms follows the uniform distribution with parameters $-L$ and $L$, that is:
+We are now ready to deploy a probability distribution function to the probability of choosing an alternative. Returning to our binary choice example, we will assume that the difference in the random utility terms follows the uniform distribution with parameters $-L$ and $L$, that is:
 $$
 \epsilon_{\text{New-Phone}} - \epsilon_{\text{Do-Nothing}} \sim U(-L, L)
 $$
