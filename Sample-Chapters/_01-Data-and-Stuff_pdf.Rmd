@@ -1,11 +1,15 @@
 ---
-title: "Chapter 01: Data and Stuff"
-author: 
-date:
-output: pdf_document
-bibliography: [book.bib, packages.bib]
-header-includes:
-  - \usepackage{lscape}
+title: 'Chapter 01: Introduction to Discrete Data in R'
+author: 'null'
+date: 'null'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+bibliography:
+- book.bib
+- packages.bib
+header-includes: \usepackage{lscape}
 ---
 
 >  "Essentially, all models are wrong, but some are useful."
@@ -17,6 +21,8 @@ header-includes:
 > --- Daniel Keys Moran
 
 ## What are models?
+
+Models propose a simplified representation of the reality, which is useful to develop a common ground for describing, analyzing and understanding complex phenomena.
 
 Model building requires three things:
 
@@ -30,11 +36,11 @@ This is true whether the model is physical (for instance a sculpture), conceptua
 
 In the case of a sculpture, the raw materials can be marble, wood, or clay; the tools chisels, mallet, and spatula; and the technique the mastery of the sculptor when working with the tools and the materials. Anyone can try sculpture, and most people can create sculptures. These kind of models are evaluated by their aesthetic value, not necessarily their usefulness. But if the sculpture is poorly balanced and falls and breaks, then its value is limited by its structural integrity - the skill of the sculptor matters even if only in this sense.
 
-In the case of a mental map, the raw materials are ideas, the tools are a drawing surface and tools for writing, or maybe an app, and the technical expertise is the ability of the modeler to organize ideas in a useful way. There are useful conceptual models, and conceptual models that are less useful. Figure \@ref(fig:fig-conceptual-models) shows two example of conceptual models.
+In the case of a mental map, the raw materials are ideas, the tools are a drawing surface and tools for writing, or maybe an app, and the technical expertise is the ability of the modeler to organize ideas in a useful way. There are useful conceptual models, and conceptual models that are less useful. Figure \@ref(fig:fig-conceptual-models) shows two example of conceptual models. The first example on the left, while displaying creative graphic features, is rather difficult to make sense of. The second one, on the right, welcomes a much more intuitive interpretation, with simplified graphic features.
 
-In the case of mathematical/statistical models, the raw materials are data; the tools are descriptive statistics and statistical plots, and various forms of regression analysis; and the technical expertise is the ability of the modeler to select tools that are appropriate to the data, and to convince the data to "speak": in other words, to extract information from the data. As Moran said in the aphorism quoted at the top of this section, you can have data without information, but no information without data. Technical mastery is the degree to which a modeler can obtain information from data that is useful, accurate, and precise, to the extent that the raw materials permit.
+In the case of mathematical/statistical models, the raw materials are data; the tools are descriptive statistics and statistical plots, and various forms of regression analysis; and the technical expertise is the ability of the modeler to select tools that are appropriate to the data, and to bring the data to "speak": in other words, to extract information from the data. As Moran said in the aphorism quoted at the top of this section, you can have data without information, but no information without data. Technical mastery is the degree to which a modeler can obtain information from data that is useful, accurate, and precise, to the extent that the raw materials permit.
 
-Before moving on to the technical skills required for modeling, it is important to understand the raw materials and the tools. The objective of this note is to introduce some important concepts concerning data and data manipulation, and some useful tools.
+Before moving on to the technical skills required for modeling, it is important to understand the raw materials and the tools. The objective of this note is to introduce some important concepts concerning data and data manipulation, and some useful tools, with an emphasis on discrete data unique features. 
 
 \newpage
 
@@ -51,21 +57,21 @@ knitr::include_graphics(rep("01-Figure-1.jpg"))
 
 The source for the document you are reading is an `R` Notebook. Notebooks are a form [_literate programming_](https://en.wikipedia.org/wiki/Literate_programming), a style of document that uses code to illustrate a discussion, as opposed to the traditional programming style that uses natural language to discuss/document the code. It flips around the usual technical writing approach to make it more intuitive and accessible. 
 
-Throughout the notes, you will find examples of code in segments of text called _chunks_. This is an example of a chunk:
+Throughout the notes, you will find examples of code in segments of text called _chunks_. This is an example of a chunk, in the gray text box:
 ```{r hello-dca, tidy="formatR"}
 print("Hello, Discrete Choice Analysis!")
 ```
 
-If you are working with the Notebook version of the document, you can run the code by clicking the 'play' icon on the top right corner of the chunk. If you are reading the web-book version of the document, you will often see that the code has already been executed. You can still try it by copying and pasting into your `R` or RStudio console. Whichever way you are working, you might want to give it a try now! You will see that the chunk of code above instructed `R` (and trough `R` the computer) to `print` (or display on the screen) some text.
+If you are working with the Notebook version of the document, you can run the code by clicking the 'play' icon on the top right corner of the chunk. If you are reading the web-book version of the document, you will often see that the code has already been executed, right below the chunk. You can still try it by copying and pasting into your `R` or RStudio console. Whichever way you are working, you might want to give it a try now! You will see that the chunk of code above instructed `R` (and trough `R` the computer) to `print` (or display on the screen) some text.
 
 ## Learning objectives
 
 In this practice, you will learn about:
 
 1. Different ways to measure stuff.
-2. Basic operations in `R`.
+2. Importing data and packages in `R`.
 3. Data classes, data types, and data transformations.
-4. The use of packages in `R`.
+4. Indexing and data manipulation
 5. Basic visualization.
 
 ## Suggested readings
@@ -79,7 +85,7 @@ Previously we said that data are the raw material for modeling, but we did not s
 
 >factual information (such as measurements or statistics) used as a basis for reasoning, discussion, or calculation
 
-As an aside, it is interesting to note that Tukey's classic Exploratory Data Analysis [@Tuckey1977] does not define 'data' in the glossary!
+As an aside, it is interesting to note that Tukey's classic book Exploratory Data Analysis [@Tuckey1977] does not define 'data' in the glossary!
 
 Measurement theory is a branch of mathematics concerned with observing and recording the _facts_ about something. It is important to note that measurements are not the same as the thing being measured; however, we would like the measurements to be a reasonably close approximation of the thing being measured - with "reasonable" in this case meaning that reasonable people can agree that the measurements are a close approximation of the thing being measured (measurement theory breaks down in the face of unreasonable people). If this is not the case, the measurements obtained might be pretty useless, and an inadequate way to learn anything valuable from the thing we are measuring.
 
@@ -97,9 +103,9 @@ Generally, there are multiple ways of measuring something, but not all of them a
 
 Two broad scales of measurement are as follows:
 
-### Categorical
+### Categorical measurements
 
-Categorical measurements assign a label or category to the thing being measured. For example, a way to measure different brands of peanut butter could be to measure their sugar content, their fat content, their consistency, and so on, and in this way describe what makes each brand unique. A different way to do this would be to label one brand "Spooky" and another "Peter's". This has the effect of reducing a large amount of information to a much simpler category. Is this loss of information inappropriate? Well, it really depends on what is the intended use of data! Categorical measurements are interesting because they may tell us something about the power of brands!
+Categorical measurements assign a label or category to the thing being measured. For example, a way to measure different brands of peanut butter could be to measure their sugar content, their fat content, their consistency, and so on, and in this way describe what makes each brand unique. A different way to do this would be to label one brand "Spooky" and another "Peter's". This has the effect of reducing a large amount of information to a much simpler category. Is this loss of information inappropriate? Well, it really depends on what is the intended use of data! Categorical measurements are interesting because they may tell us something about the power of brands! They are also relevant when specific characteristics cannot be measured or observed.
 
 Within the class of categorical variables there are two distinct scales of measurement:
 
@@ -107,9 +113,9 @@ Within the class of categorical variables there are two distinct scales of measu
 
 - Ordinal scale. When the categories follow a natural or logical sequence. A common way of measuring opinions is by means of the [Likert scale](https://en.wikipedia.org/wiki/Likert_scale), which classifies responses for instance as "strongly disagree", "disagree", "neutral", "agree", and "strongly agree". In this case, it is sensible to order the responses, since "strongly agree" is probably closer to "agree" than to "strongly disagree". Responses of this type are often represented by numbers, say, from 1 to 5, however, it is a mistake to treat the measurements as numbers instead of labels. When treated as numbers there is a temptation to think of the difference between 4 and 5 and the difference between 3 and 4 as being equivalent, when in fact the strength of disagreement could be stronger than the strength of agreement (or vice versa). In other words, the interval between "strongly disagree" and "disagree" may not be the same as "agree" and "strongly agree". With ordinal scales we do not know that, all that we know is that they measure a different opinion.
 
-Sometimes, different measurement scales might represent different behavioral mechanisms, as Bhat and Pulugurta discuss in their comparison of categorical and ordinal measurements for vehicle ownership [@Bhat1998comparison].
+Sometimes, different measurement scales might represent different behavioral mechanisms, as Bhat and Pulugurta discuss in their comparison of categorical and ordinal measurements for vehicle ownership, which respectively correspond to unordered and ordered response mechanisms [@Bhat1998comparison]. 
 
-### Quantitative
+### Quantitative measurements
 
 Quantitative measurements assign a number to an attribute, and the number quantifies the presence, strength, or intensity of the attribute. Within this class of variables, there are also two ways of measuring things.
 
@@ -120,11 +126,11 @@ is not four times as cold as $-3\,^{\circ}\mathrm{C}$.
 
 - Ratio scale. When there is an absolute value of zero to the thing being measured (to indicate absence!), attributes can be measured in a ratio scale. This combines the features of the previous scales of measurement: a number is essentially a label that follows a logical order and with differences that are meaningful. In addition to that, the ratios of variables are meaningful. For example, twenty dollars are twice as valuable as ten, and zero is the absence of value. Weight is a way of measuring mass, and zero is the absence of mass. Two hundred kilograms is twice as much mass as one hundred kilograms.
 
-It is important to understand the different scales of measurement to be able to choose the appropriate tools for each. More on this below. But first, we can bring some actual data to play with.
+It is important to understand the different scales of measurement to be able to choose the appropriate tools for each. More on this later. But first, we can bring some actual data to play with.
 
 ## Importing data
 
-There are several different ways of importing data in `R`. For this example, we will use part of a dataset that was analyzed by Whalen et al. [-@Whalen2013].
+There are several different ways of importing data in `R`. For this example, we will use a sample of a dataset that was analyzed by Whalen et al. [-@Whalen2013].
 
 At the very beginning, it is good practice to clear the workspace, to ensure that there are no extraneous items there. The workspace is where objects reside in memory during a session with `R`. The function for removing variables from the workspace is `rm()`. Another useful function is `ls`, which retrieves a list of things in the workspace. So essentially we are asking `R` to remove all things in the workspace: 
 ```{r, tidy="formatR"}
@@ -133,7 +139,7 @@ rm(list = ls())
 
 Once that the workspace is empty, we can proceed to load a few packages that are useful. Packages are the basic units of reproducible code in the `R` multiverse. Packages allow a developer to create a self-contained unit of code that often is meant to achieve some task. For instance, there are packages in `R` that specialize in statistical techniques, such as [cluster analysis](https://cran.r-project.org/web/packages/cluster/index.html), [visualization](https://cran.r-project.org/web/packages/ggplot2/index.html), or [data manipulation](https://cran.r-project.org/web/packages/dplyr/). Some packages can be miscellaneous tools, or contain mostly datasets. Packages are a very convenient way of maintaining code, data, and documentation, and also of sharing all these resources.
 
-Packages can be obtained from different sources (including making them!). One of the reasons why `R` has become so successful is the relative facility with which packages can be distributed. A package that I use frequently is called `tidyverse`. The `tidyverse` is a collection of functions for data manipulation, analysis, and visualization. This package can be downloaded and installed in your personal library of `R` packages by using the function `install.packages`, as follows:
+Packages can be obtained from different sources (including making them!). One of the reasons why `R` has become so successful is the relative facility with which packages can be distributed. A package frequently used is called `tidyverse`. The `tidyverse` is a collection of functions for data manipulation, analysis, and visualization. This package can be downloaded and installed in your personal library of `R` packages by using the function `install.packages`, as follows:
 ```{r eval=FALSE, tidy="formatR"}
 install.packages("tidyverse")
 ```
@@ -150,7 +156,7 @@ library(mlogit)
 Occasionally there are messages displayed when loading a package. These messages are informative (they ask you to cite them in a certain style) or may give you warnings, for instance that identically named functions exist in several packages.  
 
 The function that we need to read the sample dataset is `read_csv()`, which is part of the `tidyverse` package. Note that you can name the value (or output) of a function by using `<-`. In this case, we wish to read an external file, and assign the results to an object called `mc_mode_choice`:
-```{r warning=FALSE, tidy="formatR"}
+```{r message=FALSE, tidy="formatR"}
 mc_mode_choice <- read_csv("Commute Mac.csv")
 ```
 
@@ -164,7 +170,7 @@ Here we can see that what we just read is a table with several variables: an id,
 summary(mc_mode_choice)
 ```
 
-This function will print a set of summary statistics for the variables in the table. The statistics are appropriate for the scale of measurement of the variable - that is, the way the variable is coded. Presently, all summary statistics are calculated for quantitative variables. We don't know if this makes sense, until we know what the variables are supposed to measure.
+This function will print a set of summary statistics for the variables in the table. The statistics presented by R are generally determined based on the scale of measurement of the variable - that is, the way the variable is coded. Presently, all summary statistics are calculated for quantitative variables (since all variables are coded that way as we will see below). We don't know if this makes sense, until we know what the variables are supposed to measure.
 
 For example, the variable `choice` measures the use of one mode of transportation. There are four values in this scale: 1 through 4, with each indicating one of "Cycle", "Walk", "Car", or "HSR" (the local transit agency in Hamilton, ON, Canada, where these data were collected). Check the results of the summary. What does it mean to say that the mean of choice is 2.618? Does this number make sense?
 
@@ -177,14 +183,14 @@ To understand why 2.618 of mode of transportation is not an appropriate summary 
 - Logical
 - Factor
 
-The ability to store information in different forms is important, because is allows `R` to distinguish what kind of operations are appropriate for a certain variable. Consider the following example (using indexing):
+The ability to store information in different forms is important, because it allows `R` to distinguish what kind of operations are appropriate for a certain variable. Consider the following example (using indexing):
 ```{r}
 mc_mode_choice$choice[1] - mc_mode_choice$choice[4]
 ```
 
-Let us unpack what the chunk above did. First, we call our table `mc_mode_choice`. The string sign `$` is used to reference columns in the table. Therefore, we asked `R` to go and look up the column `choice` in the table `mc_mode_choice`. Finally, the value between square brackets `[]` asks `R` to retrieve a value out of the column, in this example the first value in that column and then the fourth value. This system of referring to elements in tables is called _indexing_. Most computer languages use it, but the syntax is different. Again: `$` refers to a column, and `[]` is used to call values in that column.
+Let us unpack what the chunk above did. First, we call our table `mc_mode_choice`. The string sign `$` is used to reference columns in the table. Therefore, we asked `R` to go and look up the column `choice` in the table `mc_mode_choice`. Finally, the number between square brackets `[]` asks `R` to retrieve a specific element out of the column, in this example the first element in that column and then the fourth element. This system of referring to elements in tables is called _indexing_. Most computer languages use it, but the syntax is different. Again: `$` refers to a column, and `[]` is used to call elements in that column.
 
-As we can see, the difference between the two values retrieved is $1$. But what is the meaning of "cycle" minus "walk", for instance?
+As we can see, the difference between the two values (elements) retrieved is $1$. But what is the meaning of "cycle" minus "walk", for instance?
 
 In reality, the variable `choice` was measured as a nominal variable: it just corresponds to a label indicating what mode was chosen by a respondent. But `R` does not know this. Before `R` can treat it as a nominal variable, the numbers need to be converted to a _factor_. Factors are the way `R` stores categorical variables (both nominal and ordinal). To convert the variable `choice` to a factor, we use the `factor()` function:
 ```{r}
@@ -205,7 +211,7 @@ mc_mode_choice$choice[1] - mc_mode_choice$choice[4]
 
 The message indicates that the operation we tried to perform is not meaningful for factors. As long as `R` knows the appropriate measurement scale for your variables, it will try to steer you away from doing silly things with them.
 
-Other variables included in this table are for time. These variables measure the duration in minutes (actual or imputed) for trips by different modes. For example, `timecycle` is the duration of a trip by bicycle for the journey reported by the respondent.
+Other variables included in this table relate to time. These variables measure the duration in minutes (actual or imputed) for trips by different modes. For example, `timecycle` is the duration of a trip by bicycle for the journey reported by the respondent.
 
 Let us summarize this variable again:
 ```{r}
@@ -224,7 +230,7 @@ The RStudio also allows you to quickly see the variables and their format in the
 
 ## More on indexing and data manipulation
 
-Indexing is a way of making reference to elements in a data object. There are numerous indexing methods in `R` that are appropriate for specific objects. Tables such as `mc_mode_choice` (called _data frames_) can be indexed in a few different ways. For example the next three chunks are equivalent in that they call the second column (`choice`) and in that column the second element:
+Indexing is a way of making reference to elements in a data object. There are numerous indexing methods in `R` that are appropriate for specific objects. Tables such as `mc_mode_choice` (called _data frames_ in R) can be indexed in a few different ways. For example the next three chunks are equivalent in that they call the second column (`choice`) and in that column the second element:
 ```{r}
 mc_mode_choice[2, 2]
 ```
@@ -246,7 +252,7 @@ Indexing is useful to subset data selectively. For example, we know that travel 
 ```{r}
 time.Cycle.clean <- mc_mode_choice$timecycle[mc_mode_choice$timecycle != 100000]
 ```
-where `!=` is `R` for _not_. In other words, "find all values _not_ 100000, and retrieve them".
+where `!=` is `R` for _not equal to_. In other words, "find all values _not equal to_ 100000, and retrieve them".
 
 The result of this is a numeric object:
 ```{r}
@@ -289,7 +295,7 @@ The grammar of data manipulation in `dplyr` is a powerful way of working with da
 
 ## Visualization
 
-The last item in this section is related to visualization. Humans are very much visual creatures, and much can be learned from _seeing_ the data. For example, the data frame, in essence a table, is informative in many ways, but not particularly conducive to observe trends or regularities in the data. The summary statistics are also informative, but partial, and do not convey information to the same effect as a statistical plot. 
+The last item in this section is related to data visualization. Humans are very much visual creatures, and much can be learned from _seeing_ the data. For example, the data frame, in essence a table, is informative in many ways, but not particularly conducive to observe trends or regularities in the data. The summary statistics are also informative, but partial, and do not convey information to the same effect as a statistical plot. 
 
 Take the following list of summary statistics:
 ```{r}
@@ -315,7 +321,7 @@ ggplot(data = time.Active.clean) +
 
 The plot above was created using a package called `ggplot2`, also part of `tidyverse`. This package implements a grammar of graphics, and offers a very flexible way of creating plots in `R`.
 
-`ggplot2` works by layering a series of objects, beginning with a blank plot, to which we can add things. The command to create a plot is `ggplot()`. This command accepts different arguments. For instance, we can pass data to it in the form of a data frame. We can also indicate different _aesthetic_ values, that is, the things that we wish to plot. None of this is plotted, though, until we indicate which kind of _geom_ or geometric object we wish to plot. For instance, you can see above that to create the figure we used `geom_area`. This geom is essentially a smoothed histogram.
+`ggplot2` works by layering a series of objects, beginning with a blank plot, to which we can add things. The command to create a plot is `ggplot()`. This command accepts different arguments. For instance, we can pass data to it in the form of a data frame. We can also indicate different _aesthetic_ values, that is, the things that we wish to plot. None of this is plotted, though, until we indicate which kind of _geom_ or geometric object we wish to plot. For instance, you can see above that to create the figure we used `geom_area`. The corresponding geometric object is essentially a smoothed histogram.
 
 Let us break down these instructions. 
 
@@ -331,7 +337,7 @@ p
 
 We have yet to tell `ggplot2` what the x axis is, what the y axis is, what should be plotted in the x axis, and so on.
 
-We layer elements on a plot by using the `+` sign. It is only when we tell the package to add some geometric element that it renders something on the plot. In the previous case, we told `ggplot2` to use the `geom_area` to create a smoothed histogram. Next, we need to indicate which `aes` (short for _aesthetics_) we wish to plot. The aesthetics map aspect of the dataset to the plot. For instance, by saying that the aesthetics include something for x, we tell `ggplot2` that that something should be mapped to the x axis (in this case one of the time variables in the data frame). The second argument is `stat = 'bin'`, which indicates that there is a statistical operation that happens, namely the data are binned for smoothing (small bins lead to less smoothing, large bins lead to more smoothing; try it!). After playing around with a few bin values, I selected 5:
+We layer elements on a plot by using the `+` sign. It is only when we tell the package to add some geometric element that it renders something on the plot. In the previous case, we told `ggplot2` to use the `geom_area` to create a smoothed histogram. Next, we need to indicate which `aes` (short for _aesthetics_) we wish to plot. The aesthetics map aspect of the dataset to the plot. For instance, by saying that the aesthetics include something for x, we tell `ggplot2` that that something should be mapped to the x axis (in this case one of the time variables in the data frame). The second argument is `stat = 'bin'`, which indicates that there is a statistical operation that happens, namely the data are binned for smoothing (small bins lead to less smoothing, large bins lead to more smoothing; try it!). After playing around with a few bin values, a width of 5 was selected:
 ```{r}
 p + 
   geom_area(aes(x = timecycle), 
@@ -415,7 +421,7 @@ There are many different geoms that can be used in `ggplot2`. You can always con
 
 You can also check the `ggplot2` [Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf) for more information on how to use this package.
 
-A last note. Many other visualization alternatives (for instance, Excel) provide point-and-click functions for creating plots. In contrast, `ggplot2` in `R` requires that the plot be created by meticulously instructing the package what to do. While this is more laborious, it also means that you have complete control over the creation of plots, which in turn allows you to create more flexible and creative visuals.
+A last note. Many other visualization alternatives (for instance, Excel) provide point-and-click functions for creating plots. In contrast, `ggplot2` in `R` requires that the plot be created by meticulously instructing the package what to do. While this is more laborious, it also means that you have complete control over the creation of plots, which in turn allows you to create more flexible and creative visuals. You can also easily recreate the same figures with slightly modified data, say you had an error in your initial database.
 
 ## Exercise
 
@@ -425,9 +431,9 @@ A last note. Many other visualization alternatives (for instance, Excel) provide
 
 2. Why are models on a 1-to-1 scale undesirable?
 
-3. Invoke dataset `Mode` from package `mlogit`. To do this you need to first load the package. Once you have done so, usage of datasets is as follows:
+3. Invoke dataset `Mode` from package `mlogit`. To do this you need to first load the package. This is a dataset with choices about mode of transportation. 
 
-This is a dataset with choices about mode of transportation.
+Once you have loaded the dataset, answer the following questions:
 
 4. Describe this dataset. How many variables are there and of which type (i.e., categorical/quantitative)?
 

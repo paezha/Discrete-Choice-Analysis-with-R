@@ -26,12 +26,12 @@ In the preceding chapters we have made the assumption that an observer/analyst c
 
 In addition to providing a plausible description of the decision-making mechanism of interest, a model can be used to examine how behavior _might_ change if the conditions of the decision-making situation changed. McFadden, in one of the seminal papers on discrete choice analysis [see @McFadden1974measurement], was concerned with travel demand forecasting. The basis for forecasting demand was a model of mode choice that helped to tease out the factors that influence the choice between car and bus as a mode for commuting to work. Once that this model was estimated, McFadden was interested in the level of demand of a new mode, a rail system called BART (Bay Area Rail Transit). This system had not been built yet, and so obtaining estimates of level of demand was an important part of policy analysis. In other words, McFadden was interested in how behavior _might_ change with the introduction of a new mode of transportation. What would be the demand for the new mode at a certain fare? If fares changed? If waiting times for BART were longer or shorter? And so on.
 
-You will hopefully become familiar with this process:
+You will hopefully become familiar with this process, which consists in two main steps:
 
 1. Estimate and select a plausible model for the behavior of interest.
 2. Analyze scenarios: what would happen if?
 
-This process is valuable in several ways [@King1993models]. **First**, it helps to clarify issues that are of policy interest (p. 365). Modelers need to document their assumptions, specification choices, and so on, resulting in a systematic approach of simplification (and remember, all models are wrong, but some are useful). **Secondly**, the modeling process and subsequently the use of models, help to enforce discipline in analysis and discourse. The behavior of models is to some extent limited by their mechanics, and the results should reflect this. For example, incremental changes in the inputs should result in plausible changes in the predictions. Making predictions outside of the calibration range of the model (beyond the range of values of variables used to estimate the model) will likely result in predictions that are implausibly out of bounds. As King and Kraemer note [-@King1993models] "the results of radical changes are unlikely to be predicted accurately by models based on the performance under the status quo" (p. 365). And models, when used to analyze scenarios, provide cautionary advice on _what not to do_ by revealing the possible consequences of a bad intervention or policy. In this way, models can help inform policy-makers about the range of possible outcomes and whether these outcomes are in a sense in some "acceptable range" [@King1993models, pp. 365-366]. In other words, models help to probe the limits of the plasticity of human behavior.
+This process is valuable in several ways. **First**, it helps to clarify issues that are of policy interest [@King1993models, pp 365]. Modelers need to document their assumptions, specification choices, and so on, resulting in a systematic approach of simplification (and remember, all models are wrong, but some are useful). **Secondly**, the modeling process and subsequently the use of models, help to enforce discipline in analysis and discourse. The behavior of models is to some extent limited by their mechanics, and the results should reflect this. For example, incremental changes in the inputs should result in plausible changes in the predictions. Making predictions outside of the calibration range of the model (beyond the range of values of variables used to estimate the model) will likely result in predictions that are implausibly out of bounds. As King and Kraemer note [-@King1993models] "the results of radical changes are unlikely to be predicted accurately by models based on the performance under the status quo" (p. 365). And models, when used to analyze scenarios, provide cautionary advice on _what not to do_ by revealing the possible consequences of a bad intervention or policy. In this way, models can help inform policy-makers about the range of possible outcomes and whether these outcomes are in a sense in some "acceptable range" [@King1993models, pp. 365-366]. In other words, models help to probe the limits of the plasticity of human behavior.
 
 We will explore the preceding issues in this chapter, looking at different ways to derive behavioral insights based on models of choices.
 
@@ -88,7 +88,7 @@ Five heating systems are considered in this choice problem:
 - Electric Room (er)
 - Heat Pump (hp)
 
-These heating systems differ in terms of their installation cost (ic) and annual operation cost (oc). See the following table with the median installation cost, annual operation costs, and proportion of choices in sample:
+These heating systems differ in terms of their installation cost (ic) and annual operation cost (oc). See the following table with the median installation cost, annual operation costs, and proportion of choices in the sample:
 ```{r}
 Proportion <- Heating %>% 
   group_by(depvar) %>%
@@ -123,7 +123,7 @@ summary(Heating[,13:16]) %>%
   kable_styling()
 ```
 
-The dataset is in "wide" form, which means that there is one record per decision making unit (i.e. per household). The package `mlogit` works with data in "long" format, but I find it easier to work with the dataframes in their wide format for the purpose of post-estimation analysis. Fortunately (since changing the format of a dataset is a tedious if fairly elementary process), there is a function for changing the format. We will call this function when required:
+The dataset is in "wide" form, which means that there is one record per decision-making unit (i.e. per household). The package `mlogit` works with data in "long" format, but it is easier to work with the dataframes in their wide format for the purpose of post-estimation analysis. Fortunately (since changing the format of a dataset is a tedious if fairly elementary process), there is a function for changing the format. We will call this function when required:
 ```{r}
 H <- mlogit.data(Heating, 
                  shape = "wide", 
@@ -131,7 +131,7 @@ H <- mlogit.data(Heating,
                  varying = c(3:12))
 ```
 
-In the above, the argument `varying` lets the function know that the variables in the columns 3 through 12 in the dataframe are alternative-specific, and therefore vary across utility functions. Once that the format of the table has been changed from "wide" to "long", the number of rows changes from $900$ (the number of decision makers) to $4500$: this is the number of decision makers ($900$) times the number of alternatives ($5$).
+In the above, the argument `varying` lets the function know that the variables in the columns 3 through 12 in the dataframe are alternative-specific, and therefore vary across utility functions. Once that the format of the table has been changed from "wide" to "long", the number of rows changes from $900$ (the number of decision makers) to $4500$: this is the number of decision-makers ($900$) times the number of alternatives ($5$). There is accordindgly one row per choice situtation.
 
 Before estimating an initial model, we need to define the utility functions that we wish to estimate. Since there are five alternatives, we define the following five functions (with the electric central system as the reference level):
 $$
@@ -152,6 +152,7 @@ model1 <- mlogit(depvar ~ ic,
                choice = "depvar", 
                reflevel = "ec", 
                varying = c(3:7))
+summary(model1)
 stargazer::stargazer(model1, 
                      header = FALSE,
                      single.row = TRUE,
@@ -163,6 +164,7 @@ We can verify that this is identical to estimating the model in the long format:
 model1 <- mlogit(depvar ~ ic,
                  H, 
                  reflevel = "ec")
+summary(model1)
 stargazer::stargazer(model1, 
                      header = FALSE,
                      single.row = TRUE,
@@ -171,7 +173,7 @@ stargazer::stargazer(model1,
 
 ## The meaning of the coefficients
 
-The coefficients of a discrete choice model are informative because they modulate the effect of various variables on the probabilities of selecting alternatives. For this reason, they can be used to understand how decision-makers trade-off different attributes.
+The coefficients of a discrete choice model are informative because they reflect the effect of various variables on the probabilities of selecting alternatives. For this reason, they can be used to understand how decision-makers trade off different attributes.
 
 The first thing to note is the sign of the coefficients. In the case of the binomial and multinomial logit model, the signs of the coefficients are informative because they tell us something about how the utility is affected by an attribute (either of the alternatives or the decision-maker). A positive sign indicates that the utility increases as the attribute increases. For instance, when considering mobile phones, we would expect speed to increase the utility of the alternatives. On the other hand, we would expect the price of the mobile phones to decrease their utility: the higher the cost, the lower the utility derived from an alternative. In this case, the expected sign of the coefficient for price would be negative.
 
@@ -244,7 +246,7 @@ In the case of discrete choice models, the dependent variable that we are intere
 $$
 M^{P_{in}}_{x_{jnk}} = \beta_{jk}(\delta_{ij}-P_{jn})
 $$
-where $P_{jn}$ is the probability of decision-maker $n$ selecting alternative $j$ and $\beta_{jk}$ is the coefficient that corresponds to variable $x_{jnk}$. This measures the change in probability as a result of a one-unit change in $x_{jnk}$.
+where $P_{jn}$ is the probability of decision-maker $n$ selecting alternative $j$ and $\beta_{jk}$ is the coefficient that corresponds to variable $x_{jnk}$. This measures the change in probability as a result of a one-unit change in $x_{jnk}$, where $k$ represents the attribute of interest.
 
 Two cases result from this expression: 
 
@@ -255,7 +257,7 @@ $$
 \end{array} 
 $$
 
-We discuss these cases next, but first, to continue to work with an example, we need to estimate the probability of choosing different systems at different levels of the installation costs. We use different levels of the installation cost because the effects will not be the same at different starting points in the logit curve!. 
+We discuss these cases next, but first, to continue to work with an example, we need to estimate the probability of choosing different systems at different levels of the installation costs. We use different levels of the installation cost because the effects will not be the same at different starting points in the logit curve! 
 
 To simulate this situation, we begin by copying the input dataframe. Here we copy one row from the input data frame for each of the levels that we wish to simulate, namely, at the minimum cost, at the mean cost, and at the maximum cost:
 ```{r}
@@ -349,7 +351,7 @@ data.frame(System = c("Electric Central",
                      "Maximum Cost" = 2))
 ```
 
-Of the different systems, the probability of choosing Electric Central changes the least as the cost of installation changes to the mean cost of such system, and the maximum cost. The probability of choosing Heat Pump is similar at its lowest installation cost to Electric Central, and changes substantially; it is true too that these systems can be more expensive. The probability of choosing Gas Central increases as its installation cost goes up, but this is in comparison to the maximum installation cost of every other system! Clearly, trying to understand the probabilities as the cost of every system changes is not straightforward. To understand the response of changing the installation cost by one unit at each of the three levels of cost above,_ _while other things remain constant_, we calculate the direct marginal effects, as shown next. 
+Of the different systems, the probability of choosing Electric Central changes the least as the cost of installation changes from the minimum cost to the mean cost of such system, and to the maximum cost. The probability of choosing Heat Pump is similar at its lowest installation cost to Electric Central, and changes substantially as we go to the maximum cost; it is true too that these systems can be more expensive. The probability of choosing Gas Central increases as its installation cost goes up, but this is in comparison to the maximum installation cost of every other system! Clearly, trying to understand the probabilities as the cost of every system changes is not straightforward. To understand the response of changing the installation cost by one unit at each of the three levels of cost above,_ _while other things remain constant_, we calculate the direct marginal effects, as shown next. 
 
 ### Direct marginal effects
 
@@ -411,7 +413,7 @@ $$
 
 It can be seen that the elasticity takes the marginal effect and makes it relative to the values of $y$ and $x_k$, in effect producing a unit-less summary measure that is interpreted as the percentage change in $y$ when attribute $x_i$ changes by $1$%.
 
-Following a similar logic as above, there are two cases of the elasticity, direct-point elasticity and cross-point elasticity. These will be discussed next.
+Following a similar logic as above, there are two cases of the elasticity: direct-point elasticity and cross-point elasticity. These will be discussed next.
 
 ### Direct-point elasticity
 
@@ -454,10 +456,10 @@ Or, for example:
 Again, Louviere et al. [-@Louviere2000stated, p. 58-59] show that, given a discrete choice model, the cross-point elasticity is given by:
 
 $$
-E^{P_{in}}_{x_{ink}} = -\beta_{jk}x_{jnk}P_{jn}
+E^{P_{in}}_{x_{jnk}} = -\beta_{jk}x_{jnk}P_{jn}
 $$
 
-where $P_{jn}$ is the probability of decision-maker $n$ selecting alternative $j$, given a variable $x_{jnk}$ and its corresponding coefficient $\beta_jk$.
+where $P_{in}$ is the probability of decision-maker $n$ selecting alternative $i$, given a variable $x_{jnk}$ and its corresponding coefficient $\beta_jk$.
 
 The cross-point elasticities of gas central heating at the min, mean, and max values of installation cost are:
 ```{r}
@@ -476,7 +478,7 @@ Fortunately, all the effects discussed above can be easily calculated once that 
 
 The marginal effects can be computed by means of the `effects` function. This function takes four arguments, as follows: an `mlogit` model, the name of the covariate (or attribute) that we wish to examine, the type of effect, and the data for calculating the effects.
 
-For the marginal effects, the "type" of the effect is "(r)elative" for the probability and "(a)bsolute"" for the covariate. In the case of the marginal effects at the minimum values of cost we use `model1` (our `mlogit` model object), indicate the covariate of interest (`ic` for installation cost), the type of effect ("ra"), and the input data (again, notice that the input data needs to be in long format; this is because the function needs to make predictions using the model):
+For the marginal effects, the "type" of the effect is "(r)elative" for the probability and "(a)bsolute"" for the covariate. In the case of the marginal effects at the minimum values of cost we use `model1` (our `mlogit` model output object), indicate the covariate of interest (`ic` for installation cost), the type of effect ("ra"), and the input data (again, notice that the input data needs to be in long format; this is because the function needs to make predictions using the model):
 ```{r}
 effects(model1,
         covariate = "ic",
@@ -515,7 +517,7 @@ You can verify that, with some small rounding error, they correspond to the valu
 
 ### Computing the elasticities
 
-As well, the direct-point and cross-point elasticities can be calculated using the `effects` function, however in this case the type of the effects is _relative_ both for the probability and for the covariate.
+As well, the direct-point and cross-point elasticities can be calculated using the `effects` function, however in this case the type of the effects is _relative_ both for the probability and for the covariate (type="rr").
 ```{r}
 effects(model1, 
         covariate = "ic", 
@@ -560,10 +562,10 @@ The marginal effects and elasticities discussed above are not appropriate for us
 When variable $x_{ink}$ is a dummy variable, the marginal effect must be calculated as follows:
 
 $$
-M^{P_{in}}_{x_{ink}} = P_{in}(x_{ink} = 1) - P_{in}(x_{ink} = 0)
+M^{P_{in}}_{x_{nk}} = P_{in}(x_{nk} = 1) - P_{in}(x_{nk} = 0)
 $$
 
-In other words, the marginal effect is the difference in the probability of choosing $i$ when the dummy variable is $1$ versus when it is $0$.
+In other words, the marginal effect is the difference in the probability of choosing $i$ when the dummy variable is $1$ versus when it is $0$. In this case, there is no direct or cross marginal effect, as the attribute does not vary according to the alternatives.
 
 We will estimate a second model that uses the regions variable to illustrate this (call this Model 2):
 ```{r results="asis"}
@@ -622,11 +624,11 @@ data.frame (Effect = c("valley to scostl",
 
 ## Willingness to pay and discount rate
 
-Another interesting question for policy analysis is at what rate are consumers willing to trade-off one attribute for another? In terms of the present example, this question could be:
+Another interesting question for policy analysis is at what rate are consumers willing to trade off one attribute for another? In terms of the present example, this question could be:
 
 > "How much are consumers willing to pay in increased installation costs for lower annual operating costs?"
 
-To answer this question, we first need an appropriate choice model, that is, one that includes both installation _and_ annual operation costs. The following utility functions are one possible model specification (with heat pump as the reference level):
+To answer this question, we first need an appropriate choice model, that is, one that includes both installation _and_ annual operation costs. The following utility functions are one possible model specification (with electric central as the reference level):
 $$
 \begin{array}{ccc}
 V_{\text{ec}} = & 0 & + \beta_1\text{ic.ec} + \beta_2\text{oc.ec}\\
@@ -682,11 +684,11 @@ This information can be used to assess the behavior of consumers.
 
 ## Simulating market changes
 
-To the extent that random utility models can capture consumer preferences, they are useful to understand patterns of substitution. Once a model has been estimated, simulating market changes involves creating a new data matrix to which the model can be applied. Let's take a look at two examples.
+To the extent that random utility models can capture consumer preferences, they are useful to understand patterns of substitution. Once a model has been estimated, simulating market changes (e.g.: increase in cost, reduction in quality, etc) involves creating a new data matrix to which the model can be applied. Let's take a look at two examples.
 
 ### Incentives
 
-Heat pumps are on average more expensive than other heating systems in terms of installation, but they are also more energy-efficient. Suppose then that the government, which has perhaps carbon emission targets that it wishes to meet, is analyzing a policy to encourage the adoption of heat pumps. The policy is to offer a rebate of 15% on the installation cost of heat pumps. As a consequence of this policy, consumers who install a heat pump and apply for the rebate pay only 85% of the cost of installation.
+Heat pumps are on average more expensive than other heating systems in terms of installation, but they are also more energy efficient. Suppose then that the government, which has perhaps carbon emission targets that it wishes to meet, is analyzing a policy to encourage the adoption of heat pumps. The policy is to offer a rebate of 15% on the installation cost of heat pumps. As a consequence of this policy, consumers who install a heat pump and apply for the rebate pay only 85% of the cost of installation.
 
 To simulate this scenario, we copy the input dataframe after simulating the rebate, replacing the cost of installation as follows: 
 ```{r}
@@ -694,7 +696,7 @@ H_rebate <- Heating %>%
   mutate(ic.hp = 0.85 * ic.hp)
 ```
 
-We can calculate the market shares of the "do nothing" and "rebate" policies and compare their shares (which are the mean values of the predictions):
+We can calculate the market shares of the "do nothing" (with the Heating dataset) and "rebate" (with the H_rebate dataset) policies and compare their shares (which are the mean values of the predictions):
 ```{r}
 data.frame(Policy = c("Do nothing", "15% rebate"),
            rbind(apply(predict(model3, 
@@ -713,13 +715,13 @@ data.frame(Policy = c("Do nothing", "15% rebate"),
                        mean)))
 ```
 
-In this example, we see that the market share (of probability of selecting a heat pumps) increases with the 15% rebate, while the market shares of other heating systems slightly decreases. This is in line with the policy objectives of the rebate on the installation of heat pumps.
+In this example, we see that the market share (or probability of selecting a heat pump) increases with the 15% rebate, while the market shares of other heating systems slightly decreases. This is in line with the policy objectives of the rebate on the installation of heat pumps.
 
 ### Introduction of a new system
 
-Now suppose for example that a more efficient electric system is developed using newer technologies. The cost of installation is more expensive due to the cost of the new technology (cost of installation is $200 dollars higher than the electric central system). On the other hand, the cost of operation is only 75% that of the electric central systems. The preceding analysis suggests that consumers are willing to spend more in installation in exchange for savings in operation costs. What would the market penetration of this new system be?
+Now suppose for example that a more efficient electric system is developed using newer technologies. The cost of installation is more expensive due to the cost of the new technology (cost of installation is $200 dollars higher than the electric central system). On the other hand, the cost of operation is only 75% that of the electric central systems. The preceding analysis suggests that consumers are willing to spend more in installation costs in exchange for savings in operation costs. What would the market penetration of this new system be?
 
-To simulate this situation, we begin by creating a model matrix based on Model 3: 
+To simulate this situation, we begin by creating a model matrix based on the output of Model 3: 
 ```{r}
 X <- model.matrix(model3)
 ```
@@ -730,13 +732,13 @@ alt <- index(H)$alt
 Xn <- X[alt == "ec",]
 ```
 
-Next, we'll modify the attributes to reflect the attributes of the new system (+$200 to ic and 0.75 of oc):
+Next, we will modify the attributes to reflect the attributes of the new system (+$200 to ic and 0.75 of oc):
 ```{r}
 Xn[, "ic"] <- Xn[, "ic"] + 200
 Xn[, "oc"] <- Xn[, "oc"] * 0.75
 ```
 
-We also want to identify the unique choice ids, which we will add as row names to the new systems:
+We also want to identify the unique choice ids, which we will add as row names to the new system:
 ```{r}
 chid <- index(H)$chid
 unchid <- unique(index(H)$chid)
@@ -761,7 +763,7 @@ This is the vector of logit probabilities:
 P <- exp_Xb / sum_exp_Xb[sort(chidb)]
 ```
 
-Convert to a matrix of logit probabilities, so that each row is the choice probabilities for a household:
+We now convert to a matrix of logit probabilities, so that each row is the choice probabilities for a household:
 ```{r}
 P <- data.frame(matrix(P, 
                        ncol = 6, 
@@ -785,7 +787,7 @@ The estimated penetration of the new system is the average probability of househ
 apply(P, 2, mean)
 ```
 
-The new technology is estimated to have a penetration rate of approximately $10.4\%$. Compare to the original proportions of the systems:
+The new technology is estimated to have a penetration rate of approximately $10.4\%$. Comparing to the original proportions of the systems:
 ```{r}
 apply(fitted(model3,
              outcome = FALSE), 
