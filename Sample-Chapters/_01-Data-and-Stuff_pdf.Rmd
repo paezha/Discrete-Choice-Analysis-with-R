@@ -46,7 +46,7 @@ Before moving on to the technical skills required for modeling, it is important 
 
 \begin{landscape}
 
-```{r fig-conceptual-models, out.width= "20 cm", fig.align = "center", fig.cap= "\\label{fig:fig-conceptual-models}Two Examples of Conceptual Models", echo=FALSE}
+```{r ch1-fig-conceptual-models, out.width= "20 cm", fig.align = "center", fig.cap= "\\label{fig:fig-conceptual-models}Two Examples of Conceptual Models", echo=FALSE}
 knitr::include_graphics(rep("01-Figure-1.jpg"))
 ```
 \end{landscape}
@@ -58,7 +58,7 @@ knitr::include_graphics(rep("01-Figure-1.jpg"))
 The source for the document you are reading is an `R` Notebook. Notebooks are a form [_literate programming_](https://en.wikipedia.org/wiki/Literate_programming), a style of document that uses code to illustrate a discussion, as opposed to the traditional programming style that uses natural language to discuss/document the code. It flips around the usual technical writing approach to make it more intuitive and accessible. 
 
 Throughout the notes, you will find examples of code in segments of text called _chunks_. This is an example of a chunk, in the gray text box:
-```{r hello-dca, tidy="formatR"}
+```{r ch1-hello-dca, tidy="formatR"}
 print("Hello, Discrete Choice Analysis!")
 ```
 
@@ -140,34 +140,45 @@ rm(list = ls())
 Once that the workspace is empty, we can proceed to load a few packages that are useful. Packages are the basic units of reproducible code in the `R` multiverse. Packages allow a developer to create a self-contained unit of code that often is meant to achieve some task. For instance, there are packages in `R` that specialize in statistical techniques, such as [cluster analysis](https://cran.r-project.org/web/packages/cluster/index.html), [visualization](https://cran.r-project.org/web/packages/ggplot2/index.html), or [data manipulation](https://cran.r-project.org/web/packages/dplyr/). Some packages can be miscellaneous tools, or contain mostly datasets. Packages are a very convenient way of maintaining code, data, and documentation, and also of sharing all these resources.
 
 Packages can be obtained from different sources (including making them!). One of the reasons why `R` has become so successful is the relative facility with which packages can be distributed. A package frequently used is called `tidyverse`. The `tidyverse` is a collection of functions for data manipulation, analysis, and visualization. This package can be downloaded and installed in your personal library of `R` packages by using the function `install.packages`, as follows:
-```{r eval=FALSE, tidy="formatR"}
+```{r ch1-install-tidyvarse, eval=FALSE, tidy="formatR"}
 install.packages("tidyverse")
 ```
 
 The function `install.packages` retrieves packages from the [Comprehensive R Archive Network](https://cran.r-project.org/), or CRAN for short. CRAN is a collection of sites (accessible via the internet) that carry identical materials for distribution for `R`.
 
 Installing a package is similar to acquiring a book for your library. The book is there, but if you want to use it, you need to bring it to your workspace, so to speak. The function for retrieving a package from the library is natural enough `library()`. For the moment, we need the following packages. If you have not done so, take a moment to install them, as illustrated in the previous chunk.
-```{r message=FALSE, tidy="formatR"}
-library(tidyverse)
-library(readr)
+```{r ch1-load-packages, message=FALSE, tidy="formatR"}
 library(mlogit)
+library(readr)
+library(stargazer)
+library(tidyverse)
 ```
 
 Occasionally there are messages displayed when loading a package. These messages are informative (they ask you to cite them in a certain style) or may give you warnings, for instance that identically named functions exist in several packages.  
 
 The function that we need to read the sample dataset is `read_csv()`, which is part of the `tidyverse` package. Note that you can name the value (or output) of a function by using `<-`. In this case, we wish to read an external file, and assign the results to an object called `mc_mode_choice`:
-```{r message=FALSE, tidy="formatR"}
+```{r ch1-read-mac-mode-choice, message=FALSE, tidy="formatR"}
 mc_mode_choice <- read_csv("Commute Mac.csv")
 ```
 
-It is possible to quickly examine the contents of the object by means of the function `head()`, which prints the top few rows of the object, if appropriate. For example:
-```{r , tidy="formatR"}
-head(mc_mode_choice)
+It is possible to quickly examine the contents of the object by means of the function `head()`, which prints the top few rows of the object, if appropriate. For example (showing only the first eight columns):
+```{r ch1-head-mac-mode-choice, tidy="formatR"}
+head(mc_mode_choice[,1:8])
 ```
 
-Here we can see that what we just read is a table with several variables: an id, a variable called `choice`, some variables for time, etc. Hopefully, when reading data there is also a metadata file, a data dictionary or something that defines what the data are. For example, what does it mean for choice to be "3" or "1"? Was time measured in hours, seconds, minutes, or something else? These variables will be described below. Before that, however, we can use a different function to get further insights into the contents of the table by means of the `summary()` function:
-```{r eval=FALSE, tidy="formatR"}
+Here we can see that what we just read is a table with several variables: an id, a variable called `choice`, some variables for time, etc. Hopefully, when reading data there is also a metadata file, a data dictionary or something that defines what the data are. For example, what does it mean for choice to be "3" or "1"? Was time measured in hours, seconds, minutes, or something else? These variables will be described below. Before that, however, we can use a different function to get further insights into the contents of the table by means of the `summary()` function (output not shown):
+```{r ch1-summary-mac-mode-choice, eval=FALSE, tidy="formatR"}
 summary(mc_mode_choice)
+```
+
+Or using packages such as `stargazer` to produce elegantly formatted tables (showing just the first five variables):
+```{r ch1-summary-mac-mode-choice-2, results='asis'}
+stargazer(as.data.frame(mc_mode_choice[,1:8]), # stargazer works on data frames
+          type = "latex", # the output is in latex
+          header = FALSE, # do not print package version info in the output
+          title = "Example of a table with summary statistics", # Title of table
+          omit.summary.stat = c("N", "median"), # summary statistics to omit from output
+          font.size = "small") # font size can be changed
 ```
 
 This function will print a set of summary statistics for the variables in the table. The statistics presented by R are generally determined based on the scale of measurement of the variable - that is, the way the variable is coded. Presently, all summary statistics are calculated for quantitative variables (since all variables are coded that way as we will see below). We don't know if this makes sense, until we know what the variables are supposed to measure.
@@ -184,7 +195,7 @@ To understand why 2.618 of mode of transportation is not an appropriate summary 
 - Factor
 
 The ability to store information in different forms is important, because it allows `R` to distinguish what kind of operations are appropriate for a certain variable. Consider the following example (using indexing):
-```{r}
+```{r ch1-example-indexing}
 mc_mode_choice$choice[1] - mc_mode_choice$choice[4]
 ```
 
@@ -193,19 +204,19 @@ Let us unpack what the chunk above did. First, we call our table `mc_mode_choice
 As we can see, the difference between the two values (elements) retrieved is $1$. But what is the meaning of "cycle" minus "walk", for instance?
 
 In reality, the variable `choice` was measured as a nominal variable: it just corresponds to a label indicating what mode was chosen by a respondent. But `R` does not know this. Before `R` can treat it as a nominal variable, the numbers need to be converted to a _factor_. Factors are the way `R` stores categorical variables (both nominal and ordinal). To convert the variable `choice` to a factor, we use the `factor()` function:
-```{r}
+```{r ch1-convert-to-factor}
 mc_mode_choice$choice <- factor(mc_mode_choice$choice, labels = c("Cycle", "Walk", "HSR", "Car"))
 ```
 
 In the chunk above, we ask `R` to replace the contents of `mc_mode_choice$choice` with the value (output) of the function `factor`. Factor takes the contents of `mc_mode_choice$choice` and converts to a factor with labels as indicated by the argument `labels =` (the function `c()` is used to concatenate several values).
 
 We can summarize the result, by using the `summary()` function but only for this variable:
-```{r}
+```{r ch1-summary-choices}
 summary(mc_mode_choice$choice)
 ```
 
 Now the summary is appropriate categorical variable, and is a table of frequencies: as seen there, there were 48 respondents who chose "Cycle", 711 who chose "Walk", and so on. What if we tried to calculate the difference?
-```{r}
+```{r ch1-factor-operation-is-wrong}
 mc_mode_choice$choice[1] - mc_mode_choice$choice[4]
 ```
 
@@ -214,14 +225,14 @@ The message indicates that the operation we tried to perform is not meaningful f
 Other variables included in this table relate to time. These variables measure the duration in minutes (actual or imputed) for trips by different modes. For example, `timecycle` is the duration of a trip by bicycle for the journey reported by the respondent.
 
 Let us summarize this variable again:
-```{r}
+```{r ch1-summary-time-cycle}
 summary(mc_mode_choice$timecycle)
 ```
 
 Notice that the shortest trip by bicycle would be less than a minute long, whereas the maximum is $100,000$ minutes long. Wait, what? That is over $1,600$ hours long. Is that even possible? In fact, no, it is not. The reason for these values is that when the original data were coded, whenever a respondent said that cycling was not a mode that was available to them, the time was coded as a very large and distinctive value. There were no trips taking $100,000$ minutes, this is just a code for "information not available". One problem with this manner of coding is that `R` does not know that the information is actually missing, but rather thinks it is a legitimate quantity. As a consequence, the mean is tens of thousands of minutes, despite the fact that half of all trips by bicycle were measured at less than 6 minutes long (see the median).
 
 Next we will see a way to address this. One last thing before doing so: you can check the class an object with the function `class`
-```{r}
+```{r ch1-class-data}
 class(mc_mode_choice$choice)
 class(mc_mode_choice$timecycle)
 ```
@@ -231,36 +242,36 @@ The RStudio also allows you to quickly see the variables and their format in the
 ## More on indexing and data manipulation
 
 Indexing is a way of making reference to elements in a data object. There are numerous indexing methods in `R` that are appropriate for specific objects. Tables such as `mc_mode_choice` (called _data frames_ in R) can be indexed in a few different ways. For example the next three chunks are equivalent in that they call the second column (`choice`) and in that column the second element:
-```{r}
+```{r ch1-more-indexing}
 mc_mode_choice[2, 2]
 ```
 
-```{r}
+```{r ch1-more-indexing-2}
 mc_mode_choice$choice[2]
 ```
 
-```{r}
+```{r ch1-more-indexing-3}
 mc_mode_choice[["choice"]][2]
 ``` 
 
 It is also possible to index by ranges of values. For example, the next chunks retrieves rows 2 to 5 from columns 7 and 8:
-```{r}
+```{r ch1-more-indexing-4}
 mc_mode_choice[2:5, 7:8]
 ```
 
 Indexing is useful to subset data selectively. For example, we know that travel times coded as $100,000$ are actually cases where the corresponding mode was not available. Suppose that we wanted to summarize travel time by bicycle but without those cases. We can use logical statements when indexing. We could tell `R` to retrieve only those values that meet a certain condition. In the next chunk, we save the results of this to a new variable:
-```{r}
+```{r ch1-coding-missing-observations}
 time.Cycle.clean <- mc_mode_choice$timecycle[mc_mode_choice$timecycle != 100000]
 ```
 where `!=` is `R` for _not equal to_. In other words, "find all values _not equal to_ 100000, and retrieve them".
 
 The result of this is a numeric object:
-```{r}
+```{r ch1-class-cycle-time}
 class(time.Cycle.clean)
 ```
 
 If we summarize this object now:
-```{r}
+```{r ch1-summary-cycle-clean}
 summary(time.Cycle.clean)
 ```
 
@@ -269,7 +280,7 @@ The summary statistics are much more sensible: the longest trip by bicycle was m
 Indexing is a powerful technique, but can be cumbersome (`mc_mode_choice$timecycle[mc_mode_choice$timecycle != 100000]`!). The package `dplyer` (part of the `tidyverse`) provides a grammar for data manipulation that is more intuitive. We will explore three of its elements here, namely the pipe operator (`%>%`), `select`, and `filter`.
 
 Suppose that we wanted to select two of the time variables, for cycling and walking, and wanted to retrieve only values other than the offending $100,000$, and save these values in a new object called `time.Active.clean`. In the grammar of `dplyr`, this is done as follows:
-```{r}
+```{r ch1-filtering-example}
 time.Active.clean <- mc_mode_choice %>% 
   select(c("timecycle", "timewalk")) %>% 
   filter(timecycle != 100000 & timewalk != 100000)
@@ -278,7 +289,7 @@ time.Active.clean <- mc_mode_choice %>%
 In natural language this would be something like "take mc_mode_choice and select columns timecycle and timewalk; pass the result to filter and retrieve all rows that meet the conditions timecycle != 100000 AND timewalk != 100000". The verb `select` is used to select columns from a data frame, and the verb `filter` to filter rows. 
 
 The alternative, using indexing would look something like this:
-```{r}
+```{r ch1-filtering-example-2}
 time.Active.clean.the.hard.way <- mc_mode_choice[mc_mode_choice$timecycle != 100000 & 
                                                    mc_mode_choice$timewalk != 100000, 7:8]
 ```
@@ -286,7 +297,7 @@ time.Active.clean.the.hard.way <- mc_mode_choice[mc_mode_choice$timecycle != 100
 The expression becomes more convoluted and not as easy to read. It is also easier to make mistakes when writing it.
 
 Compare the summaries of the two data frames, to make sure that they are identical:
-```{r}
+```{r ch1-summary-comparisons}
 summary(time.Active.clean)
 summary(time.Active.clean.the.hard.way)
 ```
@@ -298,12 +309,12 @@ The grammar of data manipulation in `dplyr` is a powerful way of working with da
 The last item in this section is related to data visualization. Humans are very much visual creatures, and much can be learned from _seeing_ the data. For example, the data frame, in essence a table, is informative in many ways, but not particularly conducive to observe trends or regularities in the data. The summary statistics are also informative, but partial, and do not convey information to the same effect as a statistical plot. 
 
 Take the following list of summary statistics:
-```{r}
+```{r ch1-summary-time-clean}
 summary(time.Active.clean)
 ```
 
 Now, compare to the following plot:
-```{r , tidy="formatR"}
+```{r ch1-plot-time-active, tidy="formatR"}
 ggplot(data = time.Active.clean) + 
   geom_area(aes(x = timecycle),
             stat = "bin", 
@@ -326,19 +337,19 @@ The plot above was created using a package called `ggplot2`, also part of `tidyv
 Let us break down these instructions. 
 
 First we ask `ggplot2` to create a plot that will use the data frame `time.Active.clean`. We will name this object `p`:
-```{r tidy="styler"}
+```{r ch1-plotting-step-1, tidy="styler"}
 p <- ggplot(data = time.Active.clean)
 ```
 
 Notice how `ggplot2` creates a blank plot, but it has yet to actually render any of the population information in there:
-```{r}
+```{r ch1-plotting-step-2}
 p
 ```
 
 We have yet to tell `ggplot2` what the x axis is, what the y axis is, what should be plotted in the x axis, and so on.
 
 We layer elements on a plot by using the `+` sign. It is only when we tell the package to add some geometric element that it renders something on the plot. In the previous case, we told `ggplot2` to use the `geom_area` to create a smoothed histogram. Next, we need to indicate which `aes` (short for _aesthetics_) we wish to plot. The aesthetics map aspect of the dataset to the plot. For instance, by saying that the aesthetics include something for x, we tell `ggplot2` that that something should be mapped to the x axis (in this case one of the time variables in the data frame). The second argument is `stat = 'bin'`, which indicates that there is a statistical operation that happens, namely the data are binned for smoothing (small bins lead to less smoothing, large bins lead to more smoothing; try it!). After playing around with a few bin values, a width of 5 was selected:
-```{r}
+```{r ch1-plotting-step-3}
 p + 
   geom_area(aes(x = timecycle), 
             stat = "bin", 
@@ -346,7 +357,7 @@ p +
 ```
 
 To improve the appearance of the plot, we also asked that the geom be rendered using a named color (blue for the color of the line, and also blue for the fill), and that it be transparent (the argument `alpha` controls opacity; a value of zero is transparent, a value of 1 is solid):
-```{r}
+```{r ch1-plotting-step-4}
 p + 
   geom_area(aes(x = timecycle), 
             stat = "bin", 
@@ -357,7 +368,7 @@ p +
 ```
 
 The final plot was obtained by layering a second geom (in yellow) for a different variable (time by walking), so that we could compare them:
-```{r}
+```{r ch1-plotting-step-5}
 ggplot(data = time.Active.clean) + 
   geom_area(aes(x = timecycle),
             stat = "bin",
@@ -374,7 +385,7 @@ ggplot(data = time.Active.clean) +
 ```
 
 Notice that the x axis is labeled as "timecycle" despite the fact that the plot also includes time by walking. This can be fixed by changing the label as follows:
-```{r}
+```{r ch1-plotting-step-6}
 ggplot(data = time.Active.clean) + 
   geom_area(aes(x = timecycle),
             stat = "bin",
@@ -396,7 +407,7 @@ What do we learn from this plot? Would it have been possible to learn the same f
 The plot above is an example of a _univariate_ plot, since it is created to display the distribution of a single variable, not the way two or more variables relate. Imagine now that you would like to see how mode choice and sidewalk density at the place of residence relate. An appropriate statistical plot for two variables, one of which is nominal (`choice`) and another that is continuous (`side_den`), is the boxplot.
 
 Before creating the plot, let us summarize these two variables (notice the use of the pipe operator):
-```{r}
+```{r ch1-summary-choice}
 mc_mode_choice %>% 
   select(c("choice", "side_den")) %>% 
   summary()
@@ -405,7 +416,7 @@ mc_mode_choice %>%
 Sidewalk density is measured in $km/km^2$.
 
 We will create the boxplot next. We begin by defining a `ggplot2` object with the data frame and aesthetics that we wish to use. In this case, we want to plot the categorical variable in the x axis and the quantitative variable in the y axis:
-```{r}
+```{r ch1-boxplot}
 ggplot(data = mc_mode_choice, 
        aes(x = choice, 
            y = side_den)) + 
@@ -415,13 +426,13 @@ ggplot(data = mc_mode_choice,
 What do we learn from this plot? Could we have derived a similar insight from the summary statistics?
 
 There are many different geoms that can be used in `ggplot2`. You can always consult the help/tutorial files by typing `??ggplot2` in the console. See:
-```{r eval=FALSE}
+```{r ch1-example-help, eval=FALSE}
 ?ggplot2
 ```
 
 You can also check the `ggplot2` [Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf) for more information on how to use this package.
 
-A last note. Many other visualization alternatives (for instance, Excel) provide point-and-click functions for creating plots. In contrast, `ggplot2` in `R` requires that the plot be created by meticulously instructing the package what to do. While this is more laborious, it also means that you have complete control over the creation of plots, which in turn allows you to create more flexible and creative visuals. You can also easily recreate the same figures with slightly modified data, say you had an error in your initial database.
+A last note. Many other visualization alternatives (for instance, Excel) provide point-and-click functions for creating plots. In contrast, creating plots programmatically, as we illustrated in this chapter with `ggplot2` in `R`, requires that the plot be created by meticulously instructing the package what to do. While this is more laborious, it also means that you have complete control over the creation of plots, which in turn allows you to create more flexible and creative visuals. You can also easily recreate the figures if your data changes, for instance if you are analyzing the same data set after cleaning an error in your initial database, or a different data set with similar variables.
 
 ## Exercise
 
