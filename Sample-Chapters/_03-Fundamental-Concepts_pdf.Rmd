@@ -1,8 +1,9 @@
 ---
 title: 'Chapter 03: Fundamental Concepts'
-author: "null"
-date: "null"
+author: ""
+date: ""
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 bibliography:
@@ -78,7 +79,7 @@ library(evd)
 ```
 
 
-## Choices mecanisms: Utility maximization
+## Choice mecanisms: Utility maximization
 
 A choice is a result of a decision-making process that can be described as follows: first, the decision-maker defines the problem for which a decision is required; second, the decision-maker identifies the existing alternatives and evaluates each alternative based on a set of attributes; finally, the decision-maker makes a choice based on a decision rule (also referred to as choice mechanism).
 
@@ -93,7 +94,7 @@ The decision rule refers to the internal mechanism or thought process made by th
 
 In this section, we will begin here by defining a conceptual model of choice where the decision rule is based on neo-classical economics, fundamentally consumer choice. The conceptual framework in neo-classical economics is based on the concept of _utility_.
 
-### What is utility?
+### What is _utility_?
 
 In simple terms, utility is a summary indicator of the pleasure, usefulness, enjoyment, or attractiveness associated with making a choice (for instance, buying a new phone).
 

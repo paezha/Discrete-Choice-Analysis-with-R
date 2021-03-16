@@ -1,7 +1,7 @@
 ---
 title: "Chapter 05: Practical issues in specification and estimation of discrete choice models"
-author: 
-date:
+author: ""
+date: ""
 output: pdf_document
 bibliography: [book.bib, packages.bib]
 always_allow_html: true
@@ -12,7 +12,7 @@ always_allow_html: true
 > --- Benjamin Brewster
 
 
-> "An ounce of practice is generally worth more than a ton of theory.
+> "An ounce of practice is generally worth more than a ton of theory."
 >
 > --- E.F. Schumacher
 
