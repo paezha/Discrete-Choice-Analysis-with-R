@@ -8,7 +8,7 @@ bibliography: [book.bib, packages.bib]
 
 > "Men’s actions are the best guides to their thoughts."
 >
-> --- John Locke, An Essay Concerning - Volume I
+> --- John Locke, An Essay Concerning Human Understanding - Volume I
 
 > "Prediction is not proof."
 >
@@ -322,20 +322,27 @@ data.frame(System = c("Electric Central",
       ic_min = ic_min %>% 
         select(starts_with("ic")) %>% 
         t() %>% 
-        as.numeric(),
+        as.numeric() %>%
+        round(1),
       p_min = p_model1_ic_min %>% 
-        as.numeric(),
+        as.numeric() %>%
+        round(3),
       ic_mean = ic_mean %>% 
         select(starts_with("ic")) %>% 
         t() %>% 
-        as.numeric(),
+        as.numeric() %>%
+        round(1),
       p_mean = p_model1_ic_mean %>% 
-        as.numeric(),
+        as.numeric() %>%
+        round(3),
       ic_max = ic_max %>% 
         select(starts_with("ic")) %>% 
-        t() %>% as.numeric(),
+        t() %>% 
+        as.numeric()  %>%
+        round(1),
       p_max = p_model1_ic_max %>% 
-        as.numeric()) %>%
+        as.numeric() %>%
+        round(3)) %>%
   kable(col.names = c("System",
                       "Cost",
                       "Probability",
