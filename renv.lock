@@ -163,10 +163,10 @@
     },
     "Rdpack": {
       "Package": "Rdpack",
-      "Version": "2.3.1",
+      "Version": "2.4",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "6cc7e06de6297f7021e7ed2dee56e742",
+      "Hash": "0ddbe51591ab1d3e7362e0da3727c837",
       "Requirements": [
         "rbibutils"
       ]
@@ -1542,14 +1542,12 @@
     },
     "pillar": {
       "Package": "pillar",
-      "Version": "1.7.0",
+      "Version": "1.8.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "51dfc97e1b7069e9f7e6f83f3589c22e",
+      "Hash": "f95cf85794546c4ac2b9a6ca42e671ff",
       "Requirements": [
         "cli",
-        "crayon",
-        "ellipsis",
         "fansi",
         "glue",
         "lifecycle",
@@ -1754,10 +1752,10 @@
     },
     "quantreg": {
       "Package": "quantreg",
-      "Version": "5.93",
+      "Version": "5.94",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "48485e5cbfe385caf47ce1d9442f5147",
+      "Hash": "b8b2b861526c344a7e16e5991fa5a4ab",
       "Requirements": [
         "MASS",
         "Matrix",
@@ -1957,10 +1955,10 @@
     },
     "s2": {
       "Package": "s2",
-      "Version": "1.0.7",
+      "Version": "1.1.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "cedf9ef196a446ee8080c14267e69410",
+      "Hash": "73748e27d17db3c1c400e8114fcf9824",
       "Requirements": [
         "Rcpp",
         "wk"
@@ -2020,10 +2018,10 @@
     },
     "sf": {
       "Package": "sf",
-      "Version": "1.0-7",
+      "Version": "1.0-8",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "d237b77320537f7793c7a4f83267cf50",
+      "Hash": "153da622b27630793858f24436bc0871",
       "Requirements": [
         "DBI",
         "Rcpp",
@@ -2156,12 +2154,11 @@
     },
     "tibble": {
       "Package": "tibble",
-      "Version": "3.1.7",
+      "Version": "3.1.8",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "08415af406e3dd75049afef9552e7355",
+      "Hash": "56b6934ef0f8c68225949a8672fe1a8f",
       "Requirements": [
-        "ellipsis",
         "fansi",
         "lifecycle",
         "magrittr",
