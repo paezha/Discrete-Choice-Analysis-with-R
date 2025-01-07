@@ -21,31 +21,32 @@ well as all packages used in the book.
     the programming language, it comes as a ‘core package’ here:
     <https://cran.rstudio.com/>
 
-    Currently, the environment runs with R 4.2.2. You can get it for Windows here:
+    Currently, the environment runs with R 4.2.2. You can get it for
+    Windows here:
 
-    https://cran.r-project.org/bin/windows/base/old/4.2.2/
+    <https://cran.r-project.org/bin/windows/base/old/4.2.2/>
 
-3.  Install RStudio (make sure to pick the correct operating system) -
+2.  Install RStudio (make sure to pick the correct operating system) -
     this is the an IDE here:
     <https://www.rstudio.com/products/rstudio/download/>.
 
-4.  Download the Rtools43 installer (Windows) and run it to install:
+3.  Download the Rtools43 installer (Windows) and run it to install:
     <https://cran.r-project.org/bin/windows/Rtools/rtools43/rtools.html>.
     If using a Mac this may be achieved through installing Xcode
     *untested*: <https://mac.r-project.org/tools/>
 
-5.  Download the code as a .zip file from this repository:
+4.  Download the code as a .zip file from this repository:
     <https://github.com/paezha/Applied-Spatial-Statistics>. The
     repository contains a `renv.lock` file that specifies all the
     versions of the packages used in the webbook. Unzip the file and
     store it in an apprioriate directory. Use this folder to work on the
     course.
 
-6.  Open up the `.RProj` file called “Applied-Spatial-Statistics”. This
+5.  Open up the `.RProj` file called “Applied-Spatial-Statistics”. This
     will be the `R` project you will work in all course. This will
     launch RStudio.
 
-7.  Install your first `R` package “Renv”
+6.  Install your first `R` package “Renv”
 
 <!-- -->
 
@@ -77,7 +78,7 @@ If this issue occurs again, repeat the above chunk.
     {isdas} package. Each template is 1 chapter/activity in the webook.
     Give the template a name, say “my-template-chapter-1”.
 
-10. Knit the “my-template-chapter-1.Rmd” to a .pdf file by clicking the
-    arrow on the “Knit” button and selecting “PDF”.
+10. Knit the “my-template-chapter-1.Rmd” to a .html file by clicking the
+    arrow on the “Knit” button.
 
-You’ve just knitted your first PDF file! Congrats.
+You’ve just knitted your first chapter! Congrats.
