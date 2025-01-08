@@ -36,29 +36,32 @@ well as all packages used in the book.
     *untested*: <https://mac.r-project.org/tools/>
 
 4.  Download the code as a .zip file from this repository:
-    <https://github.com/paezha/Applied-Spatial-Statistics>. The
-    repository contains a `renv.lock` file that specifies all the
-    versions of the packages used in the webbook. Unzip the file and
-    store it in an apprioriate directory. Use this folder to work on the
-    course.
+    <https://github.com/paezha/Discrete-Choice-Analysis-with-R>. To do
+    so, right-click on the “code” button on the top-right corner and
+    select “Download ZIP”. The repository contains a `renv.lock` file
+    that specifies all the versions of the packages used in the
+    [textbook](https://doi.org/10.1007/978-3-031-20719-8). Unzip the
+    file and store it in an appropriate directory. Use this folder to
+    work on the course.
 
-5.  Open up the `.RProj` file called “Applied-Spatial-Statistics”. This
-    will be the `R` project you will work in all course. This will
+5.  Open up the `.RProj` file called “Discrete-Choice-Analysis-with-R”.
+    This will be the `R` project you will work in all course. This will
     launch RStudio.
 
-6.  Install your first `R` package “Renv”
+6.  Install your first `R` package {renv}
 
 <!-- -->
 
-    install.packages("Renv")
+    install.packages("renv")
 
 7.  Close Rstudio. Restart your computer.
 
-8.  Double click the Applied-Spatial-Statistics.Rproj file. This will
-    relaunch RStudio. You will see a message in your console saying that
-    your library is out of synch with the lock file. Let’s make sure
-    they are both in sync by ‘restoring’ the state of your computer to
-    match the versions specified in the .lock file. Run the following:
+8.  Double click the Discrete-Choice-Analysis-with-R.Rproj file. This
+    will relaunch RStudio. You will see a message in your console saying
+    that your library is out of synch with the lock file. Let’s make
+    sure they are both in sync by ‘restoring’ the state of your computer
+    to match the versions specified in the .lock file. Run the
+    following:
 
 <!-- -->
 
@@ -75,8 +78,9 @@ If this issue occurs again, repeat the above chunk.
 9.  Restart `R` by going to Session -\> Restart R. Now click the “+”
     green button and open a new “R Markdown” file. Select the 4th option
     in the left panel “From Template”. Select a template option from the
-    {isdas} package. Each template is 1 chapter/activity in the webook.
-    Give the template a name, say “my-template-chapter-1”.
+    [{discrtr}](https://paezha.github.io/discrtr/) package. Each
+    template is one chapter in the book. Give the template a name, say
+    “my-template-chapter-1”.
 
 10. Knit the “my-template-chapter-1.Rmd” to a .html file by clicking the
     arrow on the “Knit” button.
